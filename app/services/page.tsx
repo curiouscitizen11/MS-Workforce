@@ -4,14 +4,14 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "General construction labour, site support, and flexible or project-based cover. White card is the baseline. Heights, confined space, asbestos and scaffold work only with the right ticket.",
+    "General construction labour, site support, and flexible or project-based cover from MS Workforce, a new construction labour hire business.",
 };
 
 const covers = [
   {
     kicker: "01",
     title: "General construction labour",
-    body: "Workers for general construction tasks. People who follow the site rules and the induction.",
+    body: "Workers for general construction tasks on site.",
     dark: false,
   },
   {
@@ -26,19 +26,6 @@ const covers = [
     body: "Workers for a set period, or for a particular piece of work, when a site needs more hands for a time.",
     dark: false,
   },
-];
-
-const tickets = [
-  {
-    name: "White card",
-    note: "Expected. We record the number and the expiry. This is the baseline.",
-  },
-  { name: "Work at heights", note: "Recorded." },
-  { name: "Asbestos class A", note: "Recorded." },
-  { name: "Asbestos class B", note: "Recorded." },
-  { name: "Confined space", note: "Recorded." },
-  { name: "Driver licence", note: "Recorded." },
-  { name: "First aid", note: "Recorded." },
 ];
 
 export default function ServicesPage() {
@@ -78,36 +65,13 @@ export default function ServicesPage() {
 
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">Tickets</p>
-          <h2 className="display mt-6">The ticket decides the work.</h2>
-          <ul className="mt-14 max-w-3xl border-b border-white/15">
-            {tickets.map((item) => (
-              <li key={item.name} className="stack-row border-t border-white/15">
-                <h3 className="text-xl font-semibold tracking-tight sm:col-span-5 sm:text-2xl">
-                  {item.name}
-                </h3>
-                <p className="text-base leading-relaxed text-white/70 sm:col-span-7">
-                  {item.note}
-                </p>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-12 max-w-2xl space-y-6 text-lg leading-relaxed text-white/75">
-            <p>
-              Work at heights only goes to someone with a work at heights
-              ticket. Confined space work only goes to someone with a confined
-              space ticket. Asbestos work only goes to someone with the matching
-              asbestos class ticket. Scaffold work only goes to a ticketed
-              scaffolder.
-            </p>
-            <p>
-              We do not offer demolition or asbestos removal as a general
-              service. We only put someone forward for that work when they hold
-              the ticket. Holding the ticket is the condition. It is not a claim
-              that those people are already on our books.
-            </p>
-          </div>
-          <div className="mt-12">
+          <p className="kicker text-white/50">Ask</p>
+          <h2 className="display mt-6">Email what you need.</h2>
+          <p className="lede mt-8 text-white/75">
+            Tell us the role, the place and the timing. A short email is
+            enough.
+          </p>
+          <div className="mt-10">
             <Link href="/contact" className="pill pill-light">
               Email what you need
             </Link>

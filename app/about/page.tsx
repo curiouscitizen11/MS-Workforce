@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const values = [
   {
     title: "Safety",
-    body: "Everyone deserves to go home safe. Inductions and safe work practices matter.",
+    body: "Everyone deserves to go home safe.",
   },
   {
     title: "Reliability",
@@ -44,8 +44,8 @@ export default function AboutPage() {
               only.
             </p>
             <p>
-              We are just getting started. The focus is doing the basics well:
-              the right ticket, a proper induction, and plain communication.
+              We are just getting started. The focus is doing the basics well,
+              and saying clearly what we can do.
             </p>
           </div>
         </div>

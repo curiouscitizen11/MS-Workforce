@@ -4,21 +4,17 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "For clients",
   description:
-    "Tell us the role, place, timing and tickets. We match someone who is available, then sight tickets, check right to work and the induction, and stay in contact. MS Workforce is new.",
+    "Tell us the role, place and timing. We match someone who is available, and stay in contact. MS Workforce is new.",
 };
 
 const steps = [
   {
-    title: "Tell us the role, place, timing and tickets",
-    body: "Email the role, where the site is, when you need someone, and which tickets the work requires.",
+    title: "Tell us the role, place and timing",
+    body: "Email the role, where the site is, and when you need someone.",
   },
   {
     title: "We match someone who is available",
-    body: "We match someone who is available, and whose tickets fit that work.",
-  },
-  {
-    title: "We sight tickets, right to work and induction",
-    body: "Before they start, tickets are sighted, right to work is checked, and the site induction is done.",
+    body: "We match someone who is available for that work.",
   },
   {
     title: "We stay in contact",
