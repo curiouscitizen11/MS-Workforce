@@ -1,101 +1,78 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata = {
-  title: "For Clients | MS Workforce",
-  description: "Looking for reliable construction workers in Sydney? MS Workforce offers straightforward labour hire with a focus on safety and clear communication.",
+export const metadata: Metadata = {
+  title: "For clients",
+  description:
+    "Tell us the role, place, timing and tickets. We match someone who is available, then sight tickets, check right to work and the induction, and stay in contact. MS Workforce is new.",
 };
+
+const steps = [
+  {
+    title: "Tell us the role, place, timing and tickets",
+    body: "Email the role, where the site is, when you need someone, and which tickets the work requires.",
+  },
+  {
+    title: "We match someone who is available",
+    body: "We match someone who is available, and whose tickets fit that work.",
+  },
+  {
+    title: "We sight tickets, right to work and induction",
+    body: "Before they start, tickets are sighted, right to work is checked, and the site induction is done.",
+  },
+  {
+    title: "We stay in contact",
+    body: "We stay in contact with you and with the worker while the placement is on.",
+  },
+];
 
 export default function ClientsPage() {
   return (
     <>
-      <section className="bg-navy-50 section-padding">
-        <div className="container-narrow">
-          <h1 className="text-4xl font-bold text-navy">For Clients</h1>
-          <p className="mt-4 text-lg text-slate-700 max-w-2xl">
-            If you’re looking for reliable construction workers, we’d like to
-            support you.
+      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-white/50">Clients</p>
+          <h1 className="display mt-6">Workers for your site.</h1>
+          <p className="lede mt-8 text-white/75">
+            We are new. Trust is earned by doing the basics properly, not by
+            talking them up. There is no pressure to go ahead.
           </p>
+          <div className="mt-10">
+            <Link href="/contact" className="pill pill-light">
+              Email us
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="section-padding bg-white">
-        <div className="container-narrow max-w-3xl">
-          <p className="text-lg text-slate-700 leading-relaxed">
-            As a new company we’re focused on doing the basics well: screening
-            people properly, checking tickets and inductions, and staying in
-            regular contact so things run smoothly on site. We understand that
-            trust is earned through consistency and clear communication.
-          </p>
-
-          <h2 className="mt-12 text-2xl font-semibold text-navy">
-            How it works
-          </h2>
-          <ol className="mt-6 space-y-6">
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-semibold text-sm">
-                1
-              </span>
-              <div>
-                <h3 className="font-semibold text-navy">
-                  Tell us what you need
-                </h3>
-                <p className="mt-1 text-slate-600">
-                  Role, location, timing and any specific requirements.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-semibold text-sm">
-                2
-              </span>
-              <div>
-                <h3 className="font-semibold text-navy">
-                  We find suitable people
-                </h3>
-                <p className="mt-1 text-slate-600">
-                  We identify available workers who match the role.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-semibold text-sm">
-                3
-              </span>
-              <div>
-                <h3 className="font-semibold text-navy">
-                  Safety and inductions confirmed
-                </h3>
-                <p className="mt-1 text-slate-600">
-                  Relevant tickets and induction requirements are checked.
-                </p>
-              </div>
-            </li>
-            <li className="flex gap-4">
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-semibold text-sm">
-                4
-              </span>
-              <div>
-                <h3 className="font-semibold text-navy">
-                  We stay in touch
-                </h3>
-                <p className="mt-1 text-slate-600">
-                  Ongoing communication throughout the placement.
-                </p>
-              </div>
-            </li>
+      <section className="flex min-h-[100svh] items-center bg-white text-navy">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-navy/45">How it works</p>
+          <h2 className="display mt-6">How a placement works.</h2>
+          <ol className="mt-14 border-b border-navy/10">
+            {steps.map((step, index) => (
+              <li key={step.title} className="stack-row border-t border-navy/10">
+                <span className="kicker text-navy/40 sm:col-span-2">
+                  0{index + 1}
+                </span>
+                <div className="sm:col-span-10">
+                  <h3 className="text-2xl font-semibold tracking-tight sm:text-4xl">
+                    {step.title}
+                  </h3>
+                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-navy/70 sm:text-lg">
+                    {step.body}
+                  </p>
+                </div>
+              </li>
+            ))}
           </ol>
-
-          <div className="mt-14 bg-navy-50 rounded-xl p-8">
-            <p className="text-slate-700 leading-relaxed">
-              Happy to discuss your requirements — no pressure, just a
-              straightforward conversation.
-            </p>
-            <div className="mt-6">
-              <Link href="/contact" className="btn-primary">
-                Get in Touch
-              </Link>
-            </div>
-          </div>
+          <p className="lede mt-12 text-navy/70">
+            If you want to talk it through, email{" "}
+            <a className="text-teal" href="mailto:smoranc.marek@gmail.com">
+              smoranc.marek@gmail.com
+            </a>
+            . A straightforward note is enough.
+          </p>
         </div>
       </section>
     </>

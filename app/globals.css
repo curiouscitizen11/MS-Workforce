@@ -4,23 +4,53 @@
 
 html {
   scroll-behavior: smooth;
+  background: #0a2540;
 }
 
 body {
-  @apply bg-white text-slate-800 antialiased;
+  @apply bg-white text-navy antialiased;
+}
+
+::selection {
+  background: #0a2540;
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 @layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center rounded-md bg-teal-600 px-6 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2;
+  .wrap {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
   }
-  .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-md border-2 border-slate-700 bg-white px-6 py-3 text-base font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2;
+  .kicker {
+    @apply text-[11px] font-medium uppercase tracking-[0.22em];
   }
-  .section-padding {
-    @apply py-16 md:py-24;
+  .display {
+    @apply max-w-5xl text-balance text-[2.6rem] font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl;
   }
-  .container-narrow {
-    @apply mx-auto max-w-5xl px-4 sm:px-6 lg:px-8;
+  .lede {
+    @apply max-w-xl text-lg leading-relaxed sm:text-xl;
+  }
+  .pill {
+    @apply inline-flex min-h-11 items-center justify-center rounded-full px-6 py-3 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal;
+  }
+  .pill-light {
+    @apply bg-white text-navy hover:bg-white/90;
+  }
+  .pill-dark {
+    @apply bg-navy text-white hover:bg-navy-600;
+  }
+  .pill-line {
+    @apply border border-white/35 bg-transparent text-white hover:bg-white/10;
+  }
+  .pill-line-dark {
+    @apply border border-navy/20 bg-transparent text-navy hover:bg-navy/[0.04];
+  }
+  .stack-row {
+    @apply grid gap-3 py-8 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:py-10;
   }
 }

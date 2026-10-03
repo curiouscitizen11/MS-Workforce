@@ -7,9 +7,12 @@ import Footer from "@/components/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MS Workforce | Reliable Construction Labour Hire – Sydney & Northern Beaches",
+  title: {
+    default: "MS Workforce | Construction labour hire",
+    template: "%s | MS Workforce",
+  },
   description:
-    "MS Workforce supplies reliable construction workers across Sydney. Safety-focused, straightforward labour hire based on the Northern Beaches.",
+    "MS Workforce is a new construction labour hire business. Home office in Queenscliff, NSW 2096. We can supply labour across Greater Sydney. First jobs are in NSW.",
 };
 
 export default function RootLayout({
@@ -18,10 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
+    <html lang="en-AU">
+      <body className={`${inter.className} bg-white text-navy antialiased`}>
         <Header />
-        <main className="flex-grow">{children}</main>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>

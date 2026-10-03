@@ -1,86 +1,79 @@
-export const metadata = {
-  title: "Contact | MS Workforce",
-  description: "Contact MS Workforce – construction labour hire on Sydney’s Northern Beaches. Email smoranc.marek@gmail.com",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Email smoranc.marek@gmail.com. Queenscliff on Sydney's Northern Beaches, NSW 2096. Greater Sydney, with first jobs in NSW.",
 };
+
+const facts = [
+  { label: "Email", value: "smoranc.marek@gmail.com", href: "mailto:smoranc.marek@gmail.com" },
+  { label: "Place", value: "Queenscliff / Northern Beaches" },
+  { label: "Home office", value: "Queenscliff, NSW 2096" },
+  { label: "Service area", value: "Greater Sydney" },
+  { label: "First jobs", value: "NSW only" },
+];
 
 export default function ContactPage() {
   return (
     <>
-      <section className="bg-navy-50 section-padding">
-        <div className="container-narrow">
-          <h1 className="text-4xl font-bold text-navy">Contact Us</h1>
-          <p className="mt-4 text-lg text-slate-700 max-w-2xl">
-            We’d like to hear from you — whether you’re a client needing
-            workers or someone looking for construction opportunities.
+      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-white/50">Contact</p>
+          <h1 className="display mt-6">Email us.</h1>
+          <p className="mt-8 max-w-full text-[clamp(1.5rem,6vw,4.5rem)] font-semibold leading-tight tracking-tight [overflow-wrap:anywhere]">
+            <a href="mailto:smoranc.marek@gmail.com" className="text-teal">
+              smoranc.marek@gmail.com
+            </a>
+          </p>
+          <p className="lede mt-8 text-white/70">
+            Whether you need workers or you are looking for work, email is the
+            way to reach us.
           </p>
         </div>
       </section>
 
-      <section className="section-padding bg-white">
-        <div className="container-narrow">
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Contact details */}
-            <div>
-              <h2 className="text-xl font-semibold text-navy">
-                Get in touch
-              </h2>
-              <ul className="mt-6 space-y-4 text-slate-700">
-                <li>
-                  <span className="block text-sm font-medium text-slate-500">
-                    Email
-                  </span>
-                  <a
-                    href="mailto:smoranc.marek@gmail.com"
-                    className="text-lg text-teal-600 hover:underline"
-                  >
-                    smoranc.marek@gmail.com
-                  </a>
-                </li>
-                <li>
-                  <span className="block text-sm font-medium text-slate-500">
-                    Location
-                  </span>
-                  <span className="text-lg">
-                    Queenscliff / Northern Beaches, Sydney
-                  </span>
-                </li>
-                <li>
-                  <span className="block text-sm font-medium text-slate-500">
-                    Service area
-                  </span>
-                  <span className="text-lg">Greater Sydney</span>
-                </li>
-              </ul>
-            </div>
+      <section className="flex min-h-[100svh] items-center bg-white text-navy">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-navy/45">Details</p>
+          <h2 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">
+            Queenscliff. Greater Sydney. NSW first.
+          </h2>
+          <dl className="mt-14 max-w-3xl border-b border-navy/10">
+            {facts.map((item) => (
+              <div key={item.label} className="stack-row border-t border-navy/10">
+                <dt className="kicker text-navy/45 sm:col-span-4">{item.label}</dt>
+                <dd className="text-xl font-medium tracking-tight sm:col-span-8 sm:text-2xl break-words">
+                  {item.href ? (
+                    <a href={item.href} className="text-teal">
+                      {item.value}
+                    </a>
+                  ) : (
+                    item.value
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
 
-            {/* Simple form note */}
-            <div className="bg-navy-50 rounded-xl p-8">
-              <h2 className="text-xl font-semibold text-navy">
-                Send a message
-              </h2>
-              <p className="mt-3 text-slate-600 leading-relaxed">
-                The easiest way right now is to email us directly at{" "}
-                <a
-                  href="mailto:smoranc.marek@gmail.com"
-                  className="text-teal-600 font-medium hover:underline"
-                >
-                  smoranc.marek@gmail.com
-                </a>
-                .
-              </p>
-              <p className="mt-4 text-slate-600 leading-relaxed">
-                Please include:
-              </p>
-              <ul className="mt-2 space-y-1 text-slate-600">
-                <li>• Your name</li>
-                <li>• Whether you’re a client or looking for work</li>
-                <li>• A short message about what you need</li>
-              </ul>
-              <p className="mt-6 text-sm text-slate-500">
-                A proper contact form can be added once the company is
-                registered and business email is set up.
-              </p>
-            </div>
+      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-white/50">No form yet</p>
+          <h2 className="display mt-6">A proper contact form waits.</h2>
+          <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-white/75">
+            <p>
+              A proper contact form waits until the company is registered and a
+              business email exists. Please email us directly. This page does
+              not send a message for you.
+            </p>
+            <p>Include:</p>
+            <ul className="space-y-2">
+              <li>Your name</li>
+              <li>Whether you need workers or you are looking for work</li>
+              <li>A short message about what you need</li>
+            </ul>
           </div>
         </div>
       </section>

@@ -1,103 +1,173 @@
 import Link from "next/link";
 
+const supply = [
+  {
+    title: "General construction labour",
+    body: "Workers for general construction tasks on site.",
+  },
+  {
+    title: "Site support",
+    body: "General site duties and cleaning, and other support work on site.",
+  },
+  {
+    title: "Flexible or project-based cover",
+    body: "People for a set period, or for a particular piece of work.",
+  },
+];
+
+const tickets = [
+  {
+    name: "White card",
+    note: "Expected. We record the number and the expiry. This is the baseline.",
+  },
+  { name: "Work at heights", note: "Recorded." },
+  { name: "Asbestos class A", note: "Recorded." },
+  { name: "Asbestos class B", note: "Recorded." },
+  { name: "Confined space", note: "Recorded." },
+  { name: "Driver licence", note: "Recorded." },
+  { name: "First aid", note: "Recorded." },
+];
+
+const before = [
+  { name: "Right to work", note: "Checked before anyone is placed." },
+  { name: "Tickets", note: "Sighted before anyone is placed." },
+  { name: "Site induction", note: "Done before anyone starts." },
+];
+
 export default function HomePage() {
   return (
     <>
-      <section className="bg-gradient-to-b from-navy-50 to-white section-padding">
-        <div className="container-narrow">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-navy tracking-tight leading-tight">
-              Reliable Construction Workers for Sydney Sites
-            </h1>
-            <p className="mt-6 text-lg md:text-xl text-slate-700 leading-relaxed">
-              MS Workforce is a Northern Beaches-based labour hire company
-              supplying dependable people for construction projects across
-              Sydney.
-            </p>
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              <Link href="/clients" className="btn-primary">
-                Hire Workers
-              </Link>
-              <Link href="/candidates" className="btn-secondary">
-                Looking for Work?
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-padding bg-white">
-        <div className="container-narrow">
-          <p className="text-lg text-slate-700 leading-relaxed max-w-3xl">
-            We’re a new labour hire business focused on construction. We believe
-            good sites run on reliable people, clear communication and a strong
-            safety culture. Whether you need workers for an upcoming job or
-            you’re looking for construction work yourself, we’re here to help —
-            straightforward and without the run-around.
+      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-white/50">Sydney sites</p>
+          <h1 className="display mt-6">Construction labour for Sydney sites.</h1>
+          <p className="lede mt-8 text-white/75">
+            MS Workforce is a new construction labour hire business. The home
+            office is in Queenscliff, NSW 2096, on Sydney&apos;s Northern
+            Beaches. We are just getting started, and we are focused on doing
+            the basics well.
           </p>
-        </div>
-      </section>
-
-      <section className="section-padding bg-navy-50">
-        <div className="container-narrow">
-          <div className="grid md:grid-cols-3 gap-10">
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center mb-5">
-                <svg className="w-6 h-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-navy">Safety First</h3>
-              <p className="mt-3 text-slate-600 leading-relaxed">
-                Proper inductions, the right tickets, and a genuine focus on
-                everyone going home safe.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center mb-5">
-                <svg className="w-6 h-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-navy">Reliable People</h3>
-              <p className="mt-3 text-slate-600 leading-relaxed">
-                Workers who turn up, follow site rules and get the job done.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 rounded-lg bg-teal-100 flex items-center justify-center mb-5">
-                <svg className="w-6 h-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-navy">Straightforward Service</h3>
-              <p className="mt-3 text-slate-600 leading-relaxed">
-                Clear communication and a personal approach from a local company.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-padding bg-navy text-white">
-        <div className="container-narrow text-center">
-          <h2 className="text-3xl font-bold">
-            Need construction workers or looking for your next role?
-          </h2>
-          <p className="mt-4 text-lg text-gray-300 max-w-2xl mx-auto">
-            Get in touch today — we’d be happy to have a chat.
-          </p>
-          <div className="mt-8">
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-md bg-teal-500 px-8 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-teal-400"
-            >
-              Contact Us
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Link href="/clients" className="pill pill-light w-full sm:w-auto">
+              Hire workers
+            </Link>
+            <Link href="/candidates" className="pill pill-line w-full sm:w-auto">
+              Looking for work
             </Link>
           </div>
         </div>
+      </section>
+
+      <section className="flex min-h-[100svh] items-center bg-white text-navy">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-navy/45">What we supply</p>
+          <h2 className="display mt-6">Three kinds of cover.</h2>
+          <ul className="mt-14 border-b border-navy/10">
+            {supply.map((item, index) => (
+              <li key={item.title} className="stack-row border-t border-navy/10">
+                <span className="kicker text-navy/40 sm:col-span-3">
+                  0{index + 1}
+                </span>
+                <div className="sm:col-span-9">
+                  <h3 className="text-2xl font-semibold tracking-tight sm:text-4xl">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 max-w-xl text-base leading-relaxed text-navy/70 sm:text-lg">
+                    {item.body}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-white/50">Tickets we check</p>
+          <h2 className="display mt-6">White card is the baseline.</h2>
+          <ul className="mt-14 max-w-3xl border-b border-white/15">
+            {tickets.map((item) => (
+              <li key={item.name} className="stack-row border-t border-white/15">
+                <h3 className="text-xl font-semibold tracking-tight sm:col-span-5 sm:text-2xl">
+                  {item.name}
+                </h3>
+                <p className="text-base leading-relaxed text-white/70 sm:col-span-7">
+                  {item.note}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <p className="lede mt-12 text-white/75">
+            Work at heights, confined space, and asbestos work only go to
+            someone who holds that ticket. Scaffold work only goes ahead with a
+            ticketed scaffolder. We do not offer demolition or asbestos removal
+            as a general service. We only put someone forward for that work
+            when they hold the ticket. That is a condition of the work, not a
+            list of people already on our books.
+          </p>
+        </div>
+      </section>
+
+      <section className="flex min-h-[100svh] items-center bg-white text-navy">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-navy/45">Before a person starts</p>
+          <h2 className="display mt-6">Three checks. Every time.</h2>
+          <p className="lede mt-8 text-navy/70">
+            Before anyone is placed, right to work is checked, tickets are
+            sighted, and the site induction is done.
+          </p>
+          <ul className="mt-14 max-w-3xl border-b border-navy/10">
+            {before.map((item, index) => (
+              <li key={item.name} className="stack-row border-t border-navy/10">
+                <span className="kicker text-navy/40 sm:col-span-2">
+                  0{index + 1}
+                </span>
+                <h3 className="text-2xl font-semibold tracking-tight sm:col-span-4 sm:text-3xl">
+                  {item.name}
+                </h3>
+                <p className="text-base leading-relaxed text-navy/70 sm:col-span-6">
+                  {item.note}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-white/50">Where we work</p>
+          <h2 className="display mt-6">Queenscliff, then Greater Sydney.</h2>
+          <p className="lede mt-8 text-white/75">
+            The home office is in Queenscliff, NSW 2096, on Sydney&apos;s
+            Northern Beaches. We can supply labour across Greater Sydney. First
+            jobs are in NSW only.
+          </p>
+        </div>
+      </section>
+
+      <section className="grid min-h-[100svh] grid-rows-2 bg-white md:grid-cols-2 md:grid-rows-1">
+        <Link
+          href="/clients"
+          className="flex flex-col justify-end border-b border-navy/10 px-5 py-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10 md:border-b-0 md:border-r"
+        >
+          <p className="kicker text-navy/45">Hire workers</p>
+          <h2 className="mt-4 max-w-md text-4xl font-semibold tracking-tight sm:text-5xl">
+            Tell us the role, the place, the timing and the tickets.
+          </h2>
+          <span className="mt-8 text-sm font-medium text-teal">For clients</span>
+        </Link>
+        <Link
+          href="/candidates"
+          className="flex flex-col justify-end px-5 py-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10"
+        >
+          <p className="kicker text-navy/45">Looking for work</p>
+          <h2 className="mt-4 max-w-md text-4xl font-semibold tracking-tight sm:text-5xl">
+            Send your details. We will be in touch when a suitable job comes up.
+          </h2>
+          <span className="mt-8 text-sm font-medium text-teal">For candidates</span>
+        </Link>
       </section>
     </>
   );

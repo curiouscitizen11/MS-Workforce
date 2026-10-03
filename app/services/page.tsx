@@ -1,75 +1,115 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata = {
-  title: "Services | MS Workforce",
-  description: "Construction labour hire services across Sydney – general labour, site support and flexible project workers.",
+export const metadata: Metadata = {
+  title: "Services",
+  description:
+    "General construction labour, site support, and flexible or project-based cover. White card is the baseline. Heights, confined space, asbestos and scaffold work only with the right ticket.",
 };
+
+const covers = [
+  {
+    kicker: "01",
+    title: "General construction labour",
+    body: "Workers for general construction tasks. People who follow the site rules and the induction.",
+    dark: false,
+  },
+  {
+    kicker: "02",
+    title: "Site support",
+    body: "General site duties and cleaning, and other day-to-day support on a construction site.",
+    dark: true,
+  },
+  {
+    kicker: "03",
+    title: "Flexible or project-based cover",
+    body: "Workers for a set period, or for a particular piece of work, when a site needs more hands for a time.",
+    dark: false,
+  },
+];
+
+const tickets = [
+  {
+    name: "White card",
+    note: "Expected. We record the number and the expiry. This is the baseline.",
+  },
+  { name: "Work at heights", note: "Recorded." },
+  { name: "Asbestos class A", note: "Recorded." },
+  { name: "Asbestos class B", note: "Recorded." },
+  { name: "Confined space", note: "Recorded." },
+  { name: "Driver licence", note: "Recorded." },
+  { name: "First aid", note: "Recorded." },
+];
 
 export default function ServicesPage() {
   return (
     <>
-      <section className="bg-navy-50 section-padding">
-        <div className="container-narrow">
-          <h1 className="text-4xl font-bold text-navy">Our Services</h1>
-          <p className="mt-4 text-lg text-slate-700 max-w-2xl">
-            MS Workforce supplies construction labour across Sydney, with a
-            focus on reliable, site-ready people.
+      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-white/50">Services</p>
+          <h1 className="display mt-6">Three kinds of cover.</h1>
+          <p className="lede mt-8 text-white/75">
+            MS Workforce supplies construction workers. That is general
+            construction labour, site support, and flexible or project-based
+            cover. We are new, and the work starts with getting those basics
+            right.
           </p>
         </div>
       </section>
 
-      <section className="section-padding bg-white">
-        <div className="container-narrow">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="border border-gray-200 rounded-xl p-8 hover:border-teal-300 transition">
-              <h2 className="text-xl font-semibold text-navy">
-                General Construction Labour
-              </h2>
-              <p className="mt-3 text-slate-600 leading-relaxed">
-                Dependable workers for a wide range of construction site tasks.
-                People who understand the pace of a site and the importance of
-                following instructions and safety rules.
-              </p>
-            </div>
-
-            <div className="border border-gray-200 rounded-xl p-8 hover:border-teal-300 transition">
-              <h2 className="text-xl font-semibold text-navy">
-                Site Support Roles
-              </h2>
-              <p className="mt-3 text-slate-600 leading-relaxed">
-                Support roles that keep a site running smoothly — including
-                general site duties and cleaning. Reliable people who take pride
-                in their work.
-              </p>
-            </div>
-
-            <div className="border border-gray-200 rounded-xl p-8 hover:border-teal-300 transition">
-              <h2 className="text-xl font-semibold text-navy">
-                Flexible & Project-Based
-              </h2>
-              <p className="mt-3 text-slate-600 leading-relaxed">
-                Temporary and project-based workers when you need extra hands
-                for a specific period or work package. Straightforward
-                arrangements and clear communication.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-16 bg-navy-50 rounded-xl p-8 md:p-10">
-            <h2 className="text-2xl font-semibold text-navy">
-              Safety and inductions matter
-            </h2>
-            <p className="mt-4 text-slate-700 leading-relaxed max-w-3xl">
-              Every person we put forward is expected to take safety seriously
-              and complete the required inductions. We check relevant tickets
-              (including White Card) and keep the process simple for both
-              clients and workers.
+      {covers.map((item) => (
+        <section
+          key={item.title}
+          className={`flex min-h-[100svh] items-center ${
+            item.dark ? "bg-navy text-white" : "bg-white text-navy"
+          }`}
+        >
+          <div className="wrap py-24 sm:py-28">
+            <p className={`kicker ${item.dark ? "text-white/50" : "text-navy/45"}`}>
+              {item.kicker}
+            </p>
+            <h2 className="display mt-6">{item.title}</h2>
+            <p className={`lede mt-8 ${item.dark ? "text-white/75" : "text-navy/70"}`}>
+              {item.body}
             </p>
           </div>
+        </section>
+      ))}
 
-          <div className="mt-12 text-center">
-            <Link href="/contact" className="btn-primary">
-              Discuss Your Requirements
+      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-white/50">Tickets</p>
+          <h2 className="display mt-6">The ticket decides the work.</h2>
+          <ul className="mt-14 max-w-3xl border-b border-white/15">
+            {tickets.map((item) => (
+              <li key={item.name} className="stack-row border-t border-white/15">
+                <h3 className="text-xl font-semibold tracking-tight sm:col-span-5 sm:text-2xl">
+                  {item.name}
+                </h3>
+                <p className="text-base leading-relaxed text-white/70 sm:col-span-7">
+                  {item.note}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-12 max-w-2xl space-y-6 text-lg leading-relaxed text-white/75">
+            <p>
+              Work at heights only goes to someone with a work at heights
+              ticket. Confined space work only goes to someone with a confined
+              space ticket. Asbestos work only goes to someone with the matching
+              asbestos class ticket. Scaffold work only goes to a ticketed
+              scaffolder.
+            </p>
+            <p>
+              We do not offer demolition or asbestos removal as a general
+              service. We only put someone forward for that work when they hold
+              the ticket. Holding the ticket is the condition. It is not a claim
+              that those people are already on our books.
+            </p>
+          </div>
+          <div className="mt-12">
+            <Link href="/contact" className="pill pill-light">
+              Email what you need
             </Link>
           </div>
         </div>
