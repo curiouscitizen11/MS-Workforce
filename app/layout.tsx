@@ -24,7 +24,12 @@ export default function RootLayout({
     <html lang="en-AU">
       <body className={`${inter.className} bg-white text-navy antialiased`}>
         <Header />
-        <main>{children}</main>
+        <main
+          className="relative z-0"
+          style={{ paddingTop: "var(--site-header-height)" }}
+        >
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

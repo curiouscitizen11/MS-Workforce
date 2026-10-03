@@ -10,7 +10,7 @@ const links = [
 
 export default function Footer() {
   return (
-    <footer className="bg-navy text-white">
+    <footer className="relative z-0 bg-navy text-white">
       <div className="wrap py-16 sm:py-20">
         <div className="grid gap-14 md:grid-cols-12">
           <div className="md:col-span-5">

@@ -17,7 +17,7 @@ const facts = [
 export default function ContactPage() {
   return (
     <>
-      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+      <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/50">Contact</p>
           <h1 className="display mt-6">Email us.</h1>
@@ -33,7 +33,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="flex min-h-[100svh] items-center bg-white text-navy">
+      <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-navy/45">Details</p>
           <h2 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">
@@ -58,7 +58,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+      <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/50">No form yet</p>
           <h2 className="display mt-6">A proper contact form waits.</h2>

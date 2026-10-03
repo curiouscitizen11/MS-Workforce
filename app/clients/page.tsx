@@ -29,7 +29,7 @@ const steps = [
 export default function ClientsPage() {
   return (
     <>
-      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+      <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/50">Clients</p>
           <h1 className="display mt-6">Workers for your site.</h1>
@@ -45,7 +45,7 @@ export default function ClientsPage() {
         </div>
       </section>
 
-      <section className="flex min-h-[100svh] items-center bg-white text-navy">
+      <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-navy/45">How it works</p>
           <h2 className="display mt-6">How a placement works.</h2>

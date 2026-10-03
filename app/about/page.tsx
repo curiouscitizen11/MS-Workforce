@@ -29,7 +29,7 @@ const values = [
 export default function AboutPage() {
   return (
     <>
-      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+      <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/50">About</p>
           <h1 className="display mt-6">Based in Queenscliff.</h1>
@@ -51,7 +51,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="flex min-h-[100svh] items-center bg-white text-navy">
+      <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-navy/45">Values</p>
           <h2 className="display mt-6">Safety, reliability, respect, straightforward.</h2>

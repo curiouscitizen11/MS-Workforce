@@ -44,7 +44,7 @@ const tickets = [
 export default function ServicesPage() {
   return (
     <>
-      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+      <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/50">Services</p>
           <h1 className="display mt-6">Three kinds of cover.</h1>
@@ -60,7 +60,7 @@ export default function ServicesPage() {
       {covers.map((item) => (
         <section
           key={item.title}
-          className={`flex min-h-[100svh] items-center ${
+          className={`flex screen items-center ${
             item.dark ? "bg-navy text-white" : "bg-white text-navy"
           }`}
         >
@@ -76,7 +76,7 @@ export default function ServicesPage() {
         </section>
       ))}
 
-      <section className="flex min-h-[100svh] items-center bg-navy text-white">
+      <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/50">Tickets</p>
           <h2 className="display mt-6">The ticket decides the work.</h2>
