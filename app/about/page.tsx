@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { REQUEST_LABOUR_HREF } from "@/components/site";
+import { REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "MS Workforce is a construction labour hire business based on Sydney's Northern Beaches, supplying general labourers, trade assistants and site support to builders across Greater Sydney.",
   alternates: { canonical: "/about" },
   openGraph: {
+    ...OG_BASE,
     title: "About MS Workforce",
     description:
       "A focused construction labour hire business based on Sydney's Northern Beaches, supplying builders across Greater Sydney.",

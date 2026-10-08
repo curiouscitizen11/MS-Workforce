@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF } from "@/components/site";
+import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
 
 export const metadata: Metadata = {
   title: "Contact MS Workforce",
@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "Request construction labour or ask a question. Email MS Workforce at smoranc.marek@gmail.com. Based on Sydney's Northern Beaches, supplying sites across Greater Sydney.",
   alternates: { canonical: "/contact" },
   openGraph: {
+    ...OG_BASE,
     title: "Contact MS Workforce",
     description: "Request construction labour across Greater Sydney, or ask a question.",
     url: "/contact",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF } from "@/components/site";
+import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
 
 export const metadata: Metadata = {
   title: "Labour Hire for Builders in Sydney",
@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "How MS Workforce supplies construction labour to Sydney builders: send the brief, we match screened labour, crew on site, simple weekly invoicing. Builders FAQ included.",
   alternates: { canonical: "/clients" },
   openGraph: {
+    ...OG_BASE,
     title: "Labour Hire for Builders in Sydney | MS Workforce",
     description:
       "Send the brief, we match screened labour, crew on site, simple weekly invoicing.",

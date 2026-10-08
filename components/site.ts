@@ -29,3 +29,17 @@ export const WORK_ENQUIRY_HREF =
 
 export const GENERAL_ENQUIRY_HREF =
   EMAIL_HREF + "?subject=" + encodeURIComponent("Enquiry");
+
+export const OG_BASE = {
+  type: "website" as const,
+  locale: "en_AU",
+  siteName: SITE_NAME,
+  images: [
+    {
+      url: "/opengraph-image",
+      width: 1200,
+      height: 630,
+      alt: "MS Workforce: construction labour hire across Greater Sydney",
+    },
+  ],
+};

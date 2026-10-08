@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EMAIL, WORK_ENQUIRY_HREF } from "@/components/site";
+import { EMAIL, WORK_ENQUIRY_HREF, OG_BASE } from "@/components/site";
 
 export const metadata: Metadata = {
   title: "Construction Jobs in Sydney",
@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     "Looking for construction labouring work across Greater Sydney? Register with MS Workforce through the employee portal for general labouring, trade assistant and site support work.",
   alternates: { canonical: "/candidates" },
   openGraph: {
+    ...OG_BASE,
     title: "Construction Jobs in Sydney | MS Workforce",
     description:
       "Register through the employee portal for general labouring, trade assistant and site support work across Greater Sydney.",

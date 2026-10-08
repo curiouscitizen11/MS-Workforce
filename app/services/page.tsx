@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { REQUEST_LABOUR_HREF } from "@/components/site";
+import { REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
 
 export const metadata: Metadata = {
   title: "Construction Labour Hire Services Sydney",
@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "General labourers, trade assistants, site cleans and materials handling for builders across Greater Sydney. Day labour, short-notice cover, ongoing supply and project-based crews.",
   alternates: { canonical: "/services" },
   openGraph: {
+    ...OG_BASE,
     title: "Construction Labour Hire Services Sydney | MS Workforce",
     description:
       "General labourers, trade assistants, site cleans and materials handling for builders across Greater Sydney.",
