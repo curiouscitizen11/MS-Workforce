@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF } from "@/components/site";
 
 const links = [
   { name: "Services", href: "/services" },
-  { name: "Clients", href: "/clients" },
-  { name: "Candidates", href: "/candidates" },
+  { name: "Builders", href: "/clients" },
+  { name: "Find work", href: "/candidates" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
@@ -23,7 +24,9 @@ export default function Footer() {
               </div>
             </div>
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-white/65">
-              Construction labour hire. Home office in Queenscliff, NSW 2096.
+              Construction labour hire for builders across Greater Sydney.
+              General labourers, trade assistants and site support, on site
+              when you need them.
             </p>
           </div>
 
@@ -44,15 +47,17 @@ export default function Footer() {
             <h2 className="kicker text-white/45">Contact</h2>
             <ul className="mt-5 space-y-3 text-sm text-white/75">
               <li>
-                <a
-                  href="mailto:smoranc.marek@gmail.com"
-                  className="text-teal hover:text-white"
-                >
-                  smoranc.marek@gmail.com
+                <a href={EMAIL_HREF} className="break-all text-teal hover:text-white">
+                  {EMAIL}
                 </a>
               </li>
-              <li>Queenscliff / Northern Beaches</li>
-              <li>Greater Sydney. First jobs in NSW.</li>
+              <li>Based on the Northern Beaches</li>
+              <li>Supplying sites across Greater Sydney</li>
+              <li>
+                <a href={REQUEST_LABOUR_HREF} className="font-medium text-white hover:text-teal">
+                  Request labour
+                </a>
+              </li>
             </ul>
           </div>
         </div>

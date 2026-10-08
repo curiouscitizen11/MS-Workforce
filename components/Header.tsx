@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { REQUEST_LABOUR_HREF } from "@/components/site";
 
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/services" },
-  { name: "Clients", href: "/clients" },
-  { name: "Candidates", href: "/candidates" },
+  { name: "Builders", href: "/clients" },
+  { name: "Find work", href: "/candidates" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
@@ -61,16 +62,23 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 aria-current={current ? "page" : undefined}
-                className={`border-b-2 pb-0.5 text-[13px] font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal ${
-                  current
+                className={
+                  "border-b-2 pb-0.5 text-[13px] font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
+                  (current
                     ? "border-teal text-white"
-                    : "border-transparent text-white/70 hover:text-white"
-                }`}
+                    : "border-transparent text-white/70 hover:text-white")
+                }
               >
                 {item.name}
               </Link>
             );
           })}
+          <a
+            href={REQUEST_LABOUR_HREF}
+            className="hidden rounded-full bg-teal px-4 py-1.5 text-[13px] font-medium text-white transition hover:bg-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
+          >
+            Request labour
+          </a>
         </nav>
 
         <button
@@ -112,11 +120,12 @@ export default function Header() {
                   <Link
                     href={item.href}
                     aria-current={current ? "page" : undefined}
-                    className={`block rounded-2xl border-l-4 px-3 py-3 text-3xl font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal ${
-                      current
+                    className={
+                      "block rounded-2xl border-l-4 px-3 py-3 text-3xl font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
+                      (current
                         ? "border-teal text-white"
-                        : "border-transparent text-white/70"
-                    }`}
+                        : "border-transparent text-white/70")
+                    }
                     onClick={() => setOpen(false)}
                   >
                     {item.name}
@@ -125,6 +134,13 @@ export default function Header() {
               );
             })}
           </ul>
+          <a
+            href={REQUEST_LABOUR_HREF}
+            className="pill pill-light mt-8 w-full"
+            onClick={() => setOpen(false)}
+          >
+            Request labour
+          </a>
         </nav>
       ) : null}
     </header>
