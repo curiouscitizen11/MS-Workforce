@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EMAIL, WORK_ENQUIRY_HREF, OG_BASE } from "@/components/site";
+import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/tickets";
 
 export const metadata: Metadata = {
   title: "Construction Jobs in Sydney",
@@ -45,6 +46,52 @@ const expect = [
 
 const formUrl =
   "https://protective-stamp-342.notion.site/69740d4cbc6c41ef914d8fb316b4b957?pvs=105";
+
+function TicketCard({ ticket }: { ticket: Ticket }) {
+  return (
+    <li className="flex flex-col rounded-2xl border border-navy/10 bg-white p-6 sm:p-8">
+      <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{ticket.title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-navy/55">{ticket.code}</p>
+      {ticket.note ? <p className="mt-3 text-sm leading-relaxed text-navy/70">{ticket.note}</p> : null}
+      <ul className="mt-5 flex-1 border-b border-navy/10">
+        {ticket.providers.map((provider) => (
+          <li key={provider.href} className="border-t border-navy/10 py-4">
+            <a
+              href={provider.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-navy underline decoration-teal/50 underline-offset-4 hover:decoration-teal"
+            >
+              {provider.name}
+              {provider.label ? ": " + provider.label : ""}
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            <p className="mt-1 text-sm text-navy/60">
+              {provider.location} · RTO {provider.rto} ·{" "}
+              <span className="font-medium text-navy/80">{provider.price}</span>
+            </p>
+          </li>
+        ))}
+      </ul>
+      {ticket.official ? (
+        <div className="mt-4 flex flex-col gap-2">
+          {ticket.official.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-teal-600 underline decoration-teal/40 underline-offset-4"
+            >
+              {link.label}
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          ))}
+        </div>
+      ) : null}
+    </li>
+  );
+}
 
 export default function CandidatesPage() {
   return (
@@ -117,6 +164,48 @@ export default function CandidatesPage() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section id="tickets" className="flex screen items-center bg-navy-50 text-navy">
+        <div className="wrap py-24 sm:py-28">
+          <p className="kicker text-navy/45">Get your tickets</p>
+          <h2 className="display mt-6">Missing a ticket? Here&apos;s where to get it in Sydney.</h2>
+          <p className="lede mt-8 text-navy/70">
+            More tickets mean more sites you can work on. These registered
+            training providers run the courses on the Northern Beaches and
+            across Sydney. Most take a day or two.
+          </p>
+          <ul className="mt-14 grid gap-5 md:grid-cols-2">
+            {tickets.map((ticket) => (
+              <TicketCard key={ticket.title} ticket={ticket} />
+            ))}
+          </ul>
+          <h3 className="kicker mt-16 text-navy/45">Useful extras</h3>
+          <ul className="mt-6 grid gap-5 md:grid-cols-2">
+            {extras.map((ticket) => (
+              <TicketCard key={ticket.title} ticket={ticket} />
+            ))}
+          </ul>
+          <div className="mt-10 max-w-3xl space-y-2 text-sm leading-relaxed text-navy/60">
+            <p>
+              Prices are as listed by each provider on {PRICES_CHECKED} and may
+              be subject to change. Check with the provider before booking.
+            </p>
+            <p>
+              Links go to independent registered training providers. MS
+              Workforce isn&apos;t affiliated with them; check dates and
+              requirements with the provider.
+            </p>
+          </div>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <a href={formUrl} className="pill pill-dark w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
+              Got your tickets? Register now
+            </a>
+            <a href={WORK_ENQUIRY_HREF} className="pill pill-line-dark w-full sm:w-auto">
+              Email us
+            </a>
+          </div>
         </div>
       </section>
 
