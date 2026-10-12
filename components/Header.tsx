@@ -77,7 +77,7 @@ export default function Header() {
             href={BOOK_LABOUR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden rounded-full bg-teal-600 px-4 py-1.5 text-[13px] font-medium text-white transition hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
+            className="hidden min-h-11 items-center rounded-full bg-teal-400 px-5 text-sm font-semibold text-navy transition hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
           >
             Book labour
           </a>
@@ -140,7 +140,7 @@ export default function Header() {
             href={BOOK_LABOUR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="pill pill-light mt-8 w-full"
+            className="pill pill-teal mt-8 w-full"
             onClick={() => setOpen(false)}
           >
             Book labour

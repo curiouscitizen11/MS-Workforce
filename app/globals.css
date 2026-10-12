@@ -7,6 +7,7 @@
 }
 
 html {
+  color-scheme: light;
   scroll-behavior: smooth;
   background: #0a2540;
 }
@@ -49,22 +50,27 @@ body {
     @apply max-w-xl text-lg leading-relaxed sm:text-xl;
   }
   .pill {
-    @apply inline-flex min-h-11 items-center justify-center rounded-full px-6 py-3 text-sm font-medium transition duration-200 ease-out hover:-translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal;
+    @apply inline-flex min-h-12 items-center justify-center rounded-full border-2 border-transparent px-6 py-3 text-[15px] font-semibold leading-tight transition duration-200 ease-out hover:-translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-300;
+    -webkit-tap-highlight-color: transparent;
   }
-  .pill-light {
-    @apply bg-white text-navy hover:bg-white/90;
-  }
-  .pill-dark {
-    @apply bg-navy text-white hover:bg-navy-600;
-  }
-  .pill-line {
-    @apply border border-white/35 bg-transparent text-white hover:bg-white/10;
-  }
+  /* Primary: solid teal, navy text (contrast ~6.9:1) */
   .pill-teal {
-    @apply bg-teal-600 text-white shadow-sm hover:bg-teal-700 hover:shadow-md;
+    @apply border-teal-400 bg-teal-400 text-navy shadow-sm hover:border-teal-300 hover:bg-teal-300;
+  }
+  /* Secondary solid: white with navy text (~15.8:1) */
+  .pill-light {
+    @apply border-white bg-white text-navy hover:bg-navy-50;
+  }
+  /* Secondary on navy: 2px white border, white text */
+  .pill-line {
+    @apply border-white bg-transparent text-white hover:bg-white hover:text-navy;
+  }
+  /* On light backgrounds */
+  .pill-dark {
+    @apply border-navy bg-navy text-white hover:bg-navy-600;
   }
   .pill-line-dark {
-    @apply border border-navy/20 bg-transparent text-navy hover:bg-navy/[0.04];
+    @apply border-navy bg-transparent text-navy hover:bg-navy hover:text-white;
   }
   .stack-row {
     @apply grid gap-3 py-8 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:py-10;

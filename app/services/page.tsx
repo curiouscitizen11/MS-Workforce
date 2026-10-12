@@ -70,7 +70,7 @@ export default function ServicesPage() {
             supplied on an ongoing, project-based basis.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-light w-full sm:w-auto">
+            <a href={REQUEST_LABOUR_HREF} className="pill pill-teal w-full sm:w-auto">
               Request labour
             </a>
             <Link href="/clients" className="pill pill-line w-full sm:w-auto">
@@ -89,7 +89,7 @@ export default function ServicesPage() {
           }
         >
           <div className="wrap py-24 sm:py-28">
-            <p className={"kicker " + (item.dark ? "text-white/50" : "text-navy/45")}>
+            <p className={"kicker " + (item.dark ? "text-white/70" : "text-navy/65")}>
               {item.kicker}
             </p>
             <h2 className="display mt-6">{item.title}</h2>
@@ -131,7 +131,7 @@ export default function ServicesPage() {
             ))}
           </ul>
           <div className="mt-12">
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-light">
+            <a href={REQUEST_LABOUR_HREF} className="pill pill-teal">
               Request labour
             </a>
           </div>

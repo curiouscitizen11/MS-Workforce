@@ -66,7 +66,7 @@ export default function HomePage() {
               href={BOOK_LABOUR_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="pill pill-light w-full sm:w-auto"
+              className="pill pill-teal w-full sm:w-auto"
             >
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>

@@ -87,7 +87,7 @@ export default function ClientsPage() {
               href={BOOK_LABOUR_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="pill pill-light w-full sm:w-auto"
+              className="pill pill-teal w-full sm:w-auto"
             >
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>
@@ -180,7 +180,7 @@ export default function ClientsPage() {
             </div>
             <a
               href={EMAIL_HREF}
-              className="break-all text-lg font-medium text-teal-600 underline decoration-teal-600/40 underline-offset-4 sm:text-2xl"
+              className="break-all text-lg font-medium text-teal-700 underline decoration-teal-700/40 underline-offset-4 sm:text-2xl"
             >
               {EMAIL}
             </a>

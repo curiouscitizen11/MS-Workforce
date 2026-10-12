@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   },
 };
 
-const mail = "text-teal-600 underline decoration-teal-600/40 underline-offset-4 break-all";
-const ext = "text-teal-600 underline decoration-teal-600/40 underline-offset-4";
+const mail = "text-teal-700 underline decoration-teal-700/40 underline-offset-4 break-all";
+const ext = "text-teal-700 underline decoration-teal-700/40 underline-offset-4";
 
 const sections: { title: string; body: React.ReactNode }[] = [
   {

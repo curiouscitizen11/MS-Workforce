@@ -17,7 +17,7 @@ export default function NotFound() {
           instead.
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Link href="/" className="pill pill-light w-full sm:w-auto">
+          <Link href="/" className="pill pill-teal w-full sm:w-auto">
             Home
           </Link>
           <Link href="/clients" className="pill pill-line w-full sm:w-auto">

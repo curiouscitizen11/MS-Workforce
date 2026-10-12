@@ -51,7 +51,7 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
   return (
     <li className="flex flex-col rounded-2xl border border-navy/10 bg-white p-6 sm:p-8">
       <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{ticket.title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-navy/55">{ticket.code}</p>
+      <p className="mt-2 text-sm leading-relaxed text-navy/70">{ticket.code}</p>
       {ticket.note ? <p className="mt-3 text-sm leading-relaxed text-navy/70">{ticket.note}</p> : null}
       <ul className="mt-5 flex-1 border-b border-navy/10">
         {ticket.providers.map((provider) => (
@@ -107,7 +107,7 @@ export default function CandidatesPage() {
             and location.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a href={formUrl} className="pill pill-light w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
+            <a href={formUrl} className="pill pill-teal w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
               Employee portal
             </a>
             <a href={WORK_ENQUIRY_HREF} className="pill pill-line w-full sm:w-auto">
