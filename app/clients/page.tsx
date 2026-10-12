@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
+import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, OG_BASE } from "@/components/site";
 
 export const metadata: Metadata = {
   title: "Labour Hire for Builders in Sydney",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const steps = [
   {
     title: "Send the brief",
-    body: "Email the site address, start date and time, the roles and numbers you need, how long for, and who the workers report to.",
+    body: "Use the Book labour form or email the site address, start date and time, the roles and numbers you need, how long for, and who the workers report to.",
   },
   {
     title: "We match the right labour",
@@ -66,7 +66,7 @@ const faqs = [
   },
   {
     q: "What do you need from us to get started?",
-    a: "The site address, start date and time, roles and numbers, expected duration, a site contact, and any PPE, access or parking notes. The Request labour button opens an email with these prompts filled in.",
+    a: "The site address, start date and time, roles and numbers, expected duration, a site contact, and any PPE, access or parking notes. The Book labour form asks for each of these, or the Email the brief button opens an email with the same prompts filled in.",
   },
 ];
 
@@ -75,7 +75,7 @@ export default function ClientsPage() {
     <>
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">For builders</p>
+          <p className="kicker text-white/65">For builders</p>
           <h1 className="display mt-6">Reliable labour for Sydney builders.</h1>
           <p className="lede mt-8 text-white/75">
             Tell us the site, the start time and the roles. We match the right
@@ -83,24 +83,40 @@ export default function ClientsPage() {
             to work.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-light w-full sm:w-auto">
-              Request labour
+            <a
+              href={BOOK_LABOUR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pill pill-light w-full sm:w-auto"
+            >
+              Book labour
+              <span className="sr-only"> (form opens in a new tab)</span>
+            </a>
+            <a href={REQUEST_LABOUR_HREF} className="pill pill-line w-full sm:w-auto">
+              Email the brief
             </a>
             <Link href="/services" className="pill pill-line w-full sm:w-auto">
               What we supply
             </Link>
           </div>
+          <p className="mt-6 text-sm text-white/60">
+            Prefer email? Write to{" "}
+            <a href={EMAIL_HREF} className="text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white">
+              {EMAIL}
+            </a>
+            .
+          </p>
         </div>
       </section>
 
       <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/45">How it works</p>
+          <p className="kicker text-navy/60">How it works</p>
           <h2 className="display mt-6">Four steps from brief to site.</h2>
           <ol className="mt-14 border-b border-navy/10">
             {steps.map((step, index) => (
               <li key={step.title} className="stack-row border-t border-navy/10">
-                <span className="kicker text-navy/40 sm:col-span-2">0{index + 1}</span>
+                <span className="kicker text-navy/60 sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
                   <h3 className="text-2xl font-semibold tracking-tight sm:text-4xl">{step.title}</h3>
                   <p className="mt-3 max-w-2xl text-base leading-relaxed text-navy/70 sm:text-lg">
@@ -115,7 +131,7 @@ export default function ClientsPage() {
 
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">Builders FAQ</p>
+          <p className="kicker text-white/65">Builders FAQ</p>
           <h2 className="display mt-6">Common questions.</h2>
           <div className="mt-14 border-b border-white/10">
             {faqs.map((item) => (
@@ -124,7 +140,7 @@ export default function ClientsPage() {
                   <span>{item.q}</span>
                   <span
                     aria-hidden="true"
-                    className="mt-1 flex-none text-2xl font-normal leading-none text-teal transition group-open:rotate-45"
+                    className="mt-1 flex-none text-2xl font-normal leading-none text-teal-300 transition group-open:rotate-45"
                   >
                     +
                   </span>
@@ -140,19 +156,31 @@ export default function ClientsPage() {
 
       <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/45">Request labour</p>
+          <p className="kicker text-navy/60">Request labour</p>
           <h2 className="display mt-6">Send us the brief.</h2>
           <p className="lede mt-8 text-navy/70">
-            One email with the site, start time, roles and numbers is all it
-            takes. Every request gets a personal reply from the owner.
+            Fill in the Book labour form with the site, start time, roles and
+            numbers, or send the same details by email. Every request gets a
+            personal reply from the owner.
           </p>
           <div className="mt-10 flex flex-col items-start gap-6">
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-dark">
-              Request labour
-            </a>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <a
+                href={BOOK_LABOUR_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pill pill-teal w-full sm:w-auto"
+              >
+                Book labour
+                <span className="sr-only"> (form opens in a new tab)</span>
+              </a>
+              <a href={REQUEST_LABOUR_HREF} className="pill pill-line-dark w-full sm:w-auto">
+                Email the brief
+              </a>
+            </div>
             <a
               href={EMAIL_HREF}
-              className="break-all text-lg font-medium text-teal underline decoration-teal/40 underline-offset-4 sm:text-2xl"
+              className="break-all text-lg font-medium text-teal-600 underline decoration-teal-600/40 underline-offset-4 sm:text-2xl"
             >
               {EMAIL}
             </a>

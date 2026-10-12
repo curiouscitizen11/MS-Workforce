@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { REQUEST_LABOUR_HREF } from "@/components/site";
+import { BOOK_LABOUR_URL } from "@/components/site";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -74,10 +74,12 @@ export default function Header() {
             );
           })}
           <a
-            href={REQUEST_LABOUR_HREF}
-            className="hidden rounded-full bg-teal px-4 py-1.5 text-[13px] font-medium text-white transition hover:bg-teal-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
+            href={BOOK_LABOUR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden rounded-full bg-teal-600 px-4 py-1.5 text-[13px] font-medium text-white transition hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
           >
-            Request labour
+            Book labour
           </a>
         </nav>
 
@@ -135,11 +137,13 @@ export default function Header() {
             })}
           </ul>
           <a
-            href={REQUEST_LABOUR_HREF}
+            href={BOOK_LABOUR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="pill pill-light mt-8 w-full"
             onClick={() => setOpen(false)}
           >
-            Request labour
+            Book labour
           </a>
         </nav>
       ) : null}
