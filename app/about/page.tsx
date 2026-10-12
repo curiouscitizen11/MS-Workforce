@@ -40,7 +40,7 @@ export default function AboutPage() {
     <>
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">About</p>
+          <p className="kicker text-white/65">About</p>
           <h1 className="display mt-6">Focused on construction labour. Nothing else.</h1>
           <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-white/75 sm:text-xl">
             <p>
@@ -60,7 +60,7 @@ export default function AboutPage() {
 
       <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/45">How we work</p>
+          <p className="kicker text-navy/60">How we work</p>
           <h2 className="display mt-6">Safety, reliability, respect, straightforward.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {values.map((item) => (

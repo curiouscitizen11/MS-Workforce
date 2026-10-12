@@ -62,7 +62,7 @@ export default function ServicesPage() {
     <>
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">Services</p>
+          <p className="kicker text-white/65">Services</p>
           <h1 className="display mt-6">Construction labour hire across Greater Sydney.</h1>
           <p className="lede mt-8 text-white/75">
             General labourers, trade assistants and site support crews for
@@ -102,7 +102,7 @@ export default function ServicesPage() {
 
       <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/45">Ways to book</p>
+          <p className="kicker text-navy/60">Ways to book</p>
           <h2 className="display mt-6">Short-notice and ongoing supply.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {supply.map((item) => (
@@ -121,7 +121,7 @@ export default function ServicesPage() {
 
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">Who we work with</p>
+          <p className="kicker text-white/65">Who we work with</p>
           <h2 className="display mt-6">Built for builders and trades.</h2>
           <ul className="mt-14 grid gap-px overflow-hidden rounded-3xl bg-white/10 sm:grid-cols-2">
             {sectors.map((item) => (
