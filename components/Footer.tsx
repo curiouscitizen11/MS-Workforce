@@ -14,6 +14,7 @@ const links = [
   { name: "Find work", href: "/candidates" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
+  { name: "Privacy", href: "/privacy" },
 ];
 
 const linkClass = "transition-colors hover:text-white";
@@ -95,7 +96,10 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/55 sm:flex-row sm:justify-between">
-          <span>© {new Date().getFullYear()} MS Workforce. All rights reserved.</span>
+          <span>
+            © {new Date().getFullYear()} MS Workforce. All rights reserved. ·{" "}
+            <Link href="/privacy" className={linkClass}>Privacy</Link>
+          </span>
           <span>Supplying construction sites across Greater Sydney, NSW.</span>
         </div>
       </div>

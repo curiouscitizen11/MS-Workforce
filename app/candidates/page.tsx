@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, OG_BASE } from "@/components/site";
 import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/tickets";
 
@@ -233,6 +234,12 @@ export default function CandidatesPage() {
             >
               {JOBS_EMAIL}
             </a>
+            <Link
+              href="/privacy"
+              className="text-sm text-white/65 underline decoration-white/30 underline-offset-4 hover:text-white"
+            >
+              How we handle your information
+            </Link>
           </div>
         </div>
       </section>

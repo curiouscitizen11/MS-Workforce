@@ -69,6 +69,12 @@ export default function ContactPage() {
               Email the brief
             </a>
           </div>
+          <Link
+            href="/privacy"
+            className="mt-6 inline-block text-sm text-white/65 underline decoration-white/30 underline-offset-4 hover:text-white"
+          >
+            How we handle your information
+          </Link>
         </div>
       </section>
 

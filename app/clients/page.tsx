@@ -184,6 +184,12 @@ export default function ClientsPage() {
             >
               {EMAIL}
             </a>
+            <Link
+              href="/privacy"
+              className="text-sm text-navy/60 underline decoration-navy/30 underline-offset-4 hover:text-navy"
+            >
+              How we handle your information
+            </Link>
           </div>
         </div>
       </section>
