@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { EMAIL, WORK_ENQUIRY_HREF, OG_BASE } from "@/components/site";
+import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, OG_BASE } from "@/components/site";
 import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/tickets";
 
 export const metadata: Metadata = {
@@ -44,8 +44,7 @@ const expect = [
   "Someone who picks up your message when something is not right on site.",
 ];
 
-const formUrl =
-  "https://protective-stamp-342.notion.site/69740d4cbc6c41ef914d8fb316b4b957?pvs=105";
+const formUrl = WORKER_FORM_URL;
 
 function TicketCard({ ticket }: { ticket: Ticket }) {
   return (
@@ -81,7 +80,7 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-teal-600 underline decoration-teal/40 underline-offset-4"
+              className="text-sm font-medium text-teal-700 underline decoration-teal/40 underline-offset-4"
             >
               {link.label}
               <span className="sr-only"> (opens in a new tab)</span>
@@ -98,7 +97,7 @@ export default function CandidatesPage() {
     <>
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">For workers</p>
+          <p className="kicker text-white/65">For workers</p>
           <h1 className="display mt-6">Construction work across Greater Sydney.</h1>
           <p className="lede mt-8 text-white/75">
             We place general labourers, trade assistants and site support
@@ -119,12 +118,12 @@ export default function CandidatesPage() {
 
       <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/45">The work</p>
+          <p className="kicker text-navy/60">The work</p>
           <h2 className="display mt-6">Labouring, trade assistant and site support work.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {work.map((item, index) => (
               <li key={item.title} className="stack-row border-t border-navy/10">
-                <span className="kicker text-navy/40 sm:col-span-2">0{index + 1}</span>
+                <span className="kicker text-navy/60 sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
                   <h3 className="text-2xl font-semibold tracking-tight sm:text-3xl">{item.title}</h3>
                   <p className="mt-3 max-w-2xl text-base leading-relaxed text-navy/70 sm:text-lg">
@@ -139,7 +138,7 @@ export default function CandidatesPage() {
 
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">What we look for</p>
+          <p className="kicker text-white/65">What we look for</p>
           <h2 className="display mt-6">Reliable people who take the work seriously.</h2>
           <ul className="mt-14 border-b border-white/10">
             {lookFor.map((item) => (
@@ -154,7 +153,7 @@ export default function CandidatesPage() {
 
       <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/45">What you can expect</p>
+          <p className="kicker text-navy/60">What you can expect</p>
           <h2 className="display mt-6">Looked after on every job.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {expect.map((item) => (
@@ -169,7 +168,7 @@ export default function CandidatesPage() {
 
       <section id="tickets" className="flex screen items-center bg-navy-50 text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/45">Get your tickets</p>
+          <p className="kicker text-navy/60">Get your tickets</p>
           <h2 className="display mt-6">Missing a ticket? Here&apos;s where to get it in Sydney.</h2>
           <p className="lede mt-8 text-navy/70">
             More tickets mean more sites you can work on. These registered
@@ -181,7 +180,7 @@ export default function CandidatesPage() {
               <TicketCard key={ticket.title} ticket={ticket} />
             ))}
           </ul>
-          <h3 className="kicker mt-16 text-navy/45">Useful extras</h3>
+          <h3 className="kicker mt-16 text-navy/60">Useful extras</h3>
           <ul className="mt-6 grid gap-5 md:grid-cols-2">
             {extras.map((ticket) => (
               <TicketCard key={ticket.title} ticket={ticket} />
@@ -189,7 +188,7 @@ export default function CandidatesPage() {
           </ul>
           <div className="mt-10 max-w-3xl space-y-2 text-sm leading-relaxed text-navy/60">
             <p>
-              Prices are as listed by each provider on {PRICES_CHECKED} and may
+              Prices are as listed by each provider in {PRICES_CHECKED} and may
               be subject to change. Check with the provider before booking.
             </p>
             <p>
@@ -209,20 +208,22 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy text-white">
+      <section id="register" className="flex screen scroll-mt-14 items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">How to register</p>
+          <p className="kicker text-white/65">How to register</p>
           <h2 className="display mt-6">Register through the employee portal.</h2>
           <p className="lede mt-8 text-white/75">
             The employee portal is where you submit your details and documents.
-            It takes a few minutes. If you have a question first, email us.
+            It takes a few minutes. We only ask whether you hold a White Card
+            and other tickets; we sight the cards themselves before any
+            placement. If you have a question first, email us.
           </p>
           <div className="mt-10 flex flex-col items-start gap-4">
             <a
               href={formUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-lg font-medium text-teal underline decoration-teal/40 underline-offset-4 sm:text-2xl"
+              className="text-lg font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 sm:text-2xl"
             >
               Open the employee portal
             </a>
@@ -230,7 +231,7 @@ export default function CandidatesPage() {
               href={WORK_ENQUIRY_HREF}
               className="text-lg font-medium text-white underline decoration-white/30 underline-offset-4 sm:text-2xl break-all"
             >
-              {EMAIL}
+              {JOBS_EMAIL}
             </a>
           </div>
         </div>

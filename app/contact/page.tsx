@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
+import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, OG_BASE } from "@/components/site";
 
 export const metadata: Metadata = {
   title: "Contact MS Workforce",
   description:
-    "Request construction labour or ask a question. Email MS Workforce at smoranc.marek@gmail.com. Based on Sydney's Northern Beaches, supplying sites across Greater Sydney.",
+    "Request construction labour or ask a question. Builders email hello@msworkforce.au; workers email jobs@msworkforce.au. Based on Sydney's Northern Beaches, supplying sites across Greater Sydney.",
   alternates: { canonical: "/contact" },
   openGraph: {
     ...OG_BASE,
@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 };
 
 const facts = [
-  { label: "Email", value: EMAIL, href: EMAIL_HREF },
+  { label: "Builders", value: EMAIL, href: EMAIL_HREF },
+  { label: "Workers", value: JOBS_EMAIL, href: JOBS_EMAIL_HREF },
   { label: "Based", value: "Northern Beaches, Sydney" },
   { label: "Service area", value: "Greater Sydney" },
 ];
@@ -35,24 +36,37 @@ export default function ContactPage() {
     <>
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">Contact</p>
+          <p className="kicker text-white/65">Contact</p>
           <h1 className="display mt-6">Request labour or ask a question.</h1>
           <p className="mt-8 max-w-full text-[clamp(1.5rem,6vw,4.5rem)] font-semibold leading-tight tracking-tight [overflow-wrap:anywhere]">
-            <a href={EMAIL_HREF} className="text-teal">
+            <a href={EMAIL_HREF} className="text-teal-300">
               {EMAIL}
             </a>
           </p>
           <p className="lede mt-8 text-white/70">
             Builders, site managers and trades: email the brief and you will get
-            a personal reply. Looking for work? Head to the{" "}
+            a personal reply. Looking for work? Email{" "}
+            <a href={JOBS_EMAIL_HREF} className="text-white underline decoration-white/30 underline-offset-4">
+              {JOBS_EMAIL}
+            </a>{" "}
+            or head to the{" "}
             <Link href="/candidates" className="text-white underline decoration-white/30 underline-offset-4">
               workers page
             </Link>
             .
           </p>
-          <div className="mt-10">
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-light">
-              Request labour
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <a
+              href={BOOK_LABOUR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pill pill-light w-full sm:w-auto"
+            >
+              Book labour
+              <span className="sr-only"> (form opens in a new tab)</span>
+            </a>
+            <a href={REQUEST_LABOUR_HREF} className="pill pill-line w-full sm:w-auto">
+              Email the brief
             </a>
           </div>
         </div>
@@ -60,36 +74,36 @@ export default function ContactPage() {
 
       <section className="flex screen items-center bg-white text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/45">Labour requests</p>
+          <p className="kicker text-navy/60">Labour requests</p>
           <h2 className="mt-6 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">
             What to include in a labour request.
           </h2>
           <ul className="mt-14 max-w-3xl border-b border-navy/10">
             {include.map((item, index) => (
               <li key={item} className="stack-row border-t border-navy/10">
-                <span className="kicker text-navy/40 sm:col-span-2">0{index + 1}</span>
+                <span className="kicker text-navy/60 sm:col-span-2">0{index + 1}</span>
                 <span className="text-xl font-medium tracking-tight sm:col-span-10 sm:text-2xl">{item}</span>
               </li>
             ))}
           </ul>
           <p className="lede mt-10 text-navy/70">
-            The Request labour button opens an email with these prompts already
-            filled in.
+            The Book labour form asks for each of these. The Email the brief button
+            opens an email with the same prompts already filled in.
           </p>
         </div>
       </section>
 
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/50">Details</p>
+          <p className="kicker text-white/65">Details</p>
           <h2 className="display mt-6">Northern Beaches based. Greater Sydney wide.</h2>
           <dl className="mt-14 max-w-3xl border-b border-white/10">
             {facts.map((item) => (
               <div key={item.label} className="stack-row border-t border-white/10">
-                <dt className="kicker text-white/50 sm:col-span-4">{item.label}</dt>
+                <dt className="kicker text-white/65 sm:col-span-4">{item.label}</dt>
                 <dd className="break-words text-xl font-medium tracking-tight sm:col-span-8 sm:text-2xl">
                   {item.href ? (
-                    <a href={item.href} className="text-teal">
+                    <a href={item.href} className="text-teal-300">
                       {item.value}
                     </a>
                   ) : (
