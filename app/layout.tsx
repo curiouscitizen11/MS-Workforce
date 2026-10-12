@@ -3,9 +3,10 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { EMAIL, SITE_NAME, SITE_URL } from "@/components/site";
+import { EMAIL, JOBS_EMAIL, SITE_NAME, SITE_URL, OG_BASE } from "@/components/site";
+import StickyCta from "@/components/StickyCta";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const description =
   "Construction labour hire across Greater Sydney. MS Workforce supplies general labourers, trade assistants and site support crews to builders, from day labour and short-notice cover to ongoing, project-based supply. Based on the Northern Beaches.";
@@ -36,11 +37,13 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: "Construction Labour Hire Sydney | MS Workforce",
     description,
+    images: OG_BASE.images,
   },
   twitter: {
     card: "summary_large_image",
     title: "Construction Labour Hire Sydney | MS Workforce",
     description,
+    images: ["/opengraph-image"],
   },
   robots: { index: true, follow: true },
   formatDetection: { telephone: false },
@@ -57,13 +60,16 @@ const organisation = {
   url: SITE_URL,
   email: EMAIL,
   description,
-  areaServed: { "@type": "City", name: "Sydney" },
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "Northern Beaches",
-    addressRegion: "NSW",
-    addressCountry: "AU",
-  },
+  logo: SITE_URL + "/icon",
+  image: SITE_URL + "/opengraph-image",
+  areaServed: [
+    { "@type": "Place", name: "Northern Beaches, Sydney NSW" },
+    { "@type": "City", name: "Sydney" },
+  ],
+  contactPoint: [
+    { "@type": "ContactPoint", contactType: "sales", email: EMAIL, areaServed: "AU", availableLanguage: "en-AU" },
+    { "@type": "ContactPoint", contactType: "recruitment", email: JOBS_EMAIL, areaServed: "AU", availableLanguage: "en-AU" },
+  ],
 };
 
 export default function RootLayout({
@@ -86,6 +92,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <StickyCta />
       </body>
     </html>
   );
