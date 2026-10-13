@@ -51,8 +51,8 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
   return (
     <li className="flex flex-col rounded-2xl border border-navy/10 bg-white p-6 sm:p-8">
       <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{ticket.title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-navy/70">{ticket.code}</p>
-      {ticket.note ? <p className="mt-3 text-sm leading-relaxed text-navy/70">{ticket.note}</p> : null}
+      <p className="mt-2 text-sm leading-relaxed text-navy/75">{ticket.code}</p>
+      {ticket.note ? <p className="mt-3 text-sm leading-relaxed text-navy/75">{ticket.note}</p> : null}
       <ul className="mt-5 flex-1 border-b border-navy/10">
         {ticket.providers.map((provider) => (
           <li key={provider.href} className="border-t border-navy/10 py-4">
@@ -66,7 +66,7 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
               {provider.label ? ": " + provider.label : ""}
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
-            <p className="mt-1 text-sm text-navy/60">
+            <p className="mt-1 text-sm text-navy/75">
               {provider.location} · RTO {provider.rto} ·{" "}
               <span className="font-medium text-navy/80">{provider.price}</span>
             </p>
@@ -117,17 +117,17 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-white text-navy">
+      <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/60">The work</p>
+          <p className="kicker text-navy/75">The work</p>
           <h2 className="display mt-6">Labouring, trade assistant and site support work.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {work.map((item, index) => (
               <li key={item.title} className="stack-row border-t border-navy/10">
-                <span className="kicker text-navy/60 sm:col-span-2">0{index + 1}</span>
+                <span className="kicker text-navy/75 sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
                   <h3 className="text-2xl font-semibold tracking-tight sm:text-3xl">{item.title}</h3>
-                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-navy/70 sm:text-lg">
+                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
                     {item.body}
                   </p>
                 </div>
@@ -152,9 +152,9 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-white text-navy">
+      <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/60">What you can expect</p>
+          <p className="kicker text-navy/75">What you can expect</p>
           <h2 className="display mt-6">Looked after on every job.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {expect.map((item) => (
@@ -167,11 +167,11 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section id="tickets" className="flex screen items-center bg-navy-50 text-navy">
+      <section id="tickets" className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/60">Get your tickets</p>
+          <p className="kicker text-navy/75">Get your tickets</p>
           <h2 className="display mt-6">Missing a ticket? Here&apos;s where to get it in Sydney.</h2>
-          <p className="lede mt-8 text-navy/70">
+          <p className="lede mt-8 text-navy/75">
             More tickets mean more sites you can work on. These registered
             training providers run the courses on the Northern Beaches and
             across Sydney. Most take a day or two.
@@ -181,13 +181,13 @@ export default function CandidatesPage() {
               <TicketCard key={ticket.title} ticket={ticket} />
             ))}
           </ul>
-          <h3 className="kicker mt-16 text-navy/60">Useful extras</h3>
+          <h3 className="kicker mt-16 text-navy/75">Useful extras</h3>
           <ul className="mt-6 grid gap-5 md:grid-cols-2">
             {extras.map((ticket) => (
               <TicketCard key={ticket.title} ticket={ticket} />
             ))}
           </ul>
-          <div className="mt-10 max-w-3xl space-y-2 text-sm leading-relaxed text-navy/60">
+          <div className="mt-10 max-w-3xl space-y-2 text-sm leading-relaxed text-navy/75">
             <p>
               Prices are as listed by each provider in {PRICES_CHECKED} and may
               be subject to change. Check with the provider before booking.

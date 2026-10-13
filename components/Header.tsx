@@ -40,7 +40,7 @@ export default function Header() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 h-[var(--site-header-height)] bg-navy text-white">
+    <header className="fixed inset-x-0 top-0 z-50 h-[var(--site-header-height)] bg-navy text-white shadow-[inset_0_-1px_0_rgba(51,191,175,0.22)]">
       <div className="wrap flex h-full items-center justify-between">
         <Link
           href="/"

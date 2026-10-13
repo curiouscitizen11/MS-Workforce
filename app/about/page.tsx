@@ -58,9 +58,9 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-white text-navy">
+      <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/60">How we work</p>
+          <p className="kicker text-navy/75">How we work</p>
           <h2 className="display mt-6">Safety, reliability, respect, straightforward.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {values.map((item) => (
@@ -68,7 +68,7 @@ export default function AboutPage() {
                 <h3 className="text-2xl font-semibold tracking-tight sm:col-span-4 sm:text-3xl">
                   {item.title}
                 </h3>
-                <p className="text-base leading-relaxed text-navy/70 sm:col-span-8 sm:text-lg">
+                <p className="text-base leading-relaxed text-navy/75 sm:col-span-8 sm:text-lg">
                   {item.body}
                 </p>
               </li>

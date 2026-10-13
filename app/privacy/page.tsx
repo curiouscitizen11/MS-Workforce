@@ -186,7 +186,7 @@ export default function PrivacyPage() {
         </div>
       </section>
 
-      <section className="bg-white text-navy">
+      <section className="bg-tint text-navy">
         <div className="wrap py-20 sm:py-24">
           <div className="max-w-3xl border-b border-navy/10">
             {sections.map((s) => (
@@ -196,7 +196,7 @@ export default function PrivacyPage() {
               </div>
             ))}
           </div>
-          <p className="mt-10 text-sm text-navy/60">
+          <p className="mt-10 text-sm text-navy/75">
             <Link href="/" className="underline underline-offset-4">Back to home</Link>
           </p>
         </div>

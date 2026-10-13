@@ -109,17 +109,17 @@ export default function ClientsPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-white text-navy">
+      <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/60">How it works</p>
+          <p className="kicker text-navy/75">How it works</p>
           <h2 className="display mt-6">Four steps from brief to site.</h2>
           <ol className="mt-14 border-b border-navy/10">
             {steps.map((step, index) => (
               <li key={step.title} className="stack-row border-t border-navy/10">
-                <span className="kicker text-navy/60 sm:col-span-2">0{index + 1}</span>
+                <span className="kicker text-navy/75 sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
                   <h3 className="text-2xl font-semibold tracking-tight sm:text-4xl">{step.title}</h3>
-                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-navy/70 sm:text-lg">
+                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
                     {step.body}
                   </p>
                 </div>
@@ -154,11 +154,11 @@ export default function ClientsPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-white text-navy">
+      <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/60">Request labour</p>
+          <p className="kicker text-navy/75">Request labour</p>
           <h2 className="display mt-6">Send us the brief.</h2>
-          <p className="lede mt-8 text-navy/70">
+          <p className="lede mt-8 text-navy/75">
             Fill in the Book labour form with the site, start time, roles and
             numbers, or send the same details by email. Every request gets a
             personal reply from the owner.
@@ -186,7 +186,7 @@ export default function ClientsPage() {
             </a>
             <Link
               href="/privacy"
-              className="text-sm text-navy/60 underline decoration-navy/30 underline-offset-4 hover:text-navy"
+              className="text-sm text-navy/75 underline decoration-navy/30 underline-offset-4 hover:text-navy"
             >
               How we handle your information
             </Link>

@@ -85,24 +85,24 @@ export default function ServicesPage() {
           key={item.title}
           className={
             "flex screen items-center " +
-            (item.dark ? "bg-navy text-white" : "bg-white text-navy")
+            (item.dark ? "bg-navy text-white" : "bg-tint text-navy")
           }
         >
           <div className="wrap py-24 sm:py-28">
-            <p className={"kicker " + (item.dark ? "text-white/70" : "text-navy/65")}>
+            <p className={"kicker " + (item.dark ? "text-white/70" : "text-navy/75")}>
               {item.kicker}
             </p>
             <h2 className="display mt-6">{item.title}</h2>
-            <p className={"lede mt-8 " + (item.dark ? "text-white/75" : "text-navy/70")}>
+            <p className={"lede mt-8 " + (item.dark ? "text-white/75" : "text-navy/75")}>
               {item.body}
             </p>
           </div>
         </section>
       ))}
 
-      <section className="flex screen items-center bg-white text-navy">
+      <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/60">Ways to book</p>
+          <p className="kicker text-navy/75">Ways to book</p>
           <h2 className="display mt-6">Short-notice and ongoing supply.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {supply.map((item) => (
@@ -110,7 +110,7 @@ export default function ServicesPage() {
                 <h3 className="text-2xl font-semibold tracking-tight sm:col-span-5 sm:text-3xl">
                   {item.title}
                 </h3>
-                <p className="text-base leading-relaxed text-navy/70 sm:col-span-7 sm:text-lg">
+                <p className="text-base leading-relaxed text-navy/75 sm:col-span-7 sm:text-lg">
                   {item.body}
                 </p>
               </li>

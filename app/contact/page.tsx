@@ -78,21 +78,21 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-white text-navy">
+      <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/60">Labour requests</p>
+          <p className="kicker text-navy/75">Labour requests</p>
           <h2 className="mt-6 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
             What to include in a labour request.
           </h2>
           <ul className="mt-14 max-w-3xl border-b border-navy/10">
             {include.map((item, index) => (
               <li key={item} className="stack-row border-t border-navy/10">
-                <span className="kicker text-navy/60 sm:col-span-2">0{index + 1}</span>
+                <span className="kicker text-navy/75 sm:col-span-2">0{index + 1}</span>
                 <span className="text-xl font-medium tracking-tight sm:col-span-10 sm:text-2xl">{item}</span>
               </li>
             ))}
           </ul>
-          <p className="lede mt-10 text-navy/70">
+          <p className="lede mt-10 text-navy/75">
             The Book labour form asks for each of these. The Email the brief button
             opens an email with the same prompts already filled in.
           </p>

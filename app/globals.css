@@ -13,7 +13,8 @@ html {
 }
 
 body {
-  @apply bg-white text-navy antialiased;
+  @apply text-navy antialiased;
+  background-color: #eef3f7;
 }
 
 ::selection {
@@ -141,4 +142,34 @@ main li.rounded-3xl, main .rounded-3xl > li, main .rounded-2xl {
   main .page-enter > section:first-of-type img { animation: none !important; }
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .pill:hover, main li.rounded-3xl:hover, main .rounded-2xl:hover { transform: none !important; }
+}
+
+/* ---- Brand backgrounds (soft tint + navy bands) ---- */
+.bg-tint {
+  background-color: #eef3f7;
+  background-image: linear-gradient(180deg, #f3f7fa 0%, #eaf1f5 100%);
+}
+main section.bg-navy {
+  position: relative;
+  isolation: isolate;
+  background-image: radial-gradient(120% 60% at 50% 0%, rgba(13, 148, 136, 0.16) 0%, rgba(13, 148, 136, 0) 60%);
+}
+/* thin teal divider at the top of each navy band */
+main section.bg-navy::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(51, 191, 175, 0) 0%, #33bfaf 20%, #33bfaf 80%, rgba(51, 191, 175, 0) 100%);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: -1;
+}
+main .page-enter > section.bg-navy:first-of-type::before { display: none; }
+/* Cards lift off the tint */
+main section.bg-tint .rounded-3xl.bg-white,
+main section.bg-tint .rounded-2xl.bg-white,
+main section.bg-tint li.bg-white {
+  border-color: rgba(10, 37, 64, 0.08);
+  box-shadow: 0 1px 2px rgba(10, 37, 64, 0.04), 0 8px 24px -16px rgba(10, 37, 64, 0.22);
 }
