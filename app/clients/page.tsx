@@ -38,7 +38,7 @@ const steps = [
 const faqs = [
   {
     q: "What kind of work can you cover?",
-    a: "General labouring, trade assistance, site cleans, rubbish removal and materials handling on residential, renovation and commercial sites across Greater Sydney.",
+    a: "General labouring, trade assistance, site cleans, rubbish removal and materials handling on residential, renovation and commercial sites across Greater Sydney. Labourers with asbestos awareness and Class B tickets are available on request.",
   },
   {
     q: "How much notice do you need?",

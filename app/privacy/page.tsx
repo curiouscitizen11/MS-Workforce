@@ -128,7 +128,7 @@ const sections: { title: string; body: React.ReactNode }[] = [
     title: "Security",
     body: (
       <p>
-        Access is limited to the director, using two-step sign-in. Worker forms
+        Access is limited to the owner, using two-step sign-in. Worker forms
         are private and password protected. We do not keep copies of identity
         documents after verifying them, and we delete information we no longer
         need.
@@ -181,7 +181,7 @@ export default function PrivacyPage() {
           <p className="kicker text-white/65">Privacy</p>
           <h1 className="display mt-6">Privacy Policy</h1>
           <p className="lede mt-8 text-white/75">
-            How we handle your information. Last updated 12 October 2026.
+            How we handle your information. Last updated 13 October 2026.
           </p>
         </div>
       </section>

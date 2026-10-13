@@ -20,7 +20,7 @@ const roles = [
   {
     kicker: "01",
     title: "General labourers",
-    body: "Reliable labour for site preparation, clean-up, loading and unloading, barrows and back-filling, and the everyday work that keeps a program on track.",
+    body: "Reliable labour for site preparation, clean-up, loading and unloading, barrows and back-filling, and the everyday work that keeps a program on track. Labourers with asbestos awareness and Class B tickets available on request.",
     dark: false,
   },
   {

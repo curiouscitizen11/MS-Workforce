@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const values = [
   {
     title: "Safety",
-    body: "Every worker goes home safe. We confirm site requirements before every start and act on concerns straight away.",
+    body: "We put safety first: we confirm site requirements before every start and act on concerns straight away.",
   },
   {
     title: "Reliability",

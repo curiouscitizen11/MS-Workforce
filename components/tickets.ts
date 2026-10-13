@@ -181,23 +181,6 @@ export const tickets: Ticket[] = [
 
 export const extras: Ticket[] = [
   {
-    title: "Traffic control",
-    code: "RIISS00054 Traffic Controller and RIISS00055 Traffic Management Implementer",
-    providers: [
-      {
-        name: "DLI Training",
-        rto: "21714",
-        location: "Auburn",
-        price: "$450 per person",
-        href: "https://www.dlitraining.edu.au/traffic-control-combo/",
-        label: "Traffic control combo course",
-      },
-    ],
-    official: [
-      { label: "SafeWork NSW: Traffic control work training cards", href: "https://www.safework.nsw.gov.au/licences-and-registrations/licences/traffic-control-work-training-card" },
-    ],
-  },
-  {
     title: "Forklift licence",
     code: "TLILIC0003 Licence to operate a forklift truck",
     providers: [
