@@ -44,7 +44,7 @@ body {
     @apply text-[11px] font-medium uppercase tracking-[0.22em];
   }
   .display {
-    @apply max-w-5xl text-balance text-[2.6rem] font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl xl:text-8xl;
+    @apply max-w-5xl text-balance text-[2.1rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl xl:text-[4.75rem];
   }
   .lede {
     @apply max-w-xl text-lg leading-relaxed sm:text-xl;

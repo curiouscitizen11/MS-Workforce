@@ -46,10 +46,10 @@ export default function Header() {
           href="/"
           className="block leading-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
         >
-          <span className="block text-[15px] font-semibold tracking-tight">
+          <span className="block text-[19px] font-semibold tracking-tight">
             MS <span className="text-teal">|</span> WORKFORCE
           </span>
-          <span className="mt-1 block text-[9px] font-medium tracking-[0.2em] text-white/70">
+          <span className="mt-1 block text-[11px] font-medium tracking-[0.2em] text-white/70">
             LABOUR HIRE
           </span>
         </Link>

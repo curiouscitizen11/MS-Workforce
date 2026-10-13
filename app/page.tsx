@@ -190,20 +190,20 @@ export default function HomePage() {
           href={BOOK_LABOUR_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex flex-col justify-end border-b transition-colors hover:bg-white/[0.03] border-white/10 px-5 py-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10 md:border-b-0 md:border-r"
+          className="group flex flex-col items-center justify-center text-center border-b transition-colors hover:bg-white/[0.03] border-white/10 px-5 py-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10 md:border-b-0 md:border-r"
         >
           <p className="kicker text-white/65">For builders</p>
-          <h2 className="mt-4 max-w-md text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h2 className="mx-auto mt-4 max-w-md text-balance text-3xl font-semibold tracking-tight sm:text-[2.5rem] sm:leading-[1.1]">
             Need labour on site? Send us the brief.
           </h2>
           <span className="mt-8 text-sm font-medium text-teal-300 transition group-hover:translate-x-1">Book labour →<span className="sr-only"> (form opens in a new tab)</span></span>
         </a>
         <Link
           href="/candidates"
-          className="group flex flex-col justify-end px-5 transition-colors hover:bg-white/[0.03] py-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10"
+          className="group flex flex-col items-center justify-center text-center px-5 transition-colors hover:bg-white/[0.03] py-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10"
         >
           <p className="kicker text-white/65">For workers</p>
-          <h2 className="mt-4 max-w-md text-4xl font-semibold tracking-tight sm:text-5xl">
+          <h2 className="mx-auto mt-4 max-w-md text-balance text-3xl font-semibold tracking-tight sm:text-[2.5rem] sm:leading-[1.1]">
             Looking for construction work in Sydney? Register with us.
           </h2>
           <span className="mt-8 text-sm font-medium text-teal-300 transition group-hover:translate-x-1">Find work →</span>
