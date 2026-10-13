@@ -76,3 +76,69 @@ body {
     @apply grid gap-3 py-8 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:py-10;
   }
 }
+
+/* ---- Motion (Apple-style: soft fade + small rise, long ease-out) ---- */
+:root {
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translate3d(0, 20px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hero-media {
+  from { opacity: 0; transform: scale(1.04); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.page-enter { animation: page-in 600ms var(--ease-apple) both; }
+
+/* Hero entrance: first section of each page, staggered */
+main .page-enter > section:first-of-type .wrap > * {
+  animation: fade-up 750ms var(--ease-out-soft) both;
+}
+main .page-enter > section:first-of-type .wrap > :nth-child(2) { animation-delay: 90ms; }
+main .page-enter > section:first-of-type .wrap > :nth-child(3) { animation-delay: 180ms; }
+main .page-enter > section:first-of-type .wrap > :nth-child(n + 4) { animation-delay: 270ms; }
+main .page-enter > section:first-of-type img {
+  animation: hero-media 900ms var(--ease-apple) both;
+}
+
+/* Scroll reveals (class added by JS only, so content is visible without JS) */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition: opacity 700ms var(--ease-out-soft), transform 700ms var(--ease-out-soft);
+}
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* Hover polish */
+.pill {
+  transition: transform 200ms var(--ease-apple), box-shadow 200ms var(--ease-apple),
+    background-color 200ms var(--ease-apple), color 200ms var(--ease-apple),
+    border-color 200ms var(--ease-apple);
+}
+main li.rounded-3xl, main .rounded-3xl > li, main .rounded-2xl {
+  transition: transform 200ms var(--ease-apple), box-shadow 200ms var(--ease-apple);
+}
+@media (hover: hover) {
+  .pill:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -10px rgba(10, 37, 64, 0.45); }
+  .pill:active { transform: translateY(0); }
+  main li.rounded-3xl:hover, main .rounded-2xl:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -18px rgba(10, 37, 64, 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter,
+  main .page-enter > section:first-of-type .wrap > *,
+  main .page-enter > section:first-of-type img { animation: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .pill:hover, main li.rounded-3xl:hover, main .rounded-2xl:hover { transform: none !important; }
+}
