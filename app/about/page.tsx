@@ -41,7 +41,7 @@ export default function AboutPage() {
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/65">About</p>
-          <h1 className="display mt-6">Focused on construction labour. Nothing else.</h1>
+          <h1 className="display mt-6">Focused on construction labour.</h1>
           <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-white/75 sm:text-xl">
             <p>
               MS Workforce is a construction labour hire business based on
