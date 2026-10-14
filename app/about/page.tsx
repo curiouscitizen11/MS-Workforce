@@ -19,19 +19,15 @@ export const metadata: Metadata = {
 const values = [
   {
     title: "Safety",
-    body: "We put safety first: we confirm site requirements before every start and act on concerns straight away.",
+    body: "We confirm site requirements before every start and act on concerns straight away.",
   },
   {
     title: "Reliability",
-    body: "On site, on time, ready to work. If we cannot fill a request properly, we say so.",
+    body: "On site, on time, ready to work. If we can't fill a request properly, we say so.",
   },
   {
     title: "Respect",
-    body: "Fair treatment and correct pay for workers. Clear, honest dealings with builders.",
-  },
-  {
-    title: "Straightforward",
-    body: "Plain answers, written rates, one weekly invoice. No fine print and no runaround.",
+    body: "Fair treatment and correct pay for workers, and honest dealings with builders.",
   },
 ];
 
@@ -41,18 +37,19 @@ export default function AboutPage() {
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/65">About</p>
-          <h1 className="display mt-6">Focused on construction labour.</h1>
+          <h1 className="display mt-6">Why MS Workforce</h1>
           <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-white/75 sm:text-xl">
             <p>
-              MS Workforce is a construction labour hire business based on
-              Sydney&apos;s Northern Beaches. We supply general labourers, trade
-              assistants and site support crews to builders and trades across
-              Greater Sydney.
+              I&apos;ve spent over five years on Sydney construction sites,
+              mostly in asbestos removal, where I hold Class A and Class B
+              supervisor tickets. I&apos;ve seen what a good labourer means to a
+              builder&apos;s program, and how much a no-show costs.
             </p>
             <p>
-              We keep the offer deliberately focused. That means we know the
-              work, we know the people we send, and builders deal directly with
-              the owner rather than a call centre.
+              I started MS Workforce to supply the kind of workers I&apos;d want
+              on my own sites: people who turn up on time, know what they&apos;re
+              doing and work safely. When you book with us, you deal with me
+              directly.
             </p>
           </div>
         </div>
@@ -61,7 +58,7 @@ export default function AboutPage() {
       <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-navy/75">How we work</p>
-          <h2 className="display mt-6">Safety, reliability, respect, straightforward.</h2>
+          <h2 className="display mt-6">Safety, reliability, respect.</h2>
           <ul className="mt-14 border-b border-navy/10">
             {values.map((item) => (
               <li key={item.title} className="stack-row border-t border-navy/10">

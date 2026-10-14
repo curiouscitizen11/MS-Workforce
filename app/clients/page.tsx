@@ -95,11 +95,15 @@ export default function ClientsPage() {
             <a href={REQUEST_LABOUR_HREF} className="pill pill-line w-full sm:w-auto">
               Email the brief
             </a>
-            <Link href="/services" className="pill pill-line w-full sm:w-auto">
-              What we supply
-            </Link>
           </div>
           <p className="mt-6 text-sm text-white/60">
+            See our full range of roles and booking options on the{" "}
+            <Link href="/services" className="text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white">
+              Services page
+            </Link>
+            .
+          </p>
+          <p className="mt-2 text-sm text-white/60">
             Prefer email? Write to{" "}
             <a href={EMAIL_HREF} className="text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white">
               {EMAIL}
