@@ -16,8 +16,9 @@ const requestBody = [
   "Role(s) and number of workers:",
   "Expected duration (day, week, ongoing):",
   "Site contact name and phone:",
-  "PPE and site requirements:",
   "Parking or access notes:",
+  "",
+  "MS Workforce workers arrive with their own basic PPE: hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses.",
   "",
   "Thanks,",
 ].join("\n");

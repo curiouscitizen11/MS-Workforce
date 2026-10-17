@@ -2,7 +2,10 @@ import { addDays, sydneyToday } from "@/lib/portal/dates"
 import { payFortnight } from "@/lib/portal/pay"
 import { blankTickets, type Offer, type PortalDocument, type StoredBlob, type Timesheet, type Worker } from "@/lib/portal/types"
 
-export const SEED_VERSION = 2
+export const SEED_VERSION = 3
+
+export const WHAT_TO_BRING =
+  "You must bring a hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses."
 
 export const DEMO_SIGNATURE =
   "data:image/svg+xml," +
@@ -185,7 +188,7 @@ export function buildSeed(now = new Date()): SeedData {
     inductionMethod: "HammerTech",
     inductionLink: "https://example.com/site-induction",
     signInMethod: "HammerTech QR at the gate",
-    bring: "Steel-cap boots, hi-vis, a hard hat, safety glasses and gloves. The site does not supply these.",
+    bring: WHAT_TO_BRING,
     highRisk: "Open edges on level 2. Stay behind the rails.",
     parking: "Street parking on Smith St. Do not block the driveway.",
     usualFinish: "15:30",

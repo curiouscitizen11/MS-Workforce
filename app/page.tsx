@@ -39,7 +39,7 @@ const steps = [
   },
   {
     title: "We match and confirm",
-    body: "We match workers we have screened ourselves to the job and confirm PPE, access and site requirements with you before the start.",
+    body: "We match workers we have screened ourselves to the job and confirm access and site requirements with you before the start. MS Workforce workers arrive with their own basic PPE: hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses.",
   },
   {
     title: "Crew on site",

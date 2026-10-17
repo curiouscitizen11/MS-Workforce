@@ -24,6 +24,7 @@ import {
   warningWindowDays,
 } from "@/lib/portal/compliance"
 import { decryptString } from "@/lib/portal/crypto"
+import { WHAT_TO_BRING } from "@/lib/portal/seed"
 import { addDays, daysBetween, formatDate, isMondayInSydney, sydneyParts, sydneyToday } from "@/lib/portal/dates"
 import { deletePrivateBlob, storePrivateBlob } from "@/lib/portal/blob"
 import { contentTypeFor, sniffFile, stripJpegExif } from "@/lib/portal/files"
@@ -827,7 +828,7 @@ export async function createOffers(
       signInMethod: input.signInMethod,
       highRisk: input.highRisk,
       parking: input.parking,
-      bring: input.bring,
+      bring: input.bring?.trim() || WHAT_TO_BRING,
       status: "Offered",
       expiresAt: new Date(ctx.now.getTime() + hours * 60 * 60 * 1000).toISOString(),
       sentAt: ctx.now.toISOString(),

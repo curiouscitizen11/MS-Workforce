@@ -28,7 +28,7 @@ const include = [
   "Roles and number of workers",
   "Expected duration",
   "Site contact name and phone",
-  "PPE, access and parking notes",
+  "Access and parking notes",
 ];
 
 export default function ContactPage() {
@@ -94,7 +94,9 @@ export default function ContactPage() {
           </ul>
           <p className="lede mt-10 text-navy/75">
             The Book labour form asks for each of these. The Email the brief button
-            opens an email with the same prompts already filled in.
+            opens an email with the same prompts already filled in. MS Workforce
+            workers arrive with their own basic PPE: hard hat, steel cap boots, long
+            pants, hi-vis clothing and safety glasses.
           </p>
         </div>
       </section>

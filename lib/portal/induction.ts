@@ -72,7 +72,7 @@ export const QUESTIONS: QuizQuestion[] = [
     options: [
       "Just a hi-vis shirt",
       "Whatever is in the ute",
-      "Steel-cap boots, hi-vis, hard hat and safety glasses",
+      "Hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses",
       "Boots only. The builder supplies the rest",
     ],
   },
