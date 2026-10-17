@@ -32,9 +32,26 @@ export function paidHours(
   return { ok: true, hours }
 }
 
-export function hoursWarnings(hours: number): string[] {
-  const warnings: string[] = []
-  if (hours > 12) warnings.push("That's more than 12 hours. Check the times with your supervisor.")
-  if (hours < 2) warnings.push("That's under 2 hours. Check the times with your supervisor.")
+export type HoursWarning = { level: "warn" | "confirm"; message: string }
+
+export function onQuarterHour(value: string): boolean {
+  const minutes = parseTime(value)
+  return minutes !== null && minutes % 15 === 0
+}
+
+export function formatHours(hours: number): string {
+  return hours.toFixed(1)
+}
+
+export function hoursWarnings(hours: number): HoursWarning[] {
+  const warnings: HoursWarning[] = []
+  if (hours > 12) {
+    warnings.push({ level: "confirm", message: "That's more than 12 hours. Confirm the times before you hand the phone over." })
+  } else if (hours > 10) {
+    warnings.push({ level: "warn", message: "That's more than 10 hours. Check the times with your supervisor." })
+  }
+  if (hours < 4) {
+    warnings.push({ level: "confirm", message: "That's under 4 hours. Confirm the times before you hand the phone over." })
+  }
   return warnings
 }

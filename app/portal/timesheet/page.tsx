@@ -1,6 +1,7 @@
 import { TimesheetForm } from "@/components/portal/TimesheetForm"
 import { Heading } from "@/components/portal/ui"
-import { sydneyToday } from "@/lib/portal/dates"
+import { formatDate, sydneyToday } from "@/lib/portal/dates"
+import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import Link from "next/link"
@@ -10,29 +11,50 @@ export default async function TimesheetPage() {
   const store = await getStore()
   const today = sydneyToday()
   const offers = (await store.offers.all()).filter((offer) => offer.workerId === worker.id && offer.status === "Accepted")
-  const shift = offers.find((offer) => offer.shiftDate === today) || offers[0]
-  if (!shift) {
-    return (
-      <div className="space-y-4">
-        <Heading kicker="Hours" title="No shift to log yet" text="Accept a shift first. Then come back at the end of the day." />
-        <Link href="/portal/offers" className="pill pill-teal w-full">
-          See offers
-        </Link>
-      </div>
-    )
-  }
-  const [hour] = shift.startTime.split(":")
-  const finishHour = String(Math.min(23, Number(hour) + shift.expectedHours)).padStart(2, "0")
+  const sheets = (await store.timesheets.all()).filter((sheet) => sheet.workerId === worker.id)
+  const fortnight = fortnightContaining(today)
+  const days = datesInFortnight(fortnight)
   return (
     <div className="space-y-4">
-      <Heading kicker="Hours" title="Log today's hours" text={shift.roleName + " · " + shift.suburb + ". No GPS."} />
+      <Heading kicker="Hours" title="Log today's hours" text="Enter the times at the end of the day. No GPS. MS Workforce." />
       <TimesheetForm
-        offerId={shift.id}
-        workDate={shift.shiftDate}
-        startDefault={shift.startTime}
-        finishDefault={finishHour + ":00"}
-        breakDefault={30}
+        today={today}
+        workerName={worker.name}
+        shifts={offers.map((offer) => ({
+          id: offer.id,
+          workDate: offer.shiftDate,
+          siteName: offer.siteName || offer.suburb,
+          suburb: offer.suburb,
+          builder: offer.siteContact || "Site",
+          start: offer.startTime,
+          finish: offer.usualFinish || "15:30",
+          breakMinutes: offer.usualBreak ?? 30,
+          signer: offer.timesheetSigner || offer.siteContact || "",
+          signerRole: offer.signerRole || "Site supervisor",
+        }))}
       />
+      <section className="rounded-2xl border border-navy/10 bg-white p-3">
+        <h2 className="text-sm font-semibold">This fortnight</h2>
+        <ul className="mt-2 space-y-1">
+          {days.map((day) => {
+            const sheet = sheets.find((item) => item.workDate === day && item.status !== "Draft")
+            const shift = offers.some((offer) => offer.shiftDate === day)
+            const label = sheet ? sheet.status : shift ? "Not signed" : "No shift"
+            return (
+              <li key={day} className="flex items-center justify-between gap-2 text-sm">
+                <span>{formatDate(day)}</span>
+                {sheet ? (
+                  <Link href={"/portal/timesheet/" + sheet.id} className="font-semibold text-teal-600">
+                    {label}
+                  </Link>
+                ) : (
+                  <span className="text-navy/60">{label}</span>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      </section>
     </div>
   )
 }

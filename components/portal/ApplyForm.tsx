@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { applyForWork } from "@/app/portal/actions"
 import { Field, fieldClass } from "@/components/portal/ui"
-import { DRIVER_CLASSES, HELD_CHOICES, ROLES } from "@/lib/portal/types"
+import { DRIVER_CLASSES, HELD_CHOICES, ROLES, WHITE_CARD_CHOICES } from "@/lib/portal/types"
 
 const ticketFields = [
   ["whiteCard", "White card"],
@@ -28,7 +28,7 @@ export function ApplyForm() {
   const [whatsappOk, setWhatsappOk] = useState(false)
   const [privacy, setPrivacy] = useState(false)
   const [tickets, setTickets] = useState<Record<string, string>>({
-    whiteCard: "Not held",
+    whiteCard: "Not completed",
     heights: "Not held",
     asbestosA: "Not held",
     asbestosB: "Not held",
@@ -41,7 +41,7 @@ export function ApplyForm() {
     return (
       <div className="rounded-2xl bg-white p-4">
         <h2 className="text-2xl font-semibold">Thanks</h2>
-        <p className="mt-2 text-sm leading-relaxed">Mav will call you within 2 business days.</p>
+        <p className="mt-2 text-sm leading-relaxed">MS Workforce will call you within 2 business days.</p>
       </div>
     )
   }
@@ -122,7 +122,7 @@ export function ApplyForm() {
                 value={tickets[key]}
                 onChange={(event) => setTickets({ ...tickets, [key]: event.target.value })}
               >
-                {HELD_CHOICES.map((choice) => (
+                {(key === "whiteCard" ? WHITE_CARD_CHOICES : HELD_CHOICES).map((choice) => (
                   <option key={choice}>{choice}</option>
                 ))}
               </select>

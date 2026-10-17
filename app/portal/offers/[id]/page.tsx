@@ -16,7 +16,7 @@ export default async function OfferPage({ params }: { params: { id: string } }) 
   const owner = worker.role === "admin" ? await store.workers.get(offer.workerId) : worker
   const check = owner
     ? canAcceptShift({ tickets: asTicketInputs(owner.tickets), jobDate: offer.shiftDate, required: offer.requiredTickets })
-    : { ok: false as const, message: "Call Mav." }
+    : { ok: false as const, message: "Call MS Workforce." }
   const showAddress = offer.status === "Accepted"
   return (
     <div className="space-y-4">

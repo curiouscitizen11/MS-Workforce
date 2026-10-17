@@ -11,7 +11,7 @@ export default function AdminLoginPage() {
   const devCode = isMock() ? totpCode(adminTotpSecret(), Date.now()) : undefined
   return (
     <div className="space-y-4">
-      <Heading kicker="Admin" title="One more code" text="This second code is only for Mav." />
+      <Heading kicker="Admin" title="One more code" text="This second code is only for the MS Workforce admin." />
       <AdminCodeForm devCode={devCode} />
     </div>
   )

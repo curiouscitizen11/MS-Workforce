@@ -5,7 +5,22 @@ import { useRouter } from "next/navigation"
 import { saveProfile, updateTicket } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { fieldClass } from "@/components/portal/ui"
-import { DRIVER_CLASSES, FITNESS_OPTIONS, HELD_CHOICES, PPE_OPTIONS, RTW_OPTIONS, TICKET_TYPES, TRANSPORT_OPTIONS, type TicketType, type Worker } from "@/lib/portal/types"
+import {
+  DRIVER_CLASSES,
+  EMERGENCY_RELATIONSHIPS,
+  FITNESS_OPTIONS,
+  HELD_CHOICES,
+  PPE_OPTIONS,
+  RTW_OPTIONS,
+  TICKET_TYPES,
+  TRANSPORT_OPTIONS,
+  VEVO_METHODS,
+  WEEKDAYS,
+  WHITE_CARD_CHOICES,
+  WORK_AREAS,
+  type TicketType,
+  type Worker,
+} from "@/lib/portal/types"
 
 export function OnboardingForm({ worker }: { worker: Worker }) {
   const router = useRouter()
@@ -40,9 +55,12 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
           onSubmit={(data) => start(() => save(data, 1))}
           fields={
             <>
+              <Text label="Preferred name" name="preferredName" defaultValue={worker.preferredName} />
               <Text label="Date of birth" name="dob" type="date" defaultValue={worker.dob} />
               <Text label="Address" name="address" defaultValue={worker.address} />
+              <Text label="Postcode" name="postcode" defaultValue={worker.postcode} />
               <Text label="Emergency contact" name="emergencyContact" defaultValue={worker.emergencyContact} />
+              <Select label="Relationship" name="emergencyRelationship" defaultValue={worker.emergencyRelationship} options={EMERGENCY_RELATIONSHIPS} />
               <Text label="Emergency phone" name="emergencyPhone" inputMode="tel" defaultValue={worker.emergencyPhone} />
             </>
           }
@@ -60,12 +78,10 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
                 I agree to a VEVO check if I am on a visa
               </label>
               <Text label="Visa subclass" name="visaSubclass" defaultValue={worker.visaSubclass} />
-              <Text label="Visa conditions" name="visaConditions" defaultValue={worker.visaConditions} />
               <Text label="Visa expiry" name="visaExpiry" type="date" defaultValue={worker.visaExpiry} />
-              <Text label="Passport number (optional, kept private)" name="passportNumber" autoComplete="off" />
-              <Text label="Passport country" name="passportCountry" />
+              <Select label="How will you show work rights?" name="vevoMethod" defaultValue={worker.vevoMethod} options={VEVO_METHODS} />
               <p className="text-xs leading-relaxed text-navy/70">
-                The passport number is encrypted. Mav sees it once for VEVO, then it is deleted. It is not sent to Notion.
+                Do not type a passport number. MS Workforce checks work rights with VEVO. Work limits come from that check.
               </p>
             </>
           }
@@ -77,7 +93,9 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
           pending={pending}
           onSubmit={(data) => {
             const ppe = PPE_OPTIONS.filter((item) => data["ppe-" + item] === "on")
-            start(() => save({ ppe, transport: data.transport }, 4))
+            const workDays = WEEKDAYS.filter((item) => data["day-" + item] === "on")
+            const workAreas = WORK_AREAS.filter((item) => data["area-" + item] === "on")
+            start(() => save({ ppe, transport: data.transport, workDays, workAreas }, 4))
           }}
           fields={
             <>
@@ -93,6 +111,28 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
                 </div>
               </fieldset>
               <Select label="How will you get to site?" name="transport" defaultValue={worker.transport} options={TRANSPORT_OPTIONS} />
+              <fieldset>
+                <legend className="text-sm font-semibold">Which days can you work?</legend>
+                <div className="mt-2 space-y-1">
+                  {WEEKDAYS.map((day) => (
+                    <label key={day} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+                      <input type="checkbox" name={"day-" + day} defaultChecked={worker.workDays?.includes(day)} />
+                      {day}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend className="text-sm font-semibold">Work areas</legend>
+                <div className="mt-2 space-y-1">
+                  {WORK_AREAS.map((area) => (
+                    <label key={area} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+                      <input type="checkbox" name={"area-" + area} defaultChecked={worker.workAreas?.includes(area)} />
+                      {area}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
             </>
           }
         />
@@ -100,15 +140,31 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
       {step === 4 ? (
         <Form
           pending={pending}
-          onSubmit={(data) => start(() => save({ fitness: data.fitness, healthConsent: data.healthConsent === "on" }, 5))}
+          onSubmit={(data) =>
+            start(() =>
+              save(
+                {
+                  fitness: data.fitness,
+                  healthConsent: data.healthConsent === "on",
+                  allergies: data.allergies,
+                  injury: data.injury,
+                  medicalNotes: data.medicalNotes,
+                },
+                5,
+              ),
+            )
+          }
           fields={
             <>
               <Select label="Can you safely do this work?" name="fitness" defaultValue={worker.fitness} options={FITNESS_OPTIONS} />
+              <Text label="Allergies (private)" name="allergies" defaultValue={worker.allergies} />
+              <Text label="Injury affecting duties (private)" name="injury" defaultValue={worker.injury} />
+              <Text label="Medical notes (private)" name="medicalNotes" defaultValue={worker.medicalNotes} />
               <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
                 <input type="checkbox" name="healthConsent" defaultChecked={worker.healthConsent} />
-                I agree you can store this fitness answer
+                I agree MS Workforce can store these private health answers
               </label>
-              <p className="text-xs text-navy/70">We do not ask for medical details.</p>
+              <p className="text-xs text-navy/70">These answers stay private. They are not shown to builders.</p>
             </>
           }
         />
@@ -125,6 +181,8 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
                   policiesAck: data.get("policies") === "on",
                   privacyConsent: data.get("privacy") === "on",
                   healthConsent: true,
+                  declaration: data.get("declaration") === "on",
+                  daConsent: data.get("da") === "on",
                   contractReceived: data.get("contract"),
                   contractAccepted: data.get("contractAccept") === "on",
                   signaturePng: signature,
@@ -143,6 +201,14 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
           <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
             <input type="checkbox" name="privacy" defaultChecked={worker.privacyConsent} />
             I agree to the privacy notice
+          </label>
+          <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+            <input type="checkbox" name="declaration" defaultChecked={worker.declaration} />
+            I declare these answers are true
+          </label>
+          <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+            <input type="checkbox" name="da" defaultChecked={worker.daConsent} />
+            I agree to the drug and alcohol policy
           </label>
           <Select label="Casual contract received?" name="contract" defaultValue={worker.contractReceived} options={["Yes", "Not yet"]} />
           <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
@@ -174,7 +240,7 @@ function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) 
         const data = new FormData(event.currentTarget)
         start(async () => {
           for (const type of TICKET_TYPES) {
-            const status = String(data.get(type) || "Not held")
+            const status = String(data.get(type) || (type === "whiteCard" ? "Not completed" : "Not held"))
             const result = await updateTicket(type, {
               status,
               number: String(data.get(type + "-number") || "") || undefined,
@@ -202,7 +268,7 @@ function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) 
 }
 
 function TicketRow({ type, status }: { type: TicketType; status: string }) {
-  const options = type === "driverLicence" ? DRIVER_CLASSES : HELD_CHOICES
+  const options = type === "driverLicence" ? DRIVER_CLASSES : type === "whiteCard" ? WHITE_CARD_CHOICES : HELD_CHOICES
   const labels: Record<TicketType, string> = {
     whiteCard: "White card",
     heights: "Work at heights",
@@ -216,7 +282,11 @@ function TicketRow({ type, status }: { type: TicketType; status: string }) {
   return (
     <label className="block text-sm font-semibold">
       {labels[type]}
-      <select name={type} defaultValue={status || "Not held"} className={fieldClass}>
+      <select
+        name={type}
+        defaultValue={type === "whiteCard" && (!status || status === "Not held") ? "Not completed" : status || "Not held"}
+        className={fieldClass}
+      >
         {options.map((option) => (
           <option key={option}>{option}</option>
         ))}

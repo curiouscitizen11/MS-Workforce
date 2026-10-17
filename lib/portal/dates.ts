@@ -42,6 +42,42 @@ export function formatTime(value: string): string {
   return minutes === "00" ? `${hour12}:00 ${suffix}` : `${hour12}:${minutes} ${suffix}`
 }
 
+export function sydneyParts(now: Date): { iso: string; minutes: number; weekday: string } {
+  const parts = new Intl.DateTimeFormat("en-AU", {
+    timeZone: SYDNEY,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    weekday: "short",
+  }).formatToParts(now)
+  const get = (type: string) => parts.find((part) => part.type === type)?.value || ""
+  let hour = Number(get("hour"))
+  if (hour === 24) hour = 0
+  return {
+    iso: get("year") + "-" + get("month") + "-" + get("day"),
+    minutes: hour * 60 + Number(get("minute")),
+    weekday: get("weekday"),
+  }
+}
+
+export function instantInSydney(isoDate: string, time: string): Date {
+  const [year, month, day] = isoDate.split("-").map(Number)
+  const [hour, minute] = time.split(":").map(Number)
+  let utc = Date.UTC(year, month - 1, day, hour, minute)
+  for (let pass = 0; pass < 3; pass += 1) {
+    const got = sydneyParts(new Date(utc))
+    const [gotHour, gotMinute] = [Math.floor(got.minutes / 60), got.minutes % 60]
+    const [gy, gm, gd] = got.iso.split("-").map(Number)
+    const delta = Date.UTC(year, month - 1, day, hour, minute) - Date.UTC(gy, gm - 1, gd, gotHour, gotMinute)
+    if (delta === 0) break
+    utc += delta
+  }
+  return new Date(utc)
+}
+
 export function isMondayInSydney(now: Date): boolean {
   const weekday = new Intl.DateTimeFormat("en-AU", {
     timeZone: SYDNEY,

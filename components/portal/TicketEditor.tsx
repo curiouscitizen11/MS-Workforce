@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { updateTicket, uploadDocument } from "@/app/portal/actions"
 import { fieldClass } from "@/components/portal/ui"
-import { DRIVER_CLASSES, HELD_CHOICES, TICKET_LABELS, TICKET_TYPES, type TicketType } from "@/lib/portal/types"
+import { DRIVER_CLASSES, HELD_CHOICES, TICKET_LABELS, TICKET_TYPES, WHITE_CARD_CHOICES, type TicketType } from "@/lib/portal/types"
 
 export function TicketEditor() {
   const router = useRouter()
@@ -14,7 +14,7 @@ export function TicketEditor() {
   const [expiry, setExpiry] = useState("")
   const [error, setError] = useState("")
   const [pending, start] = useTransition()
-  const options = type === "driverLicence" ? DRIVER_CLASSES : HELD_CHOICES
+  const options = type === "driverLicence" ? DRIVER_CLASSES : type === "whiteCard" ? WHITE_CARD_CHOICES : HELD_CHOICES
   return (
     <form
       className="space-y-3 rounded-2xl bg-white p-4"

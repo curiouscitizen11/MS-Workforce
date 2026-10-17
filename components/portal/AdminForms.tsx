@@ -131,7 +131,7 @@ export function VerifyPanel({
             const result = await saveVerification(workerId, {
               verificationMethod: String(data.get("method") || ""),
               verifiedOn: String(data.get("verifiedOn") || ""),
-              verifiedBy: String(data.get("verifiedBy") || "Mav"),
+              verifiedBy: String(data.get("verifiedBy") || "MS Workforce"),
               ticketsVerified: data.get("ticketsVerified") === "on",
               vevoResult: String(data.get("vevoResult") || "") || undefined,
               vevoCheckedOn: String(data.get("vevoCheckedOn") || "") || undefined,
@@ -144,7 +144,7 @@ export function VerifyPanel({
       >
         <Select name="method" label="Verification method" options={VERIFICATION_METHODS} />
         <Text name="verifiedOn" label="Verified on" type="date" />
-        <Text name="verifiedBy" label="Verified by" defaultValue="Mav" />
+        <Text name="verifiedBy" label="Verified by" defaultValue="MS Workforce" />
         <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
           <input type="checkbox" name="ticketsVerified" />
           Tickets verified

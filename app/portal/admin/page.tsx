@@ -18,7 +18,7 @@ export default async function AdminHomePage() {
   return (
     <div className="space-y-4">
       <DemoBanner mock={isMock()} />
-      <Heading kicker="Admin" title="Mav's desk" text="Check tickets, send offers, and read signed hours." />
+      <Heading kicker="Admin" title="Admin desk" text="Check tickets, send offers, and read signed hours." />
       <div className="grid grid-cols-3 gap-2 text-center">
         <Stat label="People" value={String(workers.length)} />
         <Stat label="Waiting" value={String(waiting)} />

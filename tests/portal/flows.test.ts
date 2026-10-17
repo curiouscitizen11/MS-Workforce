@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { encryptString } from "@/lib/portal/crypto"
 import { notionRequest } from "@/lib/portal/notion/client"
-import { workerNotionProperties } from "@/lib/portal/notion/map"
+import { timesheetNotionProperties, workerNotionProperties } from "@/lib/portal/notion/map"
 import { assertCanCreateShiftOffersDatabase } from "../../lib/portal/notion/shift-offers.mjs"
 import { createNotify } from "@/lib/portal/notify"
 import {
@@ -116,8 +116,11 @@ describe("portal flows", () => {
       start: "07:00",
       finish: "15:30",
       breakMinutes: 30,
+      incident: false,
+      workerConfirmed: true,
       supervisorName: "Pat Riley",
       supervisorRole: "Site supervisor",
+      supervisorConfirmed: true,
       signaturePng: "data:image/png;base64,abc",
     })
     expect(result.ok).toBe(true)
@@ -129,6 +132,14 @@ describe("portal flows", () => {
     expect(body).toContain("This signature is the approval")
     expect(body.toLowerCase()).not.toContain("tally")
     expect(body.toLowerCase()).not.toContain("approval link")
+    const sheet = await ctx.store.timesheets.get(result.id)
+    if (!sheet) throw new Error("missing timesheet")
+    const props = timesheetNotionProperties(sheet)
+    expect(props.Entry).toBe("Sam Lee – 2026-10-17")
+    expect(props.Source).toBe("Portal")
+    expect(props.Status).toBe("Approved")
+    expect(props["Signature"]).toBeUndefined()
+    expect(JSON.stringify(props).toLowerCase()).not.toMatch(/\btfn\b|tax file|\bbank\b|superannuation|passport|\bgps\b|latitude/)
   })
 
   it("clears ticket verification when a card changes", async () => {

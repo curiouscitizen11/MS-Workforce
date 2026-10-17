@@ -15,7 +15,7 @@ export default async function TicketsPage() {
   const docs = (await (await getStore()).documents.all()).filter((doc) => doc.workerId === worker.id && !doc.deletedAt)
   return (
     <div className="space-y-4">
-      <Heading kicker="Tickets" title="Your cards" text="A White card is required on every job. Changing a card sends it back for Mav to check." />
+      <Heading kicker="Tickets" title="Your cards" text="A White card is required on every job. Changing a card sends it back for MS Workforce to check." />
       <ul className="space-y-2">
         {check.tickets.map((ticket) => (
           <li key={ticket.type} className="flex items-center justify-between gap-2 rounded-2xl bg-white px-3 py-3">

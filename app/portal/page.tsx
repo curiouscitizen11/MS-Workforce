@@ -2,7 +2,9 @@ import Link from "next/link"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
 import { complianceFor } from "@/lib/portal/services"
-import { formatDate, formatTime, sydneyToday } from "@/lib/portal/dates"
+import { formatDate, formatTime, sydneyParts, sydneyToday } from "@/lib/portal/dates"
+import { formatHours } from "@/lib/portal/hours"
+import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 
@@ -19,7 +21,10 @@ export default async function DashboardPage() {
     )
   }
   const store = await getStore()
-  const today = sydneyToday()
+  const now = new Date()
+  const today = sydneyToday(now)
+  const afternoon = sydneyParts(now).minutes >= 14 * 60
+  const fortnight = fortnightContaining(today)
   const check = complianceFor(worker, today)
   const offers = (await store.offers.all()).filter((offer) => offer.workerId === worker.id)
   const open = offers.find((offer) => offer.status === "Offered")
@@ -62,15 +67,32 @@ export default async function DashboardPage() {
               Site info
             </Link>
             <Link href="/portal/timesheet" className="pill pill-teal w-full px-3">
-              Log hours
+              {afternoon ? "Log today's hours" : "Log hours"}
             </Link>
           </div>
         </section>
-      ) : (
+      ) : afternoon ? (
         <Link href="/portal/timesheet" className="pill pill-teal w-full">
           Log today&apos;s hours
         </Link>
-      )}
+      ) : null}
+      <section className="rounded-2xl border border-navy/10 bg-white p-3">
+        <h2 className="text-sm font-semibold">This fortnight</h2>
+        <ul className="mt-2 space-y-1">
+          {datesInFortnight(fortnight).map((day) => {
+            const sheet = sheets.find((item) => item.workDate === day && item.status !== "Draft")
+            const onShift = offers.some((offer) => offer.status === "Accepted" && offer.shiftDate === day)
+            return (
+              <li key={day} className="flex items-center justify-between text-sm">
+                <span>{formatDate(day)}</span>
+                <span className="font-semibold text-navy/70">
+                  {sheet ? formatHours(sheet.totalHours) + " h · " + sheet.status : onShift ? "Not signed" : "—"}
+                </span>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
       {latest?.status === "Approved" ? (
         <Link href={"/portal/timesheet/" + latest.id} className="block rounded-2xl border border-navy/10 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/60">Signed hours</p>
@@ -100,7 +122,7 @@ export default async function DashboardPage() {
         </Link>
       ) : null}
       {worker.status === "Applicant" ? (
-        <p className="text-sm leading-relaxed">Mav will call you within 2 business days. You can log in any time.</p>
+        <p className="text-sm leading-relaxed">MS Workforce will call you within 2 business days. You can log in any time.</p>
       ) : null}
     </div>
   )

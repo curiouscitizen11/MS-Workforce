@@ -18,6 +18,8 @@ import {
   saveUpload,
   submitApplication,
   submitInduction,
+  correctTimesheet,
+  queryTimesheet,
   submitTimesheet,
   verifyOtp,
   verifyWorker,
@@ -183,13 +185,43 @@ export async function lodgeTimesheet(input: {
   start: string
   finish: string
   breakMinutes: number
-  supervisorName?: string
-  supervisorRole?: string
-  signaturePng?: string
+  breakNote?: string
+  tasks?: string[]
+  taskNote?: string
+  incident: boolean
+  incidentNote?: string
+  workerNote?: string
+  workerConfirmed: boolean
+  confirmUnusualHours?: boolean
+  supervisorName: string
+  supervisorRole: string
+  supervisorConfirmed: boolean
+  signaturePng: string
 }) {
   const current = await readSession()
   if (!current) return { ok: false as const, error: "Log in again." }
-  const result = await submitTimesheet(await ctx(), { ...input, workerId: current.worker.id })
+  const result = await submitTimesheet(await ctx(), {
+    ...input,
+    workerId: current.worker.id,
+    ip: ip(),
+    userAgent: headers().get("user-agent") || "",
+  })
+  if (result.ok) refresh()
+  return result
+}
+
+export async function adjustTimesheet(sheetId: string, patch: { start: string; finish: string; breakMinutes: number; note?: string }) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  const result = await correctTimesheet(await ctx(), current.worker.id, sheetId, patch)
+  if (result.ok) refresh()
+  return result
+}
+
+export async function markTimesheetQueried(sheetId: string, note?: string) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  const result = await queryTimesheet(await ctx(), current.worker.id, sheetId, note)
   if (result.ok) refresh()
   return result
 }

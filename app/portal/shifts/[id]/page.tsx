@@ -49,7 +49,7 @@ export default async function ShiftPage({ params }: { params: { id: string } }) 
         {offer.bring ? <Row label="Bring" value={offer.bring} /> : null}
       </dl>
       <a className="pill pill-line-dark w-full" href={"tel:" + adminMobile()}>
-        Running late — call Mav
+        Running late — call MS Workforce
       </a>
       <Link href="/portal/timesheet" className="pill pill-teal w-full">
         Log hours

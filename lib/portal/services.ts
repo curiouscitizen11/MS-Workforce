@@ -23,11 +23,12 @@ import {
   earliestExpiry,
   warningWindowDays,
 } from "@/lib/portal/compliance"
-import { decryptString, encryptString } from "@/lib/portal/crypto"
-import { addDays, daysBetween, formatDate, isMondayInSydney, sydneyToday } from "@/lib/portal/dates"
+import { decryptString } from "@/lib/portal/crypto"
+import { addDays, daysBetween, formatDate, isMondayInSydney, sydneyParts, sydneyToday } from "@/lib/portal/dates"
 import { deletePrivateBlob, storePrivateBlob } from "@/lib/portal/blob"
 import { contentTypeFor, sniffFile, stripJpegExif } from "@/lib/portal/files"
-import { hoursWarnings, paidHours } from "@/lib/portal/hours"
+import { formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
+import { MS_PHONE, fortnightContaining, olderThanDays, payFortnight, timesheetReminder } from "@/lib/portal/pay"
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
 import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
@@ -40,13 +41,17 @@ import {
   DRIVER_CLASSES,
   HELD_CHOICES,
   ROLES,
+  SUPERVISOR_ROLES,
   TICKET_LABELS,
+  TIMESHEET_TASKS,
   VEVO_RESULTS,
   VERIFICATION_METHODS,
+  WHITE_CARD_CHOICES,
   type Offer,
   type Session,
   type Ticket,
   type TicketType,
+  type Timesheet,
   type Worker,
 } from "@/lib/portal/types"
 import { z } from "zod"
@@ -121,7 +126,7 @@ export async function requestOtp(ctx: Ctx, input: { mobile: string; ip: string }
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
   const worker = await findWorkerByMobile(ctx, mobile)
   if (!worker) return fail("That mobile is not on file. Apply for work first.", "unknown")
-  if (worker.status === "Inactive") return fail("This account is inactive. Call Mav.")
+  if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
   const challenges = await ctx.store.challenges.all()
   const recent = challenges.filter((item) => item.target === mobile && within(item.createdAt, ctx.now, OTP_SEND_WINDOW_MS))
   if (recent.some((item) => item.lockedUntil && Date.parse(item.lockedUntil) > ctx.now.getTime())) {
@@ -171,7 +176,7 @@ export async function verifyOtp(ctx: Ctx, input: { mobile: string; code: string 
   latest.consumedAt = ctx.now.toISOString()
   await ctx.store.challenges.save(latest)
   const worker = await findWorkerByMobile(ctx, mobile)
-  if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call Mav.")
+  if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
   if (worker.role === "admin") return { ok: true as const, needsTotp: true as const, workerId: worker.id }
   const session = await openSession(ctx, worker)
   return { ok: true as const, needsTotp: false as const, session }
@@ -204,7 +209,7 @@ export async function requestMagicLink(ctx: Ctx, input: { email: string; origin:
   const email = input.email.trim().toLowerCase()
   const worker = (await ctx.store.workers.all()).find((item) => item.email?.toLowerCase() === email)
   if (!worker) return fail("That email is not on file. Try your mobile instead.", "unknown")
-  if (worker.status === "Inactive") return fail("This account is inactive. Call Mav.")
+  if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
   const token = newId("magic") + newId()
   await ctx.store.magics.save({
     id: sha256(token),
@@ -228,7 +233,7 @@ export async function consumeMagicLink(ctx: Ctx, token: string) {
   row.usedAt = ctx.now.toISOString()
   await ctx.store.magics.save(row)
   const worker = await ctx.store.workers.get(row.workerId)
-  if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call Mav.")
+  if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
   if (worker.role === "admin") return { ok: true as const, needsTotp: true as const, workerId: worker.id }
   const session = await openSession(ctx, worker)
   return { ok: true as const, needsTotp: false as const, session }
@@ -244,7 +249,7 @@ const applySchema = z.object({
   whatsappOk: z.boolean(),
   privacyConsent: z.literal(true),
   tickets: z.object({
-    whiteCard: z.enum(HELD_CHOICES),
+    whiteCard: z.enum(WHITE_CARD_CHOICES),
     heights: z.enum(HELD_CHOICES),
     asbestosA: z.enum(HELD_CHOICES),
     asbestosB: z.enum(HELD_CHOICES),
@@ -316,33 +321,48 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
   const sensitive = texts([
     stringOf(patch.address),
     stringOf(patch.emergencyContact),
-    stringOf(patch.visaConditions),
     stringOf(patch.visaSubclass),
     stringOf(patch.typedName),
+    stringOf(patch.preferredName),
+    stringOf(patch.workHistory),
+    stringOf(patch.medicalNotes),
+    stringOf(patch.injury),
   ])
   if (sensitive) return fail(SENSITIVE_MESSAGE)
   if (typeof patch.dob === "string") worker.dob = patch.dob
+  if (typeof patch.preferredName === "string") worker.preferredName = patch.preferredName
   if (typeof patch.address === "string") worker.address = patch.address
+  if (typeof patch.postcode === "string") worker.postcode = patch.postcode
   if (typeof patch.emergencyContact === "string") worker.emergencyContact = patch.emergencyContact
+  if (typeof patch.emergencyRelationship === "string") worker.emergencyRelationship = patch.emergencyRelationship
   if (typeof patch.emergencyPhone === "string") worker.emergencyPhone = toE164(patch.emergencyPhone) || patch.emergencyPhone
   if (typeof patch.rtw === "string") {
-    worker.rtw = patch.rtw
-    if (patch.rtw === "Citizen - passport" || patch.rtw === "Permanent resident") worker.rightToWork = "Yes"
-  }
-  if (typeof patch.vevoConsent === "boolean") worker.vevoConsent = patch.vevoConsent
-  if (typeof patch.visaSubclass === "string") worker.visaSubclass = patch.visaSubclass
-  if (typeof patch.visaConditions === "string") worker.visaConditions = patch.visaConditions
-  if (typeof patch.visaExpiry === "string") worker.visaExpiry = patch.visaExpiry
-  if (typeof patch.passportNumber === "string" && patch.passportNumber.trim()) {
-    worker.passport = {
-      ciphertext: encryptString(patch.passportNumber.trim()),
-      country: stringOf(patch.passportCountry) || "",
-      collectedAt: ctx.now.toISOString(),
+    worker.rtw = patch.rtw === "Citizen - passport" ? "Australian citizen" : patch.rtw === "Visa - VEVO" ? "Visa holder" : patch.rtw
+    if (worker.rtw === "Australian citizen" || worker.rtw === "Permanent resident" || worker.rtw === "New Zealand citizen") {
+      worker.rightToWork = "Yes"
     }
   }
+  if (typeof patch.vevoConsent === "boolean") worker.vevoConsent = patch.vevoConsent
+  if (typeof patch.vevoMethod === "string") worker.vevoMethod = patch.vevoMethod
+  if (typeof patch.visaSubclass === "string") worker.visaSubclass = patch.visaSubclass
+  if (typeof patch.visaExpiry === "string") worker.visaExpiry = patch.visaExpiry
+  worker.visaConditions = undefined
   if (Array.isArray(patch.ppe)) worker.ppe = patch.ppe.map(String)
+  if (Array.isArray(patch.workAreas)) worker.workAreas = patch.workAreas.map(String)
+  if (Array.isArray(patch.workDays)) worker.workDays = patch.workDays.map(String)
+  if (typeof patch.experienceLevel === "string") worker.experienceLevel = patch.experienceLevel
+  if (typeof patch.workHistory === "string") worker.workHistory = patch.workHistory
+  if (typeof patch.availableFrom === "string") worker.availableFrom = patch.availableFrom
+  if (typeof patch.constructionRecent === "string") worker.constructionRecent = patch.constructionRecent
   if (typeof patch.transport === "string") worker.transport = patch.transport
-  if (typeof patch.fitness === "string") worker.fitness = patch.fitness
+  if (typeof patch.fitness === "string") {
+    worker.fitness = patch.fitness === "Yes" ? "Yes, I can safely do these tasks" : patch.fitness
+  }
+  if (typeof patch.allergies === "string") worker.allergies = patch.allergies
+  if (typeof patch.injury === "string") worker.injury = patch.injury
+  if (typeof patch.medicalNotes === "string") worker.medicalNotes = patch.medicalNotes
+  if (typeof patch.daConsent === "boolean") worker.daConsent = patch.daConsent
+  if (typeof patch.declaration === "boolean") worker.declaration = patch.declaration
   if (typeof patch.healthConsent === "boolean") worker.healthConsent = patch.healthConsent
   if (typeof patch.policiesAck === "boolean") worker.policiesAck = patch.policiesAck
   if (typeof patch.contractReceived === "string") worker.contractReceived = patch.contractReceived
@@ -372,13 +392,13 @@ function stringOf(value: unknown) {
 export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, ticket: Ticket) {
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Log in again.")
-  const allowed = type === "driverLicence" ? DRIVER_CLASSES : HELD_CHOICES
+  const allowed = type === "driverLicence" ? DRIVER_CLASSES : type === "whiteCard" ? WHITE_CARD_CHOICES : HELD_CHOICES
   if (!allowed.includes(ticket.status as never)) return fail("Choose one of the listed options.")
   if (texts([ticket.number, ticket.note])) return fail(SENSITIVE_MESSAGE)
   worker.tickets[type] = {
     ...worker.tickets[type],
     ...ticket,
-    pendingCheck: ticket.status !== "Not held",
+    pendingCheck: ticket.status !== "Not held" && ticket.status !== "Not completed",
   }
   worker.ticketsVerified = false
   const note = "Ticket updated in the portal on " + sydneyToday(ctx.now) + ". Needs a new check."
@@ -403,7 +423,7 @@ export async function saveUpload(
   try {
     url = await storePrivateBlob(id, bytes, contentType)
   } catch {
-    return fail("The private file store did not accept this photo. Try again, or ask Mav.")
+    return fail("The private file store did not accept this photo. Try again, or call MS Workforce on " + MS_PHONE + ".")
   }
   await ctx.store.blobs.save({
     id,
@@ -500,7 +520,7 @@ export async function respondToOffer(
   if (Date.parse(offer.expiresAt) < ctx.now.getTime()) {
     offer.status = "Expired"
     await ctx.store.offers.save(offer)
-    return fail("This offer has expired. Call Mav if you still want the shift.")
+    return fail("This offer has expired. Call MS Workforce on " + MS_PHONE + " if you still want the shift.")
   }
   const worker = await ctx.store.workers.get(input.workerId)
   if (!worker) return fail("Log in again.")
@@ -543,82 +563,190 @@ export async function submitTimesheet(
     start: string
     finish: string
     breakMinutes: number
-    supervisorName?: string
-    supervisorRole?: string
-    signaturePng?: string
+    breakNote?: string
+    tasks?: string[]
+    taskNote?: string
+    incident: boolean
+    incidentNote?: string
+    workerNote?: string
+    workerConfirmed: boolean
+    confirmUnusualHours?: boolean
+    supervisorName: string
+    supervisorRole: string
+    supervisorConfirmed: boolean
+    signaturePng: string
+    ip?: string
+    userAgent?: string
   },
 ) {
   const offer = await ctx.store.offers.get(input.offerId)
   if (!offer || offer.workerId !== input.workerId || offer.status !== "Accepted") {
     return fail("Choose an accepted shift first.")
   }
+  if (offer.shiftDate !== input.workDate) return fail("Choose the shift for that day.")
+  const today = sydneyToday(ctx.now)
+  if (input.workDate > today) return fail("That date has not happened yet.")
+  if (olderThanDays(input.workDate, today, 7)) return fail("Please call MS Workforce on " + MS_PHONE)
   const worker = await ctx.store.workers.get(input.workerId)
   if (!worker) return fail("Log in again.")
-  const hours = paidHours(input.start, input.finish, Number(input.breakMinutes))
+  if (!onQuarterHour(input.start) || !onQuarterHour(input.finish)) {
+    return fail("Use 15-minute steps for start and finish.")
+  }
+  const startMin = timeMinutes(input.start)
+  const finishMin = timeMinutes(input.finish)
+  if (startMin < 5 * 60 || startMin > 20 * 60 || finishMin < 5 * 60 || finishMin > 20 * 60) {
+    return fail("Start and finish need to be between 5:00 am and 8:00 pm.")
+  }
+  const breakMinutes = Number(input.breakMinutes)
+  if (!Number.isInteger(breakMinutes) || breakMinutes < 0 || breakMinutes > 120) {
+    return fail("Unpaid break needs to be between 0 and 120 minutes.")
+  }
+  const hours = paidHours(input.start, input.finish, breakMinutes)
   if (!hours.ok) return hours
-  const sensitive = texts([input.supervisorName, input.supervisorRole])
+  const warnings = hoursWarnings(hours.hours)
+  if (warnings.some((warning) => warning.level === "confirm") && !input.confirmUnusualHours) {
+    return fail(warnings.find((warning) => warning.level === "confirm")?.message || "Confirm the times.")
+  }
+  if (!input.workerConfirmed) return fail("Tick the box to confirm these are the hours you worked.")
+  if (typeof input.incident !== "boolean") return fail("Say whether there was an incident today.")
+  if (input.incident && !input.incidentNote?.trim()) return fail("Tell us what happened.")
+  if (!input.supervisorConfirmed) return fail("The supervisor needs to tick the hours as correct.")
+  const supervisorName = input.supervisorName.trim()
+  if (!supervisorName) return fail("The supervisor needs to type their name.")
+  if (!SUPERVISOR_ROLES.includes(input.supervisorRole as (typeof SUPERVISOR_ROLES)[number])) {
+    return fail("Choose the supervisor's role.")
+  }
+  if (!input.signaturePng?.startsWith("data:image/") || input.signaturePng.length > 1_500_000) {
+    return fail("The supervisor needs to sign on the screen.")
+  }
+  const tasks = (input.tasks || []).filter((task) => TIMESHEET_TASKS.includes(task as (typeof TIMESHEET_TASKS)[number]))
+  if ((input.tasks || []).length !== tasks.length) return fail("Choose tasks from the list.")
+  const workerNote = input.workerNote?.trim().slice(0, 300)
+  const sensitive = texts([supervisorName, input.breakNote, input.taskNote, input.incidentNote, workerNote])
   if (sensitive) return fail(sensitive)
   const existing = (await ctx.store.timesheets.all()).find(
     (sheet) => sheet.workerId === input.workerId && sheet.placementRef === offer.placementRef && sheet.workDate === input.workDate,
   )
-  if (existing?.status === "Approved") return fail("These hours are already signed. Call Mav if something is wrong.")
-  const warnings = hoursWarnings(hours.hours)
-  const signed = Boolean(input.signaturePng && input.supervisorName?.trim())
-  if (input.signaturePng && !input.supervisorName?.trim()) return fail("The supervisor needs to type their name.")
-  const sheet = existing || {
-    id: newId("ts"),
+  if (existing && existing.status !== "Draft") {
+    return fail("These hours are already signed. Something wrong? Call MS Workforce on " + MS_PHONE + ".")
+  }
+  const fortnight = payFortnight(ctx.now)
+  const planned = (offer.timesheetSigner || "").trim().toLowerCase()
+  const sheet: Timesheet = {
+    id: existing?.id || newId("ts"),
     workerId: worker.id,
     offerId: offer.id,
     placementRef: offer.placementRef,
     workDate: input.workDate,
     start: input.start,
     finish: input.finish,
-    breakMinutes: Number(input.breakMinutes),
+    breakMinutes,
+    breakNote: input.breakNote?.trim() || undefined,
     totalHours: hours.hours,
-    status: "Draft" as const,
+    tasks,
+    taskNote: input.taskNote?.trim() || undefined,
+    incident: input.incident,
+    incidentNote: input.incident ? input.incidentNote?.trim() : undefined,
+    workerNote: workerNote || undefined,
+    workerConfirmedAt: ctx.now.toISOString(),
+    status: "Approved",
+    supervisorName,
+    supervisorRole: input.supervisorRole,
+    plannedSigner: offer.timesheetSigner,
+    signerMismatch: Boolean(planned) && planned !== supervisorName.toLowerCase(),
+    signaturePng: input.signaturePng,
+    signatureIp: input.ip?.slice(0, 80),
+    signatureUserAgent: input.userAgent?.slice(0, 180),
+    approvedAt: ctx.now.toISOString(),
+    payFortnight: fortnight.label,
+    payDay: fortnight.payDay,
+    afterCutoff: fortnight.afterCutoff,
+    corrected: false,
+    source: "Portal",
     workerName: worker.name,
-  }
-  sheet.start = input.start
-  sheet.finish = input.finish
-  sheet.breakMinutes = Number(input.breakMinutes)
-  sheet.totalHours = hours.hours
-  sheet.offerId = offer.id
-  if (signed) {
-    sheet.status = "Approved"
-    sheet.supervisorName = input.supervisorName?.trim()
-    sheet.supervisorRole = input.supervisorRole?.trim() || "Site supervisor"
-    sheet.signaturePng = input.signaturePng
-    sheet.approvedAt = ctx.now.toISOString()
-    sheet.confirmationSentAt = ctx.now.toISOString()
+    siteName: offer.siteName,
+    suburb: offer.suburb,
+    confirmationSentAt: ctx.now.toISOString(),
   }
   await ctx.store.timesheets.save(sheet)
-  if (signed) {
-    await enqueue(ctx, "timesheets", timesheetNotionProperties(sheet))
-    const body = [
-      "Hours signed",
-      "",
-      worker.name,
-      "Date: " + formatDate(sheet.workDate),
-      "Start: " + sheet.start,
-      "Finish: " + sheet.finish,
-      "Unpaid break: " + sheet.breakMinutes + " minutes",
-      "Paid hours: " + sheet.totalHours,
-      "",
-      "Signed on site by " + sheet.supervisorName + (sheet.supervisorRole ? " (" + sheet.supervisorRole + ")" : "") + ".",
-      "This signature is the approval.",
-      "",
-      "Pay is fortnightly, on Thursday.",
-    ].join("\n")
-    if (worker.email) {
-      await ctx.notify.email({ to: worker.email, subject: "Hours signed — " + formatDate(sheet.workDate), body })
-    }
-    await ctx.notify.email({ to: adminEmail(), subject: "Hours signed — " + worker.name, body })
-    if (offer.siteEmail) {
-      await ctx.notify.email({ to: offer.siteEmail, subject: "Hours signed — " + worker.name, body })
-    }
-    await audit(ctx, worker.id, "timesheet-signed", sheet.id)
+  await enqueue(ctx, "timesheets", timesheetNotionProperties(sheet))
+  const body = [
+    "Hours signed",
+    "",
+    worker.name,
+    "Date: " + formatDate(sheet.workDate),
+    "Start: " + sheet.start,
+    "Finish: " + sheet.finish,
+    "Unpaid break: " + sheet.breakMinutes + " minutes",
+    "Paid hours: " + formatHours(sheet.totalHours),
+    "",
+    "Signed on site by " + sheet.supervisorName + (sheet.supervisorRole ? " (" + sheet.supervisorRole + ")" : "") + ".",
+    "This signature is the approval.",
+    "",
+    "Pay is fortnightly, on Thursday.",
+    "This fortnight: " + fortnight.label + ". Pay day: Thursday " + formatDate(fortnight.payDay) + ".",
+  ].join("\n")
+  if (worker.email) {
+    await ctx.notify.email({ to: worker.email, subject: "Hours signed — " + formatDate(sheet.workDate), body })
   }
-  return { ok: true as const, id: sheet.id, hours: hours.hours, warnings, status: sheet.status }
+  await ctx.notify.email({ to: adminEmail(), subject: "Hours signed — " + worker.name, body })
+  if (sheet.incident) {
+    const alert = worker.name + " reported an incident on " + formatDate(sheet.workDate) + ". " + (sheet.incidentNote || "")
+    await ctx.notify.sms(adminMobile(), alert)
+    await ctx.notify.email({ to: adminEmail(), subject: "Incident — " + worker.name, body: alert })
+  }
+  await audit(ctx, worker.id, "timesheet-signed", sheet.id)
+  return { ok: true as const, id: sheet.id, hours: hours.hours, warnings, status: sheet.status, afterCutoff: fortnight.afterCutoff, payDay: fortnight.payDay }
+}
+
+function timeMinutes(value: string) {
+  const [hour, minute] = value.split(":").map(Number)
+  return hour * 60 + minute
+}
+
+export async function correctTimesheet(
+  ctx: Ctx,
+  adminId: string,
+  sheetId: string,
+  patch: { start: string; finish: string; breakMinutes: number; note?: string },
+) {
+  const admin = await ctx.store.workers.get(adminId)
+  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  const sheet = await ctx.store.timesheets.get(sheetId)
+  if (!sheet || sheet.status === "Draft") return fail("Only a signed timesheet can be corrected.")
+  const hours = paidHours(patch.start, patch.finish, Number(patch.breakMinutes))
+  if (!hours.ok) return hours
+  const before = JSON.stringify({
+    start: sheet.start,
+    finish: sheet.finish,
+    breakMinutes: sheet.breakMinutes,
+    totalHours: sheet.totalHours,
+    status: sheet.status,
+  })
+  sheet.start = patch.start
+  sheet.finish = patch.finish
+  sheet.breakMinutes = Number(patch.breakMinutes)
+  sheet.totalHours = hours.hours
+  sheet.status = "Approved"
+  sheet.corrected = true
+  await ctx.store.timesheets.save(sheet)
+  await enqueue(ctx, "timesheets", timesheetNotionProperties(sheet))
+  await audit(ctx, adminId, "timesheet-corrected", sheet.id, before + (patch.note ? " " + patch.note : ""))
+  return { ok: true as const, id: sheet.id }
+}
+
+export async function queryTimesheet(ctx: Ctx, adminId: string, sheetId: string, note?: string) {
+  const admin = await ctx.store.workers.get(adminId)
+  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  const sheet = await ctx.store.timesheets.get(sheetId)
+  if (!sheet || sheet.status === "Draft") return fail("That timesheet is not signed.")
+  const before = sheet.status
+  sheet.status = "Queried"
+  if (note?.trim()) sheet.workerNote = note.trim().slice(0, 300)
+  await ctx.store.timesheets.save(sheet)
+  await enqueue(ctx, "timesheets", timesheetNotionProperties(sheet))
+  await audit(ctx, adminId, "timesheet-queried", sheet.id, before)
+  return { ok: true as const }
 }
 
 export async function createOffers(
@@ -837,7 +965,10 @@ export async function wipePassports(ctx: Ctx) {
 
 export async function runReminders(ctx: Ctx) {
   const today = sydneyToday(ctx.now)
+  const parts = sydneyParts(ctx.now)
   let sent = 0
+  const offers = await ctx.store.offers.all()
+  const sheets = await ctx.store.timesheets.all()
   for (const worker of await ctx.store.workers.all()) {
     if (worker.role !== "worker") continue
     const tickets = asTicketInputs(worker.tickets)
@@ -857,6 +988,48 @@ export async function runReminders(ctx: Ctx) {
       if (worker.email) await ctx.notify.email({ to: worker.email, subject: label + " expiry", body })
       await ctx.store.reminders.save({ id, workerId: worker.id, ticket: ticket.type, kind: stage, expiry: ticket.expiry, sentAt: ctx.now.toISOString() })
       sent += 1
+    }
+    const shiftToday = offers.find((offer) => offer.workerId === worker.id && offer.status === "Accepted" && offer.shiftDate === today && !offer.remindersOff)
+    const signedToday = sheets.some((sheet) => sheet.workerId === worker.id && sheet.workDate === today && sheet.status === "Approved")
+    const reminder = timesheetReminder({
+      now: ctx.now,
+      hasShiftToday: Boolean(shiftToday),
+      signedToday,
+      remindersOff: false,
+    })
+    if (reminder) {
+      const id = worker.id + ":timesheet:" + today + ":" + reminder
+      if (!(await ctx.store.reminders.get(id))) {
+        const body = reminder === "cutoff" ? "Cut-off is 6 pm today" : "Log today's hours before you leave site"
+        await ctx.notify.sms(worker.mobile, body)
+        await ctx.store.reminders.save({ id, workerId: worker.id, ticket: "timesheet", kind: reminder, expiry: today, sentAt: ctx.now.toISOString() })
+        sent += 1
+      }
+    }
+  }
+  if (parts.weekday.startsWith("Thu")) {
+    const closed = fortnightContaining(addDays(today, -1))
+    const signed = sheets.filter((sheet) => sheet.status === "Approved" && sheet.payFortnight === closed.label)
+    const bySite = new Map<string, typeof signed>()
+    for (const sheet of signed) {
+      const offer = offers.find((item) => item.id === sheet.offerId)
+      if (!offer?.siteEmail) continue
+      const list = bySite.get(offer.siteEmail) || []
+      list.push(sheet)
+      bySite.set(offer.siteEmail, list)
+    }
+    for (const [email, list] of Array.from(bySite.entries())) {
+      const id = "summary:" + closed.label + ":" + email
+      if (await ctx.store.reminders.get(id)) continue
+      const lines = list.map(
+        (sheet) => sheet.workerName + " · " + sheet.workDate + " · " + formatHours(sheet.totalHours) + " hours · signed by " + (sheet.supervisorName || "supervisor"),
+      )
+      await ctx.notify.email({
+        to: email,
+        subject: "Hours for " + closed.label,
+        body: ["MS Workforce hours for " + closed.label + ".", "", ...lines, "", "Reply within 2 business days if anything is wrong."].join("\n"),
+      })
+      await ctx.store.reminders.save({ id, workerId: "site", ticket: "timesheet-summary", kind: "thursday", expiry: closed.end, sentAt: ctx.now.toISOString() })
     }
   }
   if (isMondayInSydney(ctx.now)) {

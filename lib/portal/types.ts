@@ -22,7 +22,8 @@ export const TICKET_LABELS: Record<TicketType, string> = {
   other: "Other ticket",
 }
 
-export const HELD_CHOICES = ["Held", "Not held", "Expired"] as const
+export const HELD_CHOICES = ["Held", "Not held", "Expired", "Booked in / training now"] as const
+export const WHITE_CARD_CHOICES = ["Held", "Not completed", "Lost – replacement needed", "Expired"] as const
 export const DRIVER_CLASSES = [
   "Not held",
   "Car",
@@ -31,6 +32,7 @@ export const DRIVER_CLASSES = [
   "Heavy rigid",
   "Heavy combination",
   "Expired",
+  "Other, please explain",
 ] as const
 
 export const WORKER_STATUSES = ["Applicant", "Onboarding", "Ready", "Inactive"] as const
@@ -41,7 +43,11 @@ export const ROLES = [
   "Trade assistant",
   "Site clean",
   "Materials handling",
-  "Other",
+  "Demolition / strip-out",
+  "Concrete labourer",
+  "Asbestos removal labourer (Class B)",
+  "Landscaping labourer",
+  "Other, please explain",
 ] as const
 
 export const PPE_OPTIONS = [
@@ -51,6 +57,10 @@ export const PPE_OPTIONS = [
   "Safety glasses",
   "Gloves",
   "Hearing protection",
+  "Long-sleeve shirt and long pants",
+  "P2 dust mask",
+  "Sun protection (hat, sunscreen)",
+  "Other, please explain",
 ] as const
 
 export const TRANSPORT_OPTIONS = [
@@ -58,12 +68,91 @@ export const TRANSPORT_OPTIONS = [
   "Public transport",
   "Lift / carpool",
   "Motorbike or bicycle",
-  "Other",
+  "Other, please explain",
 ] as const
 
-export const FITNESS_OPTIONS = ["Yes", "Yes, with some adjustments", "Not sure"] as const
+export const FITNESS_OPTIONS = [
+  "Yes, I can safely do these tasks",
+  "Yes, with some adjustments (please call me)",
+  "Not sure, please call me",
+] as const
 
-export const RTW_OPTIONS = ["Citizen - passport", "Permanent resident", "Visa - VEVO"] as const
+export const RTW_OPTIONS = [
+  "Australian citizen",
+  "Permanent resident",
+  "New Zealand citizen",
+  "Visa holder",
+  "Other, please explain",
+] as const
+
+export const EXPERIENCE_LEVELS = [
+  "No construction experience yet",
+  "Under 6 months",
+  "6–12 months",
+  "1–2 years",
+  "3–5 years",
+  "More than 5 years",
+  "Other, please explain",
+] as const
+
+export const WORK_AREAS = [
+  "Northern Beaches",
+  "North Shore",
+  "Sydney CBD and inner city",
+  "Eastern Suburbs",
+  "Inner West",
+  "Hills District",
+  "Parramatta and Western Sydney",
+  "South West Sydney",
+  "Sutherland Shire and St George",
+  "Central Coast",
+  "Anywhere in Greater Sydney",
+  "Other, please explain",
+] as const
+
+export const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Short notice OK"] as const
+
+export const EMERGENCY_RELATIONSHIPS = [
+  "Partner or spouse",
+  "Parent",
+  "Brother or sister",
+  "Son or daughter",
+  "Other relative",
+  "Friend",
+  "Housemate",
+  "Other, please explain",
+] as const
+
+export const VEVO_METHODS = [
+  "I'll email my VEVO result from the myVEVO app",
+  "Show my passport on a video call",
+  "Show my passport in person",
+  "Other, please explain",
+] as const
+
+export const TIMESHEET_TASKS = [
+  "General clean-up and rubbish",
+  "Loading and unloading",
+  "Carrying materials",
+  "Demolition / strip-out",
+  "Digging by hand",
+  "Helping on concrete pours",
+  "Helping a trade",
+  "Setting up barriers and site protection",
+  "Other, please explain",
+] as const
+
+export const SUPERVISOR_ROLES = [
+  "Site supervisor",
+  "Site manager",
+  "Foreman / leading hand",
+  "Project manager",
+  "Owner / director",
+  "Office / admin",
+  "Other, please explain",
+] as const
+
+export const TIMESHEET_STATUSES = ["Submitted", "Approved", "Queried"] as const
 
 export const WHITE_CARD_STATES = ["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT"] as const
 
@@ -141,6 +230,33 @@ export type Worker = {
   verificationMethod?: string
   imagesDeletedOn?: string
   notes?: string
+  preferredName?: string
+  postcode?: string
+  emergencyRelationship?: string
+  experienceLevel?: string
+  workHistory?: string
+  availableFrom?: string
+  workAreas?: string[]
+  workDays?: string[]
+  vevoMethod?: string
+  constructionRecent?: string
+  licenceState?: string
+  otherTicketsHeld?: string[]
+  daConsent?: boolean
+  declaration?: boolean
+  allergies?: string
+  allergyTypes?: string[]
+  anaphylaxis?: string
+  epipen?: string
+  medicalNotes?: string
+  medicalConditions?: string[]
+  injury?: string
+  tasksAffected?: string[]
+  safetyMedication?: string
+  medicalSharing?: string
+  idSighted?: boolean
+  idSightedMethod?: string
+  idSightedOn?: string
   createdAt: string
   updatedAt: string
 }
@@ -168,6 +284,11 @@ export type Offer = {
   highRisk?: string
   parking?: string
   bring?: string
+  timesheetSigner?: string
+  signerRole?: string
+  usualFinish?: string
+  usualBreak?: number
+  remindersOff?: boolean
   status: OfferStatus
   expiresAt: string
   sentAt?: string
@@ -175,6 +296,8 @@ export type Offer = {
   declineReason?: string
   createdBy: string
 }
+
+export type TimesheetStatus = "Draft" | "Approved" | "Queried"
 
 export type Timesheet = {
   id: string
@@ -185,13 +308,31 @@ export type Timesheet = {
   start: string
   finish: string
   breakMinutes: number
+  breakNote?: string
   totalHours: number
-  status: "Draft" | "Approved"
+  tasks: string[]
+  taskNote?: string
+  incident: boolean
+  incidentNote?: string
+  workerNote?: string
+  workerConfirmedAt?: string
+  status: TimesheetStatus
   supervisorName?: string
   supervisorRole?: string
+  plannedSigner?: string
+  signerMismatch?: boolean
   signaturePng?: string
+  signatureIp?: string
+  signatureUserAgent?: string
   approvedAt?: string
+  payFortnight?: string
+  payDay?: string
+  afterCutoff?: boolean
+  corrected?: boolean
+  source: "Portal"
   workerName: string
+  siteName?: string
+  suburb?: string
   confirmationSentAt?: string
 }
 

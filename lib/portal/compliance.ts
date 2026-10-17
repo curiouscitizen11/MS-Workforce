@@ -51,7 +51,10 @@ export function isMarkedExpired(status: string | undefined): boolean {
 
 export function isHeld(type: TicketType, status: string | undefined): boolean {
   const value = (status || "").trim()
-  if (!value || value === "Not held" || value === "Expired") return false
+  if (!value || value === "Not held" || value === "Expired" || value === "Not completed" || value === "Booked in / training now") {
+    return false
+  }
+  if (type === "whiteCard") return value === "Held" || value === "Lost – replacement needed"
   if (type === "driverLicence") return true
   return value === "Held"
 }
@@ -145,7 +148,7 @@ export function canAcceptShift(input: {
     return {
       ok: false,
       code: "do-not-book",
-      message: "Call Mav. DO NOT BOOK. " + assessment.reasons.join(". ") + ".",
+      message: "Call MS Workforce on 0435 842 164. DO NOT BOOK. " + assessment.reasons.join(". ") + ".",
     }
   }
   const required = Array.from(new Set<TicketType>(["whiteCard", ...input.required]))
@@ -155,7 +158,7 @@ export function canAcceptShift(input: {
       return {
         ok: false,
         code: "ticket",
-        message: "Call Mav. " + TICKET_LABELS[type] + " is not valid on the job date.",
+        message: "Call MS Workforce on 0435 842 164. " + TICKET_LABELS[type] + " is not valid on the job date.",
       }
     }
   }

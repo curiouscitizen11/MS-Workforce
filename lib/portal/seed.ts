@@ -1,7 +1,8 @@
 import { addDays, sydneyToday } from "@/lib/portal/dates"
+import { payFortnight } from "@/lib/portal/pay"
 import { blankTickets, type Offer, type PortalDocument, type StoredBlob, type Timesheet, type Worker } from "@/lib/portal/types"
 
-export const SEED_VERSION = 1
+export const SEED_VERSION = 2
 
 export const DEMO_SIGNATURE =
   "data:image/svg+xml," +
@@ -76,11 +77,11 @@ export function buildSeed(now = new Date()): SeedData {
       roles: ["General labourer"],
       experience: "Two years on residential frames and site cleans.",
       whatsappOk: true,
-      rtw: "Citizen - passport",
+      rtw: "Australian citizen",
       rightToWork: "Yes",
       ppe: ["Steel-cap boots", "Hi-vis", "Hard hat"],
       transport: "Own car",
-      fitness: "Yes",
+      fitness: "Yes, I can safely do these tasks",
       healthConsent: true,
       policiesAck: true,
       contractAccepted: true,
@@ -131,7 +132,7 @@ export function buildSeed(now = new Date()): SeedData {
       status: "Ready",
       roles: ["Trade assistant"],
       rightToWork: "Yes",
-      rtw: "Visa - VEVO",
+      rtw: "Visa holder",
       vevoConsent: true,
       visaSubclass: "482",
       visaExpiry: addDays(today, 200),
@@ -189,7 +190,10 @@ export function buildSeed(now = new Date()): SeedData {
     ppe: "Boots, hi-vis and a hard hat. The site has glasses.",
     highRisk: "Open edges on level 2. Stay behind the rails.",
     parking: "Street parking on Smith St. Do not block the driveway.",
-    bring: "White card, water and lunch.",
+    usualFinish: "15:30",
+    usualBreak: 30,
+    timesheetSigner: "Pat Riley",
+    signerRole: "Site supervisor",
     requiredTickets: ["whiteCard"] as Offer["requiredTickets"],
     expectedHours: 8,
     startTime: "07:00",
@@ -272,6 +276,7 @@ export function buildSeed(now = new Date()): SeedData {
     },
   ]
 
+  const paid = payFortnight(now)
   const timesheets: Timesheet[] = [
     {
       id: "ts-sam-yest",
@@ -283,12 +288,22 @@ export function buildSeed(now = new Date()): SeedData {
       finish: "15:30",
       breakMinutes: 30,
       totalHours: 8,
+      tasks: ["Carrying materials"],
+      incident: false,
       status: "Approved",
       supervisorName: "Pat Riley",
       supervisorRole: "Site supervisor",
+      plannedSigner: "Pat Riley",
+      signerMismatch: false,
       signaturePng: DEMO_SIGNATURE,
       approvedAt: nowIso,
+      payFortnight: paid.label,
+      payDay: paid.payDay,
+      afterCutoff: paid.afterCutoff,
+      source: "Portal",
       workerName: "Sam Lee",
+      siteName: "Brookvale frame stage",
+      suburb: "Brookvale",
       confirmationSentAt: nowIso,
     },
   ]
