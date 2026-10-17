@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Page not found",
+  description: "The page you were after has moved or never existed.",
   robots: { index: false, follow: true },
+  alternates: { canonical: null },
 };
 
 export default function NotFound() {

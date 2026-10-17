@@ -23,9 +23,19 @@ body {
 }
 
 @media (max-width: 767px) {
-  body {
+  body:not(:has(.portal-root)) {
     padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
+}
+
+body:has(.portal-root) .site-chrome-header,
+body:has(.portal-root) .site-chrome-footer,
+body:has(.portal-root) .site-chrome-sticky {
+  display: none;
+}
+
+body:has(.portal-root) .site-chrome-main {
+  padding-top: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

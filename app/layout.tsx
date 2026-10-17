@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SiteChrome from "@/components/SiteChrome";
 import { EMAIL, JOBS_EMAIL, SITE_NAME, SITE_URL, OG_BASE } from "@/components/site";
 import StickyCta from "@/components/StickyCta";
 
@@ -29,7 +29,6 @@ export const metadata: Metadata = {
     "builders labour hire",
     "Greater Sydney labour hire",
   ],
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_AU",
@@ -84,15 +83,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}
         />
-        <Header />
-        <main
-          className="relative z-0"
-          style={{ paddingTop: "var(--site-header-height)" }}
-        >
+        <SiteChrome footer={<Footer />} sticky={<StickyCta />}>
           {children}
-        </main>
-        <Footer />
-        <StickyCta />
+        </SiteChrome>
       </body>
     </html>
   );
