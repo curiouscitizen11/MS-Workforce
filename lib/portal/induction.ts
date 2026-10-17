@@ -68,7 +68,7 @@ export const QUESTIONS: QuizQuestion[] = [
     id: "q5",
     critical: false,
     correctIndex: 2,
-    prompt: "What PPE do you bring to every site unless you are told otherwise?",
+    prompt: "What do you bring to every site unless you are told otherwise?",
     options: [
       "Just a hi-vis shirt",
       "Whatever is in the ute",

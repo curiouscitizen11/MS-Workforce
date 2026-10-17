@@ -43,7 +43,6 @@ export default async function ShiftPage({ params }: { params: { id: string } }) 
         {offer.inductionMethod ? <Row label="Induction" value={offer.inductionMethod} /> : null}
         {offer.inductionLink ? <Row label="Induction link" value={offer.inductionLink} href={offer.inductionLink} /> : null}
         {offer.signInMethod ? <Row label="Sign in" value={offer.signInMethod} /> : null}
-        {offer.ppe ? <Row label="PPE" value={offer.ppe} /> : null}
         {offer.highRisk ? <Row label="Watch for" value={offer.highRisk} /> : null}
         {offer.parking ? <Row label="Parking" value={offer.parking} /> : null}
         {offer.bring ? <Row label="Bring" value={offer.bring} /> : null}

@@ -6,12 +6,24 @@ import { saveProfile, updateTicket } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { fieldClass } from "@/components/portal/ui"
 import {
+  ALLERGY_ANSWERS,
+  ALLERGY_TYPES,
+  ANAPHYLAXIS_ANSWERS,
+  CONSTRUCTION_RECENT,
   DRIVER_CLASSES,
   EMERGENCY_RELATIONSHIPS,
+  EPIPEN_ANSWERS,
+  EXPERIENCE_LEVELS,
   FITNESS_OPTIONS,
   HELD_CHOICES,
-  PPE_OPTIONS,
+  INJURY_ANSWERS,
+  LICENCE_STATES,
+  MEDICAL_CONDITIONS,
+  MEDICAL_SHARING,
+  MEDICATION_ANSWERS,
+  OTHER_TICKETS,
   RTW_OPTIONS,
+  TASKS_AFFECTED,
   TICKET_TYPES,
   TRANSPORT_OPTIONS,
   VEVO_METHODS,
@@ -92,24 +104,27 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
         <Form
           pending={pending}
           onSubmit={(data) => {
-            const ppe = PPE_OPTIONS.filter((item) => data["ppe-" + item] === "on")
             const workDays = WEEKDAYS.filter((item) => data["day-" + item] === "on")
             const workAreas = WORK_AREAS.filter((item) => data["area-" + item] === "on")
-            start(() => save({ ppe, transport: data.transport, workDays, workAreas }, 4))
+            start(() =>
+              save(
+                {
+                  experienceLevel: data.experienceLevel,
+                  workHistory: data.workHistory,
+                  availableFrom: data.availableFrom,
+                  transport: data.transport,
+                  workDays,
+                  workAreas,
+                },
+                4,
+              ),
+            )
           }}
           fields={
             <>
-              <fieldset>
-                <legend className="text-sm font-semibold">PPE you already own</legend>
-                <div className="mt-2 space-y-1">
-                  {PPE_OPTIONS.map((item) => (
-                    <label key={item} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-                      <input type="checkbox" name={"ppe-" + item} defaultChecked={worker.ppe.includes(item)} />
-                      {item}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
+              <Select label="How much construction experience do you have?" name="experienceLevel" defaultValue={worker.experienceLevel} options={EXPERIENCE_LEVELS} />
+              <Text label="Your last 1 or 2 jobs" name="workHistory" defaultValue={worker.workHistory} />
+              <Text label="When can you start?" name="availableFrom" type="date" defaultValue={worker.availableFrom} />
               <Select label="How will you get to site?" name="transport" defaultValue={worker.transport} options={TRANSPORT_OPTIONS} />
               <fieldset>
                 <legend className="text-sm font-semibold">Which days can you work?</legend>
@@ -147,7 +162,14 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
                   fitness: data.fitness,
                   healthConsent: data.healthConsent === "on",
                   allergies: data.allergies,
+                  allergyTypes: ALLERGY_TYPES.filter((item) => data["allergy-" + item] === "on"),
+                  anaphylaxis: data.anaphylaxis,
+                  epipen: data.epipen,
+                  medicalConditions: MEDICAL_CONDITIONS.filter((item) => data["condition-" + item] === "on"),
                   injury: data.injury,
+                  tasksAffected: TASKS_AFFECTED.filter((item) => data["task-" + item] === "on"),
+                  safetyMedication: data.safetyMedication,
+                  medicalSharing: data.medicalSharing,
                   medicalNotes: data.medicalNotes,
                 },
                 5,
@@ -156,10 +178,20 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
           }
           fields={
             <>
-              <Select label="Can you safely do this work?" name="fitness" defaultValue={worker.fitness} options={FITNESS_OPTIONS} />
-              <Text label="Allergies (private)" name="allergies" defaultValue={worker.allergies} />
-              <Text label="Injury affecting duties (private)" name="injury" defaultValue={worker.injury} />
-              <Text label="Medical notes (private)" name="medicalNotes" defaultValue={worker.medicalNotes} />
+              <p className="text-sm leading-relaxed text-navy/80">
+                Labouring usually means lifting about 20 to 25 kg, being on your feet for 8 hours, and working outdoors.
+              </p>
+              <Select label="Can you safely do these tasks?" name="fitness" defaultValue={worker.fitness} options={FITNESS_OPTIONS} />
+              <Select label="Do you have any allergies?" name="allergies" defaultValue={worker.allergies} options={ALLERGY_ANSWERS} />
+              <Checks legend="What are you allergic to?" name="allergy" options={ALLERGY_TYPES} selected={worker.allergyTypes} />
+              <Select label="Have you ever had a severe allergic reaction (anaphylaxis)?" name="anaphylaxis" defaultValue={worker.anaphylaxis} options={ANAPHYLAXIS_ANSWERS} />
+              <Select label="Do you carry an adrenaline auto-injector (EpiPen or Anapen)?" name="epipen" defaultValue={worker.epipen} options={EPIPEN_ANSWERS} />
+              <Checks legend="Do you have a medical condition a first aider should know about?" name="condition" options={MEDICAL_CONDITIONS} selected={worker.medicalConditions} />
+              <Select label="Do you have an injury that could affect the work you can do?" name="injury" defaultValue={worker.injury} options={INJURY_ANSWERS} />
+              <Checks legend="Which tasks does it affect?" name="task" options={TASKS_AFFECTED} selected={worker.tasksAffected} />
+              <Select label="Do you take any medication that could affect your safety at work?" name="safetyMedication" defaultValue={worker.safetyMedication} options={MEDICATION_ANSWERS} />
+              <Select label="Can we share your allergy and medical information with the site supervisor or first aider?" name="medicalSharing" defaultValue={worker.medicalSharing} options={MEDICAL_SHARING} />
+              <Text label="Anything a first aider should know? (private)" name="medicalNotes" defaultValue={worker.medicalNotes} />
               <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
                 <input type="checkbox" name="healthConsent" defaultChecked={worker.healthConsent} />
                 I agree MS Workforce can store these private health answers
@@ -245,6 +277,7 @@ function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) 
               status,
               number: String(data.get(type + "-number") || "") || undefined,
               expiry: String(data.get(type + "-expiry") || "") || null,
+              issued: type === "whiteCard" ? String(data.get("whiteCard-issued") || "") || null : undefined,
               state: String(data.get(type + "-state") || "") || undefined,
             })
             if (!result.ok) {
@@ -252,13 +285,25 @@ function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) 
               return
             }
           }
+          const profile = await saveProfile({
+            constructionRecent: String(data.get("constructionRecent") || ""),
+            licenceState: String(data.get("licenceState") || ""),
+            otherTicketsHeld: OTHER_TICKETS.filter((item) => data.get("other-" + item) === "on"),
+          })
+          if (!profile.ok) {
+            setError(profile.error)
+            return
+          }
           onDone()
         })
       }}
     >
       {TICKET_TYPES.map((type) => (
-        <TicketRow key={type} type={type} status={worker.tickets[type].status} />
+        <TicketRow key={type} type={type} ticket={worker.tickets[type]} />
       ))}
+      <Select label="Have you done any construction work in the last 2 years?" name="constructionRecent" defaultValue={worker.constructionRecent} options={CONSTRUCTION_RECENT} />
+      <Select label="Driver licence: state" name="licenceState" defaultValue={worker.licenceState} options={LICENCE_STATES} />
+      <Checks legend="Do you hold any of these other tickets?" name="other" options={OTHER_TICKETS} selected={worker.otherTicketsHeld} />
       {error ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       <button className="pill pill-teal w-full" disabled={pending}>
         Save tickets
@@ -267,7 +312,8 @@ function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) 
   )
 }
 
-function TicketRow({ type, status }: { type: TicketType; status: string }) {
+function TicketRow({ type, ticket }: { type: TicketType; ticket: Worker["tickets"][TicketType] }) {
+  const status = ticket.status
   const options = type === "driverLicence" ? DRIVER_CLASSES : type === "whiteCard" ? WHITE_CARD_CHOICES : HELD_CHOICES
   const labels: Record<TicketType, string> = {
     whiteCard: "White card",
@@ -291,7 +337,34 @@ function TicketRow({ type, status }: { type: TicketType; status: string }) {
           <option key={option}>{option}</option>
         ))}
       </select>
+      {type === "whiteCard" ? <Text label="Date issued" name="whiteCard-issued" type="date" defaultValue={ticket.issued || ""} /> : null}
     </label>
+  )
+}
+
+function Checks({
+  legend,
+  name,
+  options,
+  selected,
+}: {
+  legend: string
+  name: string
+  options: readonly string[]
+  selected?: string[]
+}) {
+  return (
+    <fieldset>
+      <legend className="text-sm font-semibold">{legend}</legend>
+      <div className="mt-2 space-y-1">
+        {options.map((item) => (
+          <label key={item} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+            <input type="checkbox" name={name + "-" + item} defaultChecked={selected?.includes(item)} />
+            {item}
+          </label>
+        ))}
+      </div>
+    </fieldset>
   )
 }
 

@@ -39,7 +39,6 @@ export function OfferComposer({
             roleName: String(data.get("roleName") || "Labourer"),
             rateToWorker: String(data.get("rateToWorker") || ""),
             requiredTickets: required,
-            ppe: String(data.get("ppe") || ""),
             expiresHours: Number(data.get("expiresHours") || 2),
             workerIds: all ? "all" : picked,
           })
@@ -64,7 +63,6 @@ export function OfferComposer({
       <Text name="siteName" label="Site name" />
       <Text name="siteContact" label="Site contact" />
       <Text name="sitePhone" label="Site mobile" inputMode="tel" />
-      <Text name="ppe" label="PPE" defaultValue="Boots, hi-vis, hard hat, glasses" />
       <Text name="expiresHours" label="Offer expires (hours)" defaultValue="2" inputMode="numeric" />
       <fieldset>
         <legend className="text-sm font-semibold">Tickets required</legend>

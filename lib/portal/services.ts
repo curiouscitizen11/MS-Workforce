@@ -293,7 +293,6 @@ export async function submitApplication(ctx: Ctx, input: unknown) {
       driverLicence: { status: "Not held" },
       other: { status: "Not held" },
     },
-    ppe: [],
     createdAt: nowIso,
     updatedAt: nowIso,
   }
@@ -347,7 +346,6 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
   if (typeof patch.visaSubclass === "string") worker.visaSubclass = patch.visaSubclass
   if (typeof patch.visaExpiry === "string") worker.visaExpiry = patch.visaExpiry
   worker.visaConditions = undefined
-  if (Array.isArray(patch.ppe)) worker.ppe = patch.ppe.map(String)
   if (Array.isArray(patch.workAreas)) worker.workAreas = patch.workAreas.map(String)
   if (Array.isArray(patch.workDays)) worker.workDays = patch.workDays.map(String)
   if (typeof patch.experienceLevel === "string") worker.experienceLevel = patch.experienceLevel
@@ -359,8 +357,17 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
     worker.fitness = patch.fitness === "Yes" ? "Yes, I can safely do these tasks" : patch.fitness
   }
   if (typeof patch.allergies === "string") worker.allergies = patch.allergies
+  if (Array.isArray(patch.allergyTypes)) worker.allergyTypes = patch.allergyTypes.map(String)
+  if (typeof patch.anaphylaxis === "string") worker.anaphylaxis = patch.anaphylaxis
+  if (typeof patch.epipen === "string") worker.epipen = patch.epipen
+  if (Array.isArray(patch.medicalConditions)) worker.medicalConditions = patch.medicalConditions.map(String)
   if (typeof patch.injury === "string") worker.injury = patch.injury
+  if (Array.isArray(patch.tasksAffected)) worker.tasksAffected = patch.tasksAffected.map(String)
+  if (typeof patch.safetyMedication === "string") worker.safetyMedication = patch.safetyMedication
+  if (typeof patch.medicalSharing === "string") worker.medicalSharing = patch.medicalSharing
   if (typeof patch.medicalNotes === "string") worker.medicalNotes = patch.medicalNotes
+  if (typeof patch.licenceState === "string") worker.licenceState = patch.licenceState
+  if (Array.isArray(patch.otherTicketsHeld)) worker.otherTicketsHeld = patch.otherTicketsHeld.map(String)
   if (typeof patch.daConsent === "boolean") worker.daConsent = patch.daConsent
   if (typeof patch.declaration === "boolean") worker.declaration = patch.declaration
   if (typeof patch.healthConsent === "boolean") worker.healthConsent = patch.healthConsent
@@ -766,7 +773,6 @@ export async function createOffers(
     roleName: string
     rateToWorker: string
     requiredTickets: TicketType[]
-    ppe?: string
     inductionMethod?: string
     inductionLink?: string
     signInMethod?: string
@@ -779,7 +785,7 @@ export async function createOffers(
 ) {
   const admin = await ctx.store.workers.get(adminId)
   if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
-  if (texts([input.placementRef, input.suburb, input.address, input.ppe, input.highRisk, input.parking, input.bring])) {
+  if (texts([input.placementRef, input.suburb, input.address, input.highRisk, input.parking, input.bring])) {
     return fail(SENSITIVE_MESSAGE)
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(input.shiftDate)) return fail("Choose a shift date.")
@@ -816,7 +822,6 @@ export async function createOffers(
       roleName: input.roleName.trim(),
       rateToWorker: input.rateToWorker.trim(),
       requiredTickets: Array.from(new Set<TicketType>(["whiteCard", ...input.requiredTickets])),
-      ppe: input.ppe,
       inductionMethod: input.inductionMethod,
       inductionLink: input.inductionLink,
       signInMethod: input.signInMethod,

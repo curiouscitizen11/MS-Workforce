@@ -112,6 +112,7 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "White card number", worker.tickets.whiteCard.number)
   put(props, "White card state", worker.tickets.whiteCard.state)
   put(props, "White card expiry", worker.tickets.whiteCard.expiry)
+  put(props, "White card issued", worker.tickets.whiteCard.issued)
   put(props, "Work at heights", choice(worker.tickets.heights.status, HELD_CHOICES))
   put(props, "Work at heights number", worker.tickets.heights.number)
   put(props, "Work at heights expiry", worker.tickets.heights.expiry)
@@ -131,7 +132,7 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "First aid expiry", worker.tickets.firstAid.expiry)
   put(props, "Other tickets", worker.tickets.other.note || (worker.tickets.other.status === "Held" ? "Held" : undefined))
   put(props, "Next ticket expiry", earliestExpiry(asTicketInputs(worker.tickets), null))
-  if (worker.ppe.length) props["PPE owned"] = worker.ppe
+  if (worker.otherTicketsHeld?.length) props["Other tickets held"] = worker.otherTicketsHeld
   put(props, "Transport", worker.transport)
   put(props, "Fitness declaration", fitnessChoice(worker.fitness))
   put(props, "Construction work in last 2 years", worker.constructionRecent)
@@ -190,7 +191,7 @@ export function offerNotionProperties(offer: Offer, workerName: string): Record<
   put(props, "Site contact", offer.siteContact)
   put(props, "Site phone", offer.sitePhone)
   props["Expected hours"] = offer.expectedHours
-  put(props, "PPE", offer.ppe)
+  put(props, "Bring", offer.bring)
   props["Required tickets"] = offer.requiredTickets.map((type: TicketType) => TICKET_LABELS[type])
   assertNotionPayloadSafe(props)
   return props
@@ -257,6 +258,7 @@ const DATE_FIELDS = new Set([
   "Date of birth",
   "VEVO checked on",
   "White card expiry",
+  "White card issued",
   "Work at heights expiry",
   "Asbestos class A expiry",
   "Asbestos class B expiry",

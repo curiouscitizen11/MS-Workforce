@@ -50,19 +50,6 @@ export const ROLES = [
   "Other, please explain",
 ] as const
 
-export const PPE_OPTIONS = [
-  "Steel-cap boots",
-  "Hi-vis",
-  "Hard hat",
-  "Safety glasses",
-  "Gloves",
-  "Hearing protection",
-  "Long-sleeve shirt and long pants",
-  "P2 dust mask",
-  "Sun protection (hat, sunscreen)",
-  "Other, please explain",
-] as const
-
 export const TRANSPORT_OPTIONS = [
   "Own car",
   "Public transport",
@@ -110,7 +97,82 @@ export const WORK_AREAS = [
   "Other, please explain",
 ] as const
 
-export const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Short notice OK"] as const
+export const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Short notice OK", "Other, please explain"] as const
+
+export const CONSTRUCTION_RECENT = ["Yes", "No", "Not sure"] as const
+
+export const LICENCE_STATES = ["NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT", "Overseas", "Other, please explain"] as const
+
+export const OTHER_TICKETS = [
+  "Asbestos awareness",
+  "Silica awareness",
+  "Manual handling",
+  "Forklift (LF)",
+  "EWP over 11 m (WP licence)",
+  "EWP under 11 m (yellow card)",
+  "Telehandler",
+  "Dogging (DG)",
+  "Basic rigging (RB)",
+  "Basic scaffolding (SB)",
+  "Plant ticket (excavator, skid steer, roller)",
+  "Test and tag",
+  "None of these",
+  "Other, please explain",
+] as const
+
+export const ALLERGY_ANSWERS = ["No", "Yes", "I'd rather tell MS Workforce by phone"] as const
+
+export const ALLERGY_TYPES = [
+  "Bee or wasp stings",
+  "Other insect bites",
+  "Foods (e.g. nuts, shellfish)",
+  "Medicines (e.g. penicillin)",
+  "Latex",
+  "Plants or pollen",
+  "Dust or chemicals",
+  "Other, please explain",
+] as const
+
+export const ANAPHYLAXIS_ANSWERS = ["No", "Yes", "Not sure"] as const
+
+export const EPIPEN_ANSWERS = ["No", "Yes, I always carry it", "Yes, but not always"] as const
+
+export const MEDICAL_CONDITIONS = [
+  "No",
+  "Asthma",
+  "Diabetes",
+  "Epilepsy or seizures",
+  "Heart condition",
+  "Fainting or blackouts",
+  "Hearing or vision condition that affects safety",
+  "I'd rather tell MS Workforce by phone",
+  "Other, please explain",
+] as const
+
+export const INJURY_ANSWERS = [
+  "No",
+  "Yes, a current injury",
+  "Yes, a past injury that still affects me",
+  "I'd rather tell MS Workforce by phone",
+] as const
+
+export const TASKS_AFFECTED = [
+  "Lifting or carrying",
+  "Bending or kneeling",
+  "Ladders or heights",
+  "Standing for long periods",
+  "Using hand or power tools",
+  "Working in heat",
+  "Other, please explain",
+] as const
+
+export const MEDICATION_ANSWERS = ["No", "Yes", "I'd rather tell MS Workforce by phone"] as const
+
+export const MEDICAL_SHARING = [
+  "Yes, share it with the site supervisor and first aider",
+  "Only in an emergency",
+  "Other, please explain",
+] as const
 
 export const EMERGENCY_RELATIONSHIPS = [
   "Partner or spouse",
@@ -173,6 +235,7 @@ export type Ticket = {
   number?: string
   state?: string
   expiry?: string | null
+  issued?: string | null
   note?: string
   pendingCheck?: boolean
 }
@@ -210,7 +273,6 @@ export type Worker = {
   vevoCheckedOn?: string
   passport?: PassportRecord | null
   tickets: Record<TicketType, Ticket>
-  ppe: string[]
   transport?: string
   fitness?: string
   healthConsent?: boolean
@@ -277,7 +339,6 @@ export type Offer = {
   roleName: string
   rateToWorker: string
   requiredTickets: TicketType[]
-  ppe?: string
   inductionMethod?: string
   inductionLink?: string
   signInMethod?: string
