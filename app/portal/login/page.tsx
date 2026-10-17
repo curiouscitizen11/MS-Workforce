@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { DemoBanner, Heading } from "@/components/portal/ui"
 import { LoginForm } from "@/components/portal/LoginForm"
 import { isMock } from "@/lib/portal/config"
@@ -5,6 +6,8 @@ import { formatAuMobile } from "@/lib/portal/phone"
 import { readSession } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { redirect } from "next/navigation"
+
+export const metadata: Metadata = { title: "Use your mobile" }
 
 export default async function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
   const current = await readSession()

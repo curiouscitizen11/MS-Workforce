@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Heading, StatusChip } from "@/components/portal/ui"
 import { formatDate } from "@/lib/portal/dates"
@@ -5,6 +6,8 @@ import { formatHours } from "@/lib/portal/hours"
 import { payRunFortnight } from "@/lib/portal/pay"
 import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+
+export const metadata: Metadata = { title: "Pay run" }
 
 export default async function AdminTimesheetsPage() {
   await requireAdmin()
@@ -40,7 +43,7 @@ export default async function AdminTimesheetsPage() {
                   <span className="text-sm font-semibold">{sheet.workerName}</span>
                   <StatusChip level={sheet.status === "Approved" ? "ok" : "pending"}>{sheet.status}</StatusChip>
                 </span>
-                <span className="mt-1 block text-xs text-navy/60">
+                <span className="mt-1 block text-xs text-navy/70">
                   {formatDate(sheet.workDate)} · {formatHours(sheet.totalHours)} hours
                   {flags.length ? " · " + flags.join(" · ") : ""}
                 </span>

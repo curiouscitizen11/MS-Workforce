@@ -1,7 +1,10 @@
+import type { Metadata } from "next"
 import { OnboardingForm } from "@/components/portal/OnboardingForm"
 import { Heading } from "@/components/portal/ui"
 import { requireUser } from "@/lib/portal/session"
 import { redirect } from "next/navigation"
+
+export const metadata: Metadata = { title: "Your details" }
 
 export default async function OnboardingPage() {
   const { worker } = await requireUser()

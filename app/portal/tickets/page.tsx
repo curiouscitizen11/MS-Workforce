@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Heading, StatusChip } from "@/components/portal/ui"
 import { complianceFor } from "@/lib/portal/services"
 import { sydneyToday } from "@/lib/portal/dates"
@@ -7,6 +8,8 @@ import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { TicketEditor } from "@/components/portal/TicketEditor"
 import Link from "next/link"
+
+export const metadata: Metadata = { title: "Your cards" }
 
 export default async function TicketsPage() {
   const { worker } = await requireUser()

@@ -79,7 +79,7 @@ export function TicketEditor() {
           }}
         />
       </label>
-      {error ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+      {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       <button className="pill pill-teal w-full" disabled={pending}>
         Save ticket
       </button>

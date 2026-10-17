@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { TimesheetForm } from "@/components/portal/TimesheetForm"
 import { Heading } from "@/components/portal/ui"
 import { formatDate, sydneyToday } from "@/lib/portal/dates"
@@ -5,6 +6,8 @@ import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import Link from "next/link"
+
+export const metadata: Metadata = { title: "Log today's hours" }
 
 export default async function TimesheetPage() {
   const { worker } = await requireUser()
@@ -48,7 +51,7 @@ export default async function TimesheetPage() {
                     {label}
                   </Link>
                 ) : (
-                  <span className="text-navy/60">{label}</span>
+                  <span className="text-navy/70">{label}</span>
                 )}
               </li>
             )

@@ -60,7 +60,7 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/60">Step {Math.min(step + 1, 6)} of 6</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Step {Math.min(step + 1, 6)} of 6</p>
       {step === 0 ? (
         <Form
           pending={pending}
@@ -250,13 +250,13 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
           <Text label="Type your full name" name="typedName" value={typedName} onChange={(event) => setTypedName(event.target.value)} />
           <SignaturePad onChange={setSignature} />
           <p className="text-xs leading-relaxed text-navy/70">Tax, bank and super details are not collected here.</p>
-          {error ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+          {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
           <button className="pill pill-teal w-full" disabled={pending}>
             Finish onboarding
           </button>
         </form>
       ) : null}
-      {error && step !== 5 ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+      {error && step !== 5 ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
     </div>
   )
 }
@@ -304,7 +304,7 @@ function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) 
       <Select label="Have you done any construction work in the last 2 years?" name="constructionRecent" defaultValue={worker.constructionRecent} options={CONSTRUCTION_RECENT} />
       <Select label="Driver licence: state" name="licenceState" defaultValue={worker.licenceState} options={LICENCE_STATES} />
       <Checks legend="Do you hold any of these other tickets?" name="other" options={OTHER_TICKETS} selected={worker.otherTicketsHeld} />
-      {error ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+      {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       <button className="pill pill-teal w-full" disabled={pending}>
         Save tickets
       </button>

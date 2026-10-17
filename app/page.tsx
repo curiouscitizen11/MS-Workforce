@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { REQUEST_LABOUR_HREF, BOOK_LABOUR_URL } from "@/components/site";
+import { REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, SITE_URL } from "@/components/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: SITE_URL + "/" },
+};
 
 const roles = [
   {

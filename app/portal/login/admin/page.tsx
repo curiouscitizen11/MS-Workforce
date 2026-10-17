@@ -1,9 +1,12 @@
+import type { Metadata } from "next"
 import { AdminCodeForm } from "@/components/portal/LoginForm"
 import { Heading } from "@/components/portal/ui"
 import { adminTotpSecret, isMock } from "@/lib/portal/config"
 import { readPendingWorkerId } from "@/lib/portal/session"
 import { totpCode } from "@/lib/portal/totp"
 import { redirect } from "next/navigation"
+
+export const metadata: Metadata = { title: "One more code" }
 
 export default function AdminLoginPage() {
   const workerId = readPendingWorkerId()

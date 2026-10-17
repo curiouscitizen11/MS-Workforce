@@ -1,8 +1,11 @@
+import type { Metadata } from "next"
 import { InductionForm } from "@/components/portal/InductionForm"
 import { Heading } from "@/components/portal/ui"
 import { publicQuiz } from "@/lib/portal/induction"
 import { requireUser } from "@/lib/portal/session"
 import Link from "next/link"
+
+export const metadata: Metadata = { title: "Safety basics" }
 
 export default async function InductionPage() {
   const { worker } = await requireUser()

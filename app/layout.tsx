@@ -29,7 +29,6 @@ export const metadata: Metadata = {
     "builders labour hire",
     "Greater Sydney labour hire",
   ],
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_AU",

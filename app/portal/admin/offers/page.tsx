@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { OfferComposer } from "@/components/portal/AdminForms"
 import { Heading, StatusChip } from "@/components/portal/ui"
@@ -6,6 +7,8 @@ import { formatDate } from "@/lib/portal/dates"
 import { sydneyToday } from "@/lib/portal/dates"
 import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+
+export const metadata: Metadata = { title: "Send a shift" }
 
 export default async function AdminOffersPage() {
   await requireAdmin()
@@ -26,7 +29,7 @@ export default async function AdminOffersPage() {
           <li key={offer.id} className="flex items-center justify-between gap-2 rounded-2xl bg-white px-3 py-2 text-sm">
             <Link href={"/portal/offers/" + offer.id}>
               <span className="font-semibold">{names.get(offer.workerId)}</span>
-              <span className="block text-navy/60">
+              <span className="block text-navy/70">
                 {offer.suburb} · {formatDate(offer.shiftDate)}
               </span>
             </Link>

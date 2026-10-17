@@ -1,8 +1,11 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Heading, StatusChip } from "@/components/portal/ui"
 import { formatDate, formatTime } from "@/lib/portal/dates"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+
+export const metadata: Metadata = { title: "Offers and shifts" }
 
 export default async function OffersPage() {
   const { worker } = await requireUser()

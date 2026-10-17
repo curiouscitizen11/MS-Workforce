@@ -14,7 +14,7 @@ export default function SiteChrome({
       <div className="site-chrome-header">
         <Header />
       </div>
-      <main className="site-chrome-main relative z-0" style={{ paddingTop: "var(--site-header-height)" }}>
+      <main className="site-chrome-main relative z-0 pt-14">
         {children}
       </main>
       <div className="site-chrome-footer">{footer}</div>

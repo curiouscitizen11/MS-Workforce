@@ -98,7 +98,7 @@ export function OfferComposer({
           ))}
         </div>
       )}
-      {error ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+      {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       {note ? <p className="text-sm font-semibold text-[#15803D]">{note}</p> : null}
       <button className="pill pill-teal w-full" disabled={pending}>
         Send offers
@@ -155,7 +155,7 @@ export function VerifyPanel({
             <p className="text-xs text-navy/70">Saving a VEVO result deletes the passport number.</p>
           </>
         ) : null}
-        {error ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+        {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
         <button className="pill pill-teal w-full" disabled={pending}>
           Save check
         </button>

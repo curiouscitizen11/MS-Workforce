@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
@@ -7,6 +8,8 @@ import { formatHours } from "@/lib/portal/hours"
 import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+
+export const metadata: Metadata = { title: "Home" }
 
 export default async function DashboardPage() {
   const { worker } = await requireUser()
@@ -95,7 +98,7 @@ export default async function DashboardPage() {
       </section>
       {latest?.status === "Approved" ? (
         <Link href={"/portal/timesheet/" + latest.id} className="block rounded-2xl border border-navy/10 bg-white p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/60">Signed hours</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Signed hours</p>
           <p className="mt-1 font-semibold">
             {latest.totalHours} hours · {formatDate(latest.workDate)}
           </p>

@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
@@ -5,6 +6,8 @@ import { complianceFor } from "@/lib/portal/services"
 import { sydneyToday } from "@/lib/portal/dates"
 import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+
+export const metadata: Metadata = { title: "Admin desk" }
 
 export default async function AdminHomePage() {
   await requireAdmin()
@@ -31,7 +34,7 @@ export default async function AdminHomePage() {
             <Link key={worker.id} href={"/portal/admin/workers/" + worker.id} className="flex min-h-12 items-center justify-between gap-2 rounded-2xl border border-navy/10 bg-white px-3 py-2">
               <span>
                 <span className="block text-sm font-semibold">{worker.name}</span>
-                <span className="block text-xs text-navy/60">{worker.status}</span>
+                <span className="block text-xs text-navy/70">{worker.status}</span>
               </span>
               <StatusChip level={badgeLevel(check.badge)}>{check.label}</StatusChip>
             </Link>
@@ -55,7 +58,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl bg-white px-2 py-3">
       <p className="text-xl font-semibold">{value}</p>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-navy/60">{label}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-navy/70">{label}</p>
     </div>
   )
 }

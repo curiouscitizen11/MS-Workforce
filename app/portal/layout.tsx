@@ -4,8 +4,23 @@ import { PortalNav } from "@/components/portal/Nav"
 import { readSession } from "@/lib/portal/session"
 
 export const metadata: Metadata = {
-  title: "Worker portal",
+  title: {
+    default: "Worker portal",
+    template: "%s | MS Workforce",
+  },
+  description: "MS Workforce worker portal.",
   robots: { index: false, follow: false },
+  alternates: { canonical: null },
+  openGraph: {
+    title: "Worker portal",
+    description: "MS Workforce worker portal.",
+    url: "/portal",
+  },
+  twitter: {
+    card: "summary",
+    title: "Worker portal",
+    description: "MS Workforce worker portal.",
+  },
 }
 
 export const dynamic = "force-dynamic"

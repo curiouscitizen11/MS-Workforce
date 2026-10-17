@@ -247,7 +247,7 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
       {step === "times" ? (
         <>
           <section className="rounded-2xl border border-navy/10 bg-white p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/60">Site</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Site</p>
             {dayShifts.length > 1 ? (
               <label className="mt-2 block text-sm font-semibold" htmlFor="shift">
                 Choose the shift
@@ -344,7 +344,7 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
             ) : null}
           </fieldset>
           <p className="rounded-2xl bg-white px-3 py-3" data-testid="paid-hours">
-            <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-navy/60">Paid hours today</span>
+            <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Paid hours today</span>
             <span className="mt-1 block text-4xl font-semibold tracking-tight">{preview.ok ? formatHours(preview.hours) + " hours" : "Check the times"}</span>
           </p>
           {warnings.map((warning) => (
@@ -449,7 +449,7 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
           <SignaturePad onChange={setSignature} />
         </>
       )}
-      {queued ? <p className="text-sm font-semibold text-teal-600">{queued}</p> : null}
+      {queued ? <p role="status" className="text-sm font-semibold text-teal-600">{queued}</p> : null}
       {error ? (
         <p role="alert" className="text-sm font-semibold text-[#B91C1C]">
           {error}

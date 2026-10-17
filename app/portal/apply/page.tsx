@@ -1,5 +1,8 @@
+import type { Metadata } from "next"
 import { ApplyForm } from "@/components/portal/ApplyForm"
 import { Heading } from "@/components/portal/ui"
+
+export const metadata: Metadata = { title: "Tell us about you" }
 
 export default function ApplyPage() {
   return (

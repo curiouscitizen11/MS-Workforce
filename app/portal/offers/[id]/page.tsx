@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { OfferActions } from "@/components/portal/OfferActions"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
@@ -7,6 +8,8 @@ import { TICKET_LABELS } from "@/lib/portal/types"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { notFound } from "next/navigation"
+
+export const metadata: Metadata = { title: "Shift offer" }
 
 export default async function OfferPage({ params }: { params: { id: string } }) {
   const { worker } = await requireUser()

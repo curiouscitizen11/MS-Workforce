@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { applyForWork } from "@/app/portal/actions"
 import { Field, fieldClass } from "@/components/portal/ui"
+import { toE164 } from "@/lib/portal/phone"
 import { DRIVER_CLASSES, HELD_CHOICES, ROLES, WHITE_CARD_CHOICES } from "@/lib/portal/types"
 
 const ticketFields = [
@@ -51,6 +52,25 @@ export function ApplyForm() {
       className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault()
+        setError("")
+        if (step === 0) {
+          if (name.trim().length < 2 || suburb.trim().length < 2) {
+            setError("Check the form and try again.")
+            return
+          }
+          if (!toE164(mobile)) {
+            setError("Enter an Australian mobile, like 0400 000 000.")
+            return
+          }
+          if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+            setError("That email does not look right.")
+            return
+          }
+        }
+        if (step === 1 && roles.length === 0) {
+          setError("Choose at least one role.")
+          return
+        }
         if (step < 3) {
           setStep(step + 1)
           return
@@ -75,7 +95,7 @@ export function ApplyForm() {
         })
       }}
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/60">Step {step + 1} of 4</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Step {step + 1} of 4</p>
       {step === 0 ? (
         <>
           <Field label="Full name" name="name" value={name} onChange={(event) => setName(event.target.value)} required />

@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Heading, StatusChip } from "@/components/portal/ui"
 import { formatDate, formatTime } from "@/lib/portal/dates"
 import { adminMobile } from "@/lib/portal/config"
@@ -5,6 +6,8 @@ import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+
+export const metadata: Metadata = { title: "Shift" }
 
 export default async function ShiftPage({ params }: { params: { id: string } }) {
   const { worker } = await requireUser()

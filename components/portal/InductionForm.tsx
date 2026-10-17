@@ -62,7 +62,7 @@ export function InductionForm({ questions, name }: { questions: PublicQuestion[]
           <input id="typed" className={fieldClass} value={typedName} onChange={(event) => setTypedName(event.target.value)} />
         </label>
         <SignaturePad onChange={setSignature} />
-        {error ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+        {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
         <button className="pill pill-teal w-full" disabled={pending}>
           Sign induction
         </button>
@@ -72,8 +72,8 @@ export function InductionForm({ questions, name }: { questions: PublicQuestion[]
 
   return (
     <div className="space-y-4">
-      {fail ? <p className="rounded-2xl bg-[#FEF3C7] px-3 py-2 text-sm font-semibold text-[#B45309]">{fail}</p> : null}
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/60">
+      {fail ? <p role="alert" className="rounded-2xl bg-[#FEF3C7] px-3 py-2 text-sm font-semibold text-[#B45309]">{fail}</p> : null}
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">
         Question {index + 1} of {questions.length}
       </p>
       <h2 className="text-xl font-semibold leading-snug">{question.prompt}</h2>

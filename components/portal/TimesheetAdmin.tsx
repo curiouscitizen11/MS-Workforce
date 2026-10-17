@@ -47,7 +47,7 @@ export function TimesheetAdmin({
         <input name="breakMinutes" aria-label="Corrected break" defaultValue={String(breakMinutes)} className={fieldClass} />
       </div>
       <input name="note" aria-label="Correction note" placeholder="What changed" className={fieldClass} />
-      {error ? <p className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+      {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       <button name="mode" value="correct" className="pill pill-teal w-full" disabled={pending}>
         Save correction
       </button>

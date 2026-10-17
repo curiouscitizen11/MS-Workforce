@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { TimesheetAdmin } from "@/components/portal/TimesheetAdmin"
 import { DemoBanner, Heading } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
@@ -8,6 +9,8 @@ import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+
+export const metadata: Metadata = { title: "Signed hours" }
 
 export default async function SignedTimesheetPage({ params }: { params: { id: string } }) {
   const { worker } = await requireUser()
@@ -39,15 +42,15 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
       {late ? <p className="rounded-2xl bg-[#FEF3C7] px-3 py-3 text-sm font-semibold text-[#B45309]">{late}</p> : null}
       <dl className="grid grid-cols-3 gap-2 rounded-2xl border border-navy/10 bg-white p-3 text-sm">
         <div>
-          <dt className="text-navy/60">Start</dt>
+          <dt className="text-navy/70">Start</dt>
           <dd className="font-semibold">{sheet.start}</dd>
         </div>
         <div>
-          <dt className="text-navy/60">Finish</dt>
+          <dt className="text-navy/70">Finish</dt>
           <dd className="font-semibold">{sheet.finish}</dd>
         </div>
         <div>
-          <dt className="text-navy/60">Break</dt>
+          <dt className="text-navy/70">Break</dt>
           <dd className="font-semibold">{sheet.breakMinutes} min</dd>
         </div>
       </dl>
@@ -59,7 +62,7 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
       </p>
       {sheet.signaturePng ? (
         <section className="rounded-2xl border border-navy/10 bg-white p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/60">Supervisor signature</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Supervisor signature</p>
           <p className="mt-1 font-semibold">{sheet.supervisorName}</p>
           <p className="text-sm text-navy/70">{sheet.supervisorRole}</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}

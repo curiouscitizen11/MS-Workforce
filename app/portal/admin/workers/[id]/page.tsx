@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { VerifyPanel } from "@/components/portal/AdminForms"
 import { Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { signingSecret } from "@/lib/portal/config"
@@ -9,6 +10,8 @@ import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { TICKET_LABELS, TICKET_TYPES } from "@/lib/portal/types"
 import { notFound } from "next/navigation"
+
+export const metadata: Metadata = { title: "Worker" }
 
 export default async function AdminWorkerPage({ params }: { params: { id: string } }) {
   await requireAdmin()
