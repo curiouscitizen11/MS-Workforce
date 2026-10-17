@@ -18,6 +18,8 @@ Do not ask workers for a tax file number, bank details or super. Those stay in X
 
 Leave `PORTAL_MODE` unset, or set it to `mock` in `.env.local`. Demo mode never calls Notion, Twilio or email, even if those keys are sitting in the file.
 
+A Vercel preview of this branch is also demo mode. It does not need Neon, Twilio, Notion or Blob. It switches to the real accounts only when `PORTAL_MODE` is set to `live`. On the production site, if `PORTAL_MODE` is left blank and both the database address and the Notion token are set, the portal treats that as live.
+
 Demo logins are on the login screen:
 
 - **Sam Lee**, mobile `0400 111 222` — a ready worker with an open shift offer and a signed timesheet.
@@ -36,7 +38,7 @@ Other demo people:
 
 Create these accounts yourself. Put the keys in Vercel (Project → Settings → Environment Variables), not in the code. Copy the names from `.env.example`.
 
-Set `PORTAL_MODE` to `live` only after every item below is filled in. If both the database address and the Notion token are set, and `PORTAL_MODE` is left blank, the portal also treats that as live.
+Set `PORTAL_MODE` to `live` only after every item below is filled in, and only on production. Preview links stay in demo mode. On production, if `PORTAL_MODE` is left blank and both the database address and the Notion token are set, the portal treats that as live. Missing login secrets are rejected only in live mode. Demo mode uses stand-in secrets so a preview can open with no environment variables.
 
 ### 1. Neon (the login database)
 

@@ -2,9 +2,8 @@ import { NextResponse } from "next/server"
 import { portalMode } from "@/lib/portal/config"
 import { createNotify } from "@/lib/portal/notify"
 import { consumeMagicLink } from "@/lib/portal/services"
+import { sessionCookieValue, writePendingCookie } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
-import { createHmac } from "crypto"
-import { sessionSecret } from "@/lib/portal/config"
 
 export async function GET(request: Request) {
   const token = new URL(request.url).searchParams.get("token") || ""
@@ -17,18 +16,14 @@ export async function GET(request: Request) {
     return NextResponse.redirect(login)
   }
   if (result.needsTotp) {
-    const exp = Math.floor(Date.now() / 1000) + 300
-    const payload = result.workerId + "." + exp
-    const signature = createHmac("sha256", sessionSecret()).update(payload).digest("base64url")
-    const response = NextResponse.redirect(new URL("/portal/login/admin", request.url))
-    response.cookies.set("msw_admin_pending", payload + "." + signature, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 300 })
-    return response
+    writePendingCookie(result.workerId, Date.now())
+    return NextResponse.redirect(new URL("/portal/login/admin", request.url))
   }
-  const signature = createHmac("sha256", sessionSecret()).update(result.session.id).digest("base64url")
   const response = NextResponse.redirect(new URL("/portal", request.url))
-  response.cookies.set("msw_portal", result.session.id + "." + signature, {
+  response.cookies.set("msw_portal", sessionCookieValue(result.session), {
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     expires: new Date(result.session.expiresAt),
   })

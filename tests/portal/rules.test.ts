@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
+import { portalMode, sessionSecret, signingSecret } from "@/lib/portal/config"
 import { assessTickets, canAcceptShift, dueReminderStage, type TicketInput } from "@/lib/portal/compliance"
+import { encryptString } from "@/lib/portal/crypto"
+import { createMemoryStore } from "@/lib/portal/store"
 import { sydneyToday } from "@/lib/portal/dates"
 import { signedFilePath, stripJpegExif, verifyFileToken } from "@/lib/portal/files"
 import { hoursWarnings, paidHours } from "@/lib/portal/hours"
@@ -194,6 +197,74 @@ describe("hours, privacy, induction and file links", () => {
     expect(totpCode(secret, 59_000)).toBe("287082")
     expect(verifyTotp("287082", secret, 59_000)).toBe(true)
     expect(verifyTotp("000000", secret, 59_000)).toBe(false)
+  })
+})
+
+describe("preview starts with no secrets", () => {
+  const keys = [
+    "PORTAL_MODE",
+    "VERCEL_ENV",
+    "DATABASE_URL",
+    "NOTION_TOKEN",
+    "PORTAL_SESSION_SECRET",
+    "PORTAL_SIGNING_SECRET",
+    "PORTAL_ENCRYPTION_KEY",
+    "ADMIN_TOTP_SECRET",
+  ]
+
+  function withEnv(values: Record<string, string | undefined>, run: () => void) {
+    const saved = Object.fromEntries(keys.map((key) => [key, process.env[key]]))
+    for (const key of keys) delete process.env[key]
+    for (const [key, value] of Object.entries(values)) {
+      if (value === undefined) delete process.env[key]
+      else process.env[key] = value
+    }
+    try {
+      run()
+    } finally {
+      for (const key of keys) {
+        if (saved[key] === undefined) delete process.env[key]
+        else process.env[key] = saved[key]
+      }
+    }
+  }
+
+  it("stays in demo mode on a preview even when live keys are present", () => {
+    withEnv({ VERCEL_ENV: "preview", DATABASE_URL: "postgres://example", NOTION_TOKEN: "ntn" }, () => {
+      expect(portalMode()).toBe("mock")
+      expect(sessionSecret()).toBe("mock-only-session-secret")
+      expect(signingSecret()).toBe("mock-only-signing-secret")
+      expect(encryptString("passport").length).toBeGreaterThan(20)
+    })
+  })
+
+  it("uses demo mode when the database and Notion are not configured", () => {
+    withEnv({}, () => {
+      expect(portalMode()).toBe("mock")
+      expect(() => sessionSecret()).not.toThrow()
+    })
+  })
+
+  it("fails only when live mode is missing a secret", () => {
+    withEnv({ PORTAL_MODE: "live", VERCEL_ENV: "preview" }, () => {
+      expect(portalMode()).toBe("live")
+      expect(() => sessionSecret()).toThrow(/PORTAL_SESSION_SECRET is required when the portal is live/)
+      expect(() => encryptString("passport")).toThrow(/PORTAL_ENCRYPTION_KEY/)
+    })
+  })
+
+  it("keeps the demo running when the disk is read-only", async () => {
+    const { mkdtempSync, writeFileSync } = await import("fs")
+    const { tmpdir } = await import("os")
+    const { join } = await import("path")
+    const dir = mkdtempSync(join(tmpdir(), "msw-ro-"))
+    const blocker = join(dir, "not-a-directory")
+    writeFileSync(blocker, "x")
+    const store = createMemoryStore({ seed: true, persistPath: join(blocker, "store.json") })
+    const workers = await store.workers.all()
+    expect(workers.length).toBeGreaterThan(0)
+    await store.workers.save(workers[0])
+    expect((await store.workers.get(workers[0].id))?.name).toBe(workers[0].name)
   })
 })
 

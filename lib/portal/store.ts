@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs"
+import { tmpdir } from "os"
 import { dirname, join } from "path"
 import { buildSeed, SEED_VERSION, type SeedData } from "@/lib/portal/seed"
 import type {
@@ -127,8 +128,12 @@ export function createMemoryStore(options?: { seed?: boolean; now?: Date; persis
 
   const persist = () => {
     if (!persistPath) return
-    mkdirSync(dirname(persistPath), { recursive: true })
-    writeFileSync(persistPath, JSON.stringify(db))
+    try {
+      mkdirSync(dirname(persistPath), { recursive: true })
+      writeFileSync(persistPath, JSON.stringify(db))
+    } catch {
+      // Vercel's app directory is read-only. The copy in memory still serves this instance.
+    }
   }
   if (persistPath) persist()
   return bind(db, persist)
@@ -150,7 +155,9 @@ export async function getStore(): Promise<Store> {
     } else {
       globalStore.__mswStore = createMemoryStore({
         seed: true,
-        persistPath: join(process.cwd(), ".data", "portal-store.json"),
+        persistPath: process.env.VERCEL
+          ? join(tmpdir(), "msw-portal", "portal-store.json")
+          : join(process.cwd(), ".data", "portal-store.json"),
       })
     }
   }

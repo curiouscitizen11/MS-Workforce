@@ -23,11 +23,15 @@ import {
   verifyWorker,
   type Ctx,
 } from "@/lib/portal/services"
+import { toE164 } from "@/lib/portal/phone"
 import {
+  clearOtpCookie,
   clearPendingCookie,
   clearSessionCookie,
+  readOtpCookie,
   readPendingWorkerId,
   readSession,
+  writeOtpCookie,
   writePendingCookie,
   writeSessionCookie,
 } from "@/lib/portal/session"
@@ -49,13 +53,38 @@ function refresh() {
   revalidatePath("/portal/admin")
 }
 
+async function restoreDemoOtp() {
+  if (!isMock()) return
+  const saved = readOtpCookie()
+  if (!saved) return
+  const store = await getStore()
+  if (!(await store.challenges.get(saved.id))) await store.challenges.save(saved)
+}
+
+async function rememberDemoOtp(mobile: string) {
+  if (!isMock()) return
+  const target = toE164(mobile)
+  if (!target) return
+  const latest = (await (await getStore()).challenges.all())
+    .filter((item) => item.target === target)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+  if (latest) writeOtpCookie(latest)
+}
+
 export async function sendLoginCode(mobile: string) {
-  return requestOtp(await ctx(), { mobile, ip: ip() })
+  const result = await requestOtp(await ctx(), { mobile, ip: ip() })
+  if (result.ok) await rememberDemoOtp(mobile)
+  return result
 }
 
 export async function checkLoginCode(mobile: string, code: string) {
+  await restoreDemoOtp()
   const result = await verifyOtp(await ctx(), { mobile, code })
-  if (!result.ok) return result
+  if (!result.ok) {
+    await rememberDemoOtp(mobile)
+    return result
+  }
+  clearOtpCookie()
   if (result.needsTotp) {
     writePendingCookie(result.workerId, Date.now())
     return { ok: true as const, next: "/portal/login/admin" }
