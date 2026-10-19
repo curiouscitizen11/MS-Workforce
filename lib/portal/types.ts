@@ -22,18 +22,7 @@ export const TICKET_LABELS: Record<TicketType, string> = {
   other: "Other ticket",
 }
 
-export const HELD_CHOICES = ["Held", "Not held", "Expired", "Booked in / training now"] as const
-export const WHITE_CARD_CHOICES = ["Held", "Not completed", "Lost – replacement needed", "Expired"] as const
-export const DRIVER_CLASSES = [
-  "Not held",
-  "Car",
-  "Light rigid",
-  "Medium rigid",
-  "Heavy rigid",
-  "Heavy combination",
-  "Expired",
-  "Other, please explain",
-] as const
+export const TICKET_ANSWERS = ["Yes, I have it", "No", "Booked in for the course"] as const
 
 export const WORKER_STATUSES = ["Applicant", "Onboarding", "Ready", "Inactive"] as const
 export type WorkerStatus = (typeof WORKER_STATUSES)[number]
@@ -507,7 +496,7 @@ export type StoredBlob = {
   url?: string
 }
 
-export function blankTicket(status = "Not held"): Ticket {
+export function blankTicket(status = "No"): Ticket {
   return { status }
 }
 

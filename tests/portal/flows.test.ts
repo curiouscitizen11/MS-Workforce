@@ -8,6 +8,7 @@ import {
   createOffers,
   processOutbox,
   purgeDocuments,
+  requestMagicLink,
   requestOtp,
   respondToOffer,
   saveTicket,
@@ -70,19 +71,20 @@ describe("portal flows", () => {
       name: "New Worker",
       mobile: "0412 555 010",
       email: "new.worker@example.com",
+      confirmEmail: "New.Worker@Example.com",
       suburb: "Dee Why",
       roles: ["General labourer"],
       experience: "Site cleaning on weekends.",
       whatsappOk: true,
       privacyConsent: true,
       tickets: {
-        whiteCard: "Held",
-        heights: "Not held",
-        asbestosA: "Not held",
-        asbestosB: "Not held",
-        confinedSpace: "Not held",
-        firstAid: "Not held",
-        driverLicence: "Not held",
+        whiteCard: "Yes, I have it",
+        heights: "No",
+        asbestosA: "No",
+        asbestosB: "No",
+        confinedSpace: "No",
+        firstAid: "No",
+        driverLicence: "No",
       },
     }
     expect((await submitApplication(ctx, input)).ok).toBe(true)
@@ -92,6 +94,26 @@ describe("portal flows", () => {
     expect(matches[0].status).toBe("Applicant")
     const again = await submitApplication(ctx, { ...input, mobile: "0400 111 222", name: "Sam Lee" })
     expect(again.ok).toBe(false)
+    expect(matches[0].email).toBe("new.worker@example.com")
+    const mismatch = await submitApplication(ctx, { ...input, mobile: "0412 555 011", confirmEmail: "other@example.com" })
+    expect(mismatch.ok).toBe(false)
+    if (!mismatch.ok) expect(mismatch.error).toBe("Emails don't match.")
+    const bad = await submitApplication(ctx, { ...input, mobile: "0412 555 012", email: "not-an-email", confirmEmail: "not-an-email" })
+    expect(bad.ok).toBe(false)
+    if (!bad.ok) expect(bad.error).toBe("That email does not look right.")
+    const link = await requestMagicLink(ctx, {
+      email: "Sam.Lee@example.com",
+      confirmEmail: "nope@example.com",
+      origin: "http://localhost:3000",
+    })
+    expect(link.ok).toBe(false)
+    if (!link.ok) expect(link.error).toBe("Emails don't match.")
+    const sent = await requestMagicLink(ctx, {
+      email: "Sam.Lee@example.com",
+      confirmEmail: "sam.lee@example.com",
+      origin: "http://localhost:3000",
+    })
+    expect(sent.ok).toBe(true)
   })
 
   it("blocks Alex and lets Sam accept", async () => {
@@ -146,9 +168,14 @@ describe("portal flows", () => {
     const { ctx } = harness()
     const before = await ctx.store.workers.get("w-sam")
     expect(before?.ticketsVerified).toBe(true)
-    await saveTicket(ctx, "w-sam", "heights", { status: "Held", expiry: "2027-01-01", number: "HT-9999" })
+    await saveTicket(ctx, "w-sam", "heights", { status: "Yes, I have it", expiry: "2027-01-01", number: "HT-9999" })
     const after = await ctx.store.workers.get("w-sam")
     expect(after?.ticketsVerified).toBe(false)
+    expect(after?.tickets.heights.status).toBe("Yes, I have it")
+    expect(after?.tickets.heights.number).toBeUndefined()
+    expect(after?.tickets.heights.expiry).toBeUndefined()
+    const rejected = await saveTicket(ctx, "w-sam", "heights", { status: "Expired" })
+    expect(rejected.ok).toBe(false)
   })
 
   it("keeps passport numbers out of Notion and wipes them", async () => {

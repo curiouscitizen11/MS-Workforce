@@ -4,6 +4,7 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { checkAdminCode, checkLoginCode, sendLoginCode, sendMagicLink } from "@/app/portal/actions"
 import { Field, fieldClass } from "@/components/portal/ui"
+import { emailError, emailProblem } from "@/lib/portal/email"
 
 export function LoginForm({
   mock,
@@ -16,6 +17,7 @@ export function LoginForm({
   const [mobile, setMobile] = useState("")
   const [code, setCode] = useState("")
   const [email, setEmail] = useState("")
+  const [confirmEmail, setConfirmEmail] = useState("")
   const [devCode, setDevCode] = useState("")
   const [devLink, setDevLink] = useState("")
   const [error, setError] = useState("")
@@ -30,7 +32,12 @@ export function LoginForm({
         setError("")
         start(async () => {
           if (step === "email") {
-            const result = await sendMagicLink(email)
+            const emailIssue = emailError(emailProblem(email, confirmEmail, true))
+            if (emailIssue) {
+              setError(emailIssue)
+              return
+            }
+            const result = await sendMagicLink(email.trim(), confirmEmail.trim())
             if (!result.ok) {
               setError(result.error)
               return
@@ -94,14 +101,26 @@ export function LoginForm({
         </label>
       ) : null}
       {step === "email" ? (
-        <Field
-          label="Email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-        />
+        <>
+          <Field
+            label="Email"
+            name="email"
+            type="text"
+            inputMode="email"
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+          <Field
+            label="Confirm email"
+            name="confirmEmail"
+            type="text"
+            inputMode="email"
+            autoComplete="email"
+            value={confirmEmail}
+            onChange={(event) => setConfirmEmail(event.target.value)}
+          />
+        </>
       ) : null}
       {devLink ? (
         <a className="block text-sm font-semibold text-teal-600 underline" href={devLink}>

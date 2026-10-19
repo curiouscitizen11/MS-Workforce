@@ -24,6 +24,7 @@ import {
   warningWindowDays,
 } from "@/lib/portal/compliance"
 import { decryptString } from "@/lib/portal/crypto"
+import { emailError, emailProblem } from "@/lib/portal/email"
 import { WHAT_TO_BRING } from "@/lib/portal/seed"
 import { addDays, daysBetween, formatDate, isMondayInSydney, sydneyParts, sydneyToday } from "@/lib/portal/dates"
 import { deletePrivateBlob, storePrivateBlob } from "@/lib/portal/blob"
@@ -39,15 +40,13 @@ import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
 import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
 import {
-  DRIVER_CLASSES,
-  HELD_CHOICES,
   ROLES,
   SUPERVISOR_ROLES,
+  TICKET_ANSWERS,
   TICKET_LABELS,
   TIMESHEET_TASKS,
   VEVO_RESULTS,
   VERIFICATION_METHODS,
-  WHITE_CARD_CHOICES,
   type Offer,
   type Session,
   type Ticket,
@@ -206,7 +205,9 @@ async function openSession(ctx: Ctx, worker: Worker): Promise<Session> {
   return session
 }
 
-export async function requestMagicLink(ctx: Ctx, input: { email: string; origin: string }) {
+export async function requestMagicLink(ctx: Ctx, input: { email: string; confirmEmail: string; origin: string }) {
+  const problem = emailProblem(input.email, input.confirmEmail, true)
+  if (problem) return fail(emailError(problem))
   const email = input.email.trim().toLowerCase()
   const worker = (await ctx.store.workers.all()).find((item) => item.email?.toLowerCase() === email)
   if (!worker) return fail("That email is not on file. Try your mobile instead.", "unknown")
@@ -244,19 +245,20 @@ const applySchema = z.object({
   name: z.string().trim().min(2).max(80),
   mobile: z.string(),
   email: z.string().trim().max(120).optional(),
+  confirmEmail: z.string().trim().max(120).optional(),
   suburb: z.string().trim().min(2).max(80),
   roles: z.array(z.enum(ROLES)).min(1),
   experience: z.string().trim().max(1000).optional(),
   whatsappOk: z.boolean(),
   privacyConsent: z.literal(true),
   tickets: z.object({
-    whiteCard: z.enum(WHITE_CARD_CHOICES),
-    heights: z.enum(HELD_CHOICES),
-    asbestosA: z.enum(HELD_CHOICES),
-    asbestosB: z.enum(HELD_CHOICES),
-    confinedSpace: z.enum(HELD_CHOICES),
-    firstAid: z.enum(HELD_CHOICES),
-    driverLicence: z.enum(DRIVER_CLASSES),
+    whiteCard: z.enum(TICKET_ANSWERS),
+    heights: z.enum(TICKET_ANSWERS),
+    asbestosA: z.enum(TICKET_ANSWERS),
+    asbestosB: z.enum(TICKET_ANSWERS),
+    confinedSpace: z.enum(TICKET_ANSWERS),
+    firstAid: z.enum(TICKET_ANSWERS),
+    driverLicence: z.enum(TICKET_ANSWERS),
   }),
 })
 
@@ -268,7 +270,9 @@ export async function submitApplication(ctx: Ctx, input: unknown) {
   if (sensitive) return fail(sensitive)
   const mobile = toE164(data.mobile)
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
-  if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return fail("That email does not look right.")
+  const emailProblemFound = emailProblem(data.email || "", data.confirmEmail || "")
+  if (emailProblemFound) return fail(emailError(emailProblemFound))
+  const email = (data.email || "").trim()
   const existing = await findWorkerByMobile(ctx, mobile)
   if (existing?.role === "admin") return fail("Use the admin login for this mobile.")
   if (existing && existing.status !== "Applicant") {
@@ -285,21 +289,21 @@ export async function submitApplication(ctx: Ctx, input: unknown) {
     whatsappOk: false,
     privacyConsent: false,
     tickets: {
-      whiteCard: { status: "Not held" },
-      heights: { status: "Not held" },
-      asbestosA: { status: "Not held" },
-      asbestosB: { status: "Not held" },
-      confinedSpace: { status: "Not held" },
-      firstAid: { status: "Not held" },
-      driverLicence: { status: "Not held" },
-      other: { status: "Not held" },
+      whiteCard: { status: "No" },
+      heights: { status: "No" },
+      asbestosA: { status: "No" },
+      asbestosB: { status: "No" },
+      confinedSpace: { status: "No" },
+      firstAid: { status: "No" },
+      driverLicence: { status: "No" },
+      other: { status: "No" },
     },
     createdAt: nowIso,
     updatedAt: nowIso,
   }
   worker.name = data.name
   worker.mobile = mobile
-  worker.email = data.email || worker.email
+  worker.email = email || worker.email
   worker.suburb = data.suburb
   worker.roles = data.roles
   worker.experience = data.experience
@@ -400,13 +404,10 @@ function stringOf(value: unknown) {
 export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, ticket: Ticket) {
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Log in again.")
-  const allowed = type === "driverLicence" ? DRIVER_CLASSES : type === "whiteCard" ? WHITE_CARD_CHOICES : HELD_CHOICES
-  if (!allowed.includes(ticket.status as never)) return fail("Choose one of the listed options.")
-  if (texts([ticket.number, ticket.note])) return fail(SENSITIVE_MESSAGE)
+  if (!TICKET_ANSWERS.includes(ticket.status as (typeof TICKET_ANSWERS)[number])) return fail("Choose one of the listed options.")
   worker.tickets[type] = {
-    ...worker.tickets[type],
-    ...ticket,
-    pendingCheck: ticket.status !== "Not held" && ticket.status !== "Not completed",
+    status: ticket.status,
+    pendingCheck: ticket.status === "Yes, I have it",
   }
   worker.ticketsVerified = false
   const note = "Ticket updated in the portal on " + sydneyToday(ctx.now) + ". Needs a new check."

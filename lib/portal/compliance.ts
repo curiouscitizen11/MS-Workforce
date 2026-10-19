@@ -49,14 +49,8 @@ export function isMarkedExpired(status: string | undefined): boolean {
   return (status || "").trim() === "Expired"
 }
 
-export function isHeld(type: TicketType, status: string | undefined): boolean {
-  const value = (status || "").trim()
-  if (!value || value === "Not held" || value === "Expired" || value === "Not completed" || value === "Booked in / training now") {
-    return false
-  }
-  if (type === "whiteCard") return value === "Held" || value === "Lost – replacement needed"
-  if (type === "driverLicence") return true
-  return value === "Held"
+export function isHeld(_type: TicketType, status: string | undefined): boolean {
+  return (status || "").trim() === "Yes, I have it"
 }
 
 export function asTicketInputs(

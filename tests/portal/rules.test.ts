@@ -18,14 +18,14 @@ const DAY = "2026-10-17"
 
 function tickets(overrides: Partial<Record<TicketType, { status?: string; expiry?: string | null }>> = {}): TicketInput[] {
   const base: TicketInput[] = [
-    { type: "whiteCard", status: "Held" },
-    { type: "heights", status: "Not held" },
-    { type: "asbestosA", status: "Not held" },
-    { type: "asbestosB", status: "Not held" },
-    { type: "confinedSpace", status: "Not held" },
-    { type: "firstAid", status: "Not held" },
-    { type: "driverLicence", status: "Not held" },
-    { type: "other", status: "Not held" },
+    { type: "whiteCard", status: "Yes, I have it" },
+    { type: "heights", status: "No" },
+    { type: "asbestosA", status: "No" },
+    { type: "asbestosB", status: "No" },
+    { type: "confinedSpace", status: "No" },
+    { type: "firstAid", status: "No" },
+    { type: "driverLicence", status: "No" },
+    { type: "other", status: "No" },
   ]
   return base.map((ticket) => ({ ...ticket, ...overrides[ticket.type] }))
 }
@@ -33,35 +33,36 @@ function tickets(overrides: Partial<Record<TicketType, { status?: string; expiry
 describe("booking blocks and warning windows", () => {
   const cases: Array<{ name: string; tickets: TicketInput[]; badge: string }> = [
     { name: "white card blank", tickets: tickets({ whiteCard: { status: "" } }), badge: "do-not-book" },
-    { name: "white card not held", tickets: tickets({ whiteCard: { status: "Not held" } }), badge: "do-not-book" },
+    { name: "white card no", tickets: tickets({ whiteCard: { status: "No" } }), badge: "do-not-book" },
+    { name: "white card booked in", tickets: tickets({ whiteCard: { status: "Booked in for the course" } }), badge: "do-not-book" },
     { name: "white card marked expired", tickets: tickets({ whiteCard: { status: "Expired" } }), badge: "do-not-book" },
-    { name: "white card date past", tickets: tickets({ whiteCard: { status: "Held", expiry: "2026-10-16" } }), badge: "do-not-book" },
+    { name: "white card date past", tickets: tickets({ whiteCard: { status: "Yes, I have it", expiry: "2026-10-16" } }), badge: "do-not-book" },
     { name: "white card held with no expiry", tickets: tickets(), badge: "ok" },
-    { name: "white card expires today", tickets: tickets({ whiteCard: { status: "Held", expiry: DAY } }), badge: "warning" },
-    { name: "white card inside 30 days", tickets: tickets({ whiteCard: { status: "Held", expiry: "2026-11-16" } }), badge: "warning" },
-    { name: "white card outside 30 days", tickets: tickets({ whiteCard: { status: "Held", expiry: "2026-11-17" } }), badge: "ok" },
+    { name: "white card expires today", tickets: tickets({ whiteCard: { status: "Yes, I have it", expiry: DAY } }), badge: "warning" },
+    { name: "white card inside 30 days", tickets: tickets({ whiteCard: { status: "Yes, I have it", expiry: "2026-11-16" } }), badge: "warning" },
+    { name: "white card outside 30 days", tickets: tickets({ whiteCard: { status: "Yes, I have it", expiry: "2026-11-17" } }), badge: "ok" },
     { name: "asbestos A marked expired", tickets: tickets({ asbestosA: { status: "Expired" } }), badge: "do-not-book" },
-    { name: "asbestos A date past", tickets: tickets({ asbestosA: { status: "Held", expiry: "2026-10-16" } }), badge: "do-not-book" },
-    { name: "asbestos A not held", tickets: tickets({ asbestosA: { status: "Not held" } }), badge: "ok" },
+    { name: "asbestos A date past", tickets: tickets({ asbestosA: { status: "Yes, I have it", expiry: "2026-10-16" } }), badge: "do-not-book" },
+    { name: "asbestos A not held", tickets: tickets({ asbestosA: { status: "No" } }), badge: "ok" },
     { name: "asbestos B marked expired", tickets: tickets({ asbestosB: { status: "Expired" } }), badge: "do-not-book" },
-    { name: "asbestos B inside 60 days", tickets: tickets({ asbestosB: { status: "Held", expiry: "2026-12-16" } }), badge: "warning" },
-    { name: "asbestos B outside 60 days", tickets: tickets({ asbestosB: { status: "Held", expiry: "2026-12-17" } }), badge: "ok" },
-    { name: "first aid in 59 days", tickets: tickets({ firstAid: { status: "Held", expiry: "2026-12-15" } }), badge: "warning" },
-    { name: "first aid in 60 days", tickets: tickets({ firstAid: { status: "Held", expiry: "2026-12-16" } }), badge: "warning" },
-    { name: "first aid in 61 days", tickets: tickets({ firstAid: { status: "Held", expiry: "2026-12-17" } }), badge: "ok" },
-    { name: "first aid date past", tickets: tickets({ firstAid: { status: "Held", expiry: "2026-10-16" } }), badge: "restricted" },
-    { name: "heights in 31 days", tickets: tickets({ heights: { status: "Held", expiry: "2026-11-17" } }), badge: "ok" },
-    { name: "heights in 30 days", tickets: tickets({ heights: { status: "Held", expiry: "2026-11-16" } }), badge: "warning" },
+    { name: "asbestos B inside 60 days", tickets: tickets({ asbestosB: { status: "Yes, I have it", expiry: "2026-12-16" } }), badge: "warning" },
+    { name: "asbestos B outside 60 days", tickets: tickets({ asbestosB: { status: "Yes, I have it", expiry: "2026-12-17" } }), badge: "ok" },
+    { name: "first aid in 59 days", tickets: tickets({ firstAid: { status: "Yes, I have it", expiry: "2026-12-15" } }), badge: "warning" },
+    { name: "first aid in 60 days", tickets: tickets({ firstAid: { status: "Yes, I have it", expiry: "2026-12-16" } }), badge: "warning" },
+    { name: "first aid in 61 days", tickets: tickets({ firstAid: { status: "Yes, I have it", expiry: "2026-12-17" } }), badge: "ok" },
+    { name: "first aid date past", tickets: tickets({ firstAid: { status: "Yes, I have it", expiry: "2026-10-16" } }), badge: "restricted" },
+    { name: "heights in 31 days", tickets: tickets({ heights: { status: "Yes, I have it", expiry: "2026-11-17" } }), badge: "ok" },
+    { name: "heights in 30 days", tickets: tickets({ heights: { status: "Yes, I have it", expiry: "2026-11-16" } }), badge: "warning" },
     { name: "heights marked expired", tickets: tickets({ heights: { status: "Expired" } }), badge: "restricted" },
-    { name: "heights date past", tickets: tickets({ heights: { status: "Held", expiry: "2026-10-01" } }), badge: "restricted" },
+    { name: "heights date past", tickets: tickets({ heights: { status: "Yes, I have it", expiry: "2026-10-01" } }), badge: "restricted" },
     { name: "confined space expired", tickets: tickets({ confinedSpace: { status: "Expired" } }), badge: "restricted" },
     { name: "driver marked expired", tickets: tickets({ driverLicence: { status: "Expired" } }), badge: "restricted" },
-    { name: "driver date past", tickets: tickets({ driverLicence: { status: "Car", expiry: "2026-10-01" } }), badge: "restricted" },
-    { name: "driver inside 30 days", tickets: tickets({ driverLicence: { status: "Car", expiry: "2026-11-16" } }), badge: "warning" },
-    { name: "other ticket date past", tickets: tickets({ other: { status: "Held", expiry: "2026-10-01" } }), badge: "restricted" },
+    { name: "driver date past", tickets: tickets({ driverLicence: { status: "Yes, I have it", expiry: "2026-10-01" } }), badge: "restricted" },
+    { name: "driver inside 30 days", tickets: tickets({ driverLicence: { status: "Yes, I have it", expiry: "2026-11-16" } }), badge: "warning" },
+    { name: "other ticket date past", tickets: tickets({ other: { status: "Yes, I have it", expiry: "2026-10-01" } }), badge: "restricted" },
     {
       name: "do not book wins over restricted",
-      tickets: tickets({ whiteCard: { status: "Not held" }, heights: { status: "Expired" } }),
+      tickets: tickets({ whiteCard: { status: "No" }, heights: { status: "Expired" } }),
       badge: "do-not-book",
     },
   ]
@@ -84,7 +85,7 @@ describe("booking blocks and warning windows", () => {
 
   it("allows a warning, and a restricted worker when the required tickets are valid", () => {
     const warning = canAcceptShift({
-      tickets: tickets({ heights: { status: "Held", expiry: "2026-11-01" } }),
+      tickets: tickets({ heights: { status: "Yes, I have it", expiry: "2026-11-01" } }),
       jobDate: DAY,
       required: ["whiteCard"],
     })
@@ -96,13 +97,13 @@ describe("booking blocks and warning windows", () => {
     })
     expect(restricted.ok).toBe(true)
     const requiredExpired = canAcceptShift({
-      tickets: tickets({ heights: { status: "Held", expiry: "2026-10-16" } }),
+      tickets: tickets({ heights: { status: "Yes, I have it", expiry: "2026-10-16" } }),
       jobDate: "2026-10-20",
       required: ["heights"],
     })
     expect(requiredExpired.ok).toBe(false)
     const validOnTheDay = canAcceptShift({
-      tickets: tickets({ heights: { status: "Held", expiry: "2026-10-20" } }),
+      tickets: tickets({ heights: { status: "Yes, I have it", expiry: "2026-10-20" } }),
       jobDate: "2026-10-20",
       required: ["heights"],
     })

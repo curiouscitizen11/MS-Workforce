@@ -1,17 +1,15 @@
 import { asTicketInputs, earliestExpiry } from "@/lib/portal/compliance"
 import { sensitiveFindings } from "@/lib/portal/privacy"
 import {
-  DRIVER_CLASSES,
   EXPERIENCE_LEVELS,
   FITNESS_OPTIONS,
-  HELD_CHOICES,
   OFFER_STATUSES,
   RTW_OPTIONS,
+  TICKET_ANSWERS,
   TICKET_LABELS,
   VEVO_METHODS,
   VEVO_RESULTS,
   VERIFICATION_METHODS,
-  WHITE_CARD_CHOICES,
   WORKER_STATUSES,
   type Offer,
   type TicketType,
@@ -62,9 +60,9 @@ function choice(value: string | undefined, allowed: readonly string[]): string |
   return value
 }
 
-function whiteCardChoice(status: string | undefined) {
-  const mapped = !status || status === "Not held" ? "Not completed" : status
-  return choice(mapped, WHITE_CARD_CHOICES)
+function ticketChoice(status: string | undefined) {
+  if (!status) return undefined
+  return choice(status, TICKET_ANSWERS)
 }
 
 function rtwChoice(value: string | undefined) {
@@ -108,29 +106,14 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "VEVO method", worker.vevoMethod ? choice(worker.vevoMethod, VEVO_METHODS) : undefined)
   put(props, "VEVO result", worker.vevoResult ? choice(worker.vevoResult, VEVO_RESULTS) : undefined)
   put(props, "VEVO checked on", worker.vevoCheckedOn)
-  put(props, "White card", whiteCardChoice(worker.tickets.whiteCard.status))
-  put(props, "White card number", worker.tickets.whiteCard.number)
-  put(props, "White card state", worker.tickets.whiteCard.state)
-  put(props, "White card expiry", worker.tickets.whiteCard.expiry)
-  put(props, "White card issued", worker.tickets.whiteCard.issued)
-  put(props, "Work at heights", choice(worker.tickets.heights.status, HELD_CHOICES))
-  put(props, "Work at heights number", worker.tickets.heights.number)
-  put(props, "Work at heights expiry", worker.tickets.heights.expiry)
-  put(props, "Asbestos class A", choice(worker.tickets.asbestosA.status, HELD_CHOICES))
-  put(props, "Asbestos class A number", worker.tickets.asbestosA.number)
-  put(props, "Asbestos class A expiry", worker.tickets.asbestosA.expiry)
-  put(props, "Asbestos class B", choice(worker.tickets.asbestosB.status, HELD_CHOICES))
-  put(props, "Asbestos class B number", worker.tickets.asbestosB.number)
-  put(props, "Asbestos class B expiry", worker.tickets.asbestosB.expiry)
-  put(props, "Confined space", choice(worker.tickets.confinedSpace.status, HELD_CHOICES))
-  put(props, "Confined space number", worker.tickets.confinedSpace.number)
-  put(props, "Confined space expiry", worker.tickets.confinedSpace.expiry)
-  put(props, "Driver licence", choice(worker.tickets.driverLicence.status, DRIVER_CLASSES))
-  put(props, "Driver licence expiry", worker.tickets.driverLicence.expiry)
-  put(props, "First aid", choice(worker.tickets.firstAid.status, HELD_CHOICES))
-  put(props, "First aid number", worker.tickets.firstAid.number)
-  put(props, "First aid expiry", worker.tickets.firstAid.expiry)
-  put(props, "Other tickets", worker.tickets.other.note || (worker.tickets.other.status === "Held" ? "Held" : undefined))
+  put(props, "White card", ticketChoice(worker.tickets.whiteCard.status))
+  put(props, "Work at heights", ticketChoice(worker.tickets.heights.status))
+  put(props, "Asbestos class A", ticketChoice(worker.tickets.asbestosA.status))
+  put(props, "Asbestos class B", ticketChoice(worker.tickets.asbestosB.status))
+  put(props, "Confined space", ticketChoice(worker.tickets.confinedSpace.status))
+  put(props, "Driver licence", ticketChoice(worker.tickets.driverLicence.status))
+  put(props, "First aid", ticketChoice(worker.tickets.firstAid.status))
+  put(props, "Other tickets", worker.tickets.other.note || (worker.tickets.other.status === "No" ? undefined : worker.tickets.other.status))
   put(props, "Next ticket expiry", earliestExpiry(asTicketInputs(worker.tickets), null))
   if (worker.otherTicketsHeld?.length) props["Other tickets held"] = worker.otherTicketsHeld
   put(props, "Transport", worker.transport)

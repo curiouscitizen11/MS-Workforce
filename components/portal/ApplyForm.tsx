@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react"
 import { applyForWork } from "@/app/portal/actions"
+import { TicketChoices } from "@/components/portal/TicketChoices"
 import { Field, fieldClass } from "@/components/portal/ui"
+import { emailError, emailProblem } from "@/lib/portal/email"
 import { toE164 } from "@/lib/portal/phone"
-import { DRIVER_CLASSES, HELD_CHOICES, ROLES, WHITE_CARD_CHOICES } from "@/lib/portal/types"
+import { ROLES } from "@/lib/portal/types"
 
 const ticketFields = [
   ["whiteCard", "White card"],
@@ -23,19 +25,20 @@ export function ApplyForm() {
   const [name, setName] = useState("")
   const [mobile, setMobile] = useState("")
   const [email, setEmail] = useState("")
+  const [confirmEmail, setConfirmEmail] = useState("")
   const [suburb, setSuburb] = useState("")
   const [roles, setRoles] = useState<string[]>([])
   const [experience, setExperience] = useState("")
   const [whatsappOk, setWhatsappOk] = useState(false)
   const [privacy, setPrivacy] = useState(false)
   const [tickets, setTickets] = useState<Record<string, string>>({
-    whiteCard: "Not completed",
-    heights: "Not held",
-    asbestosA: "Not held",
-    asbestosB: "Not held",
-    confinedSpace: "Not held",
-    firstAid: "Not held",
-    driverLicence: "Not held",
+    whiteCard: "No",
+    heights: "No",
+    asbestosA: "No",
+    asbestosB: "No",
+    confinedSpace: "No",
+    firstAid: "No",
+    driverLicence: "No",
   })
 
   if (done) {
@@ -62,8 +65,9 @@ export function ApplyForm() {
             setError("Enter an Australian mobile, like 0400 000 000.")
             return
           }
-          if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-            setError("That email does not look right.")
+          const emailIssue = emailError(emailProblem(email, confirmEmail))
+          if (emailIssue) {
+            setError(emailIssue)
             return
           }
         }
@@ -75,11 +79,18 @@ export function ApplyForm() {
           setStep(step + 1)
           return
         }
+        const emailIssue = emailError(emailProblem(email, confirmEmail))
+        if (emailIssue) {
+          setError(emailIssue)
+          setStep(0)
+          return
+        }
         start(async () => {
           const result = await applyForWork({
             name,
             mobile,
-            email,
+            email: email.trim(),
+            confirmEmail: confirmEmail.trim(),
             suburb,
             roles,
             experience,
@@ -100,7 +111,8 @@ export function ApplyForm() {
         <>
           <Field label="Full name" name="name" value={name} onChange={(event) => setName(event.target.value)} required />
           <Field label="Mobile" name="mobile" inputMode="tel" autoComplete="tel" value={mobile} onChange={(event) => setMobile(event.target.value)} required />
-          <Field label="Email (helps if texts fail)" name="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+          <Field label="Email (helps if texts fail)" name="email" type="text" inputMode="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+          <Field label="Confirm email" name="confirmEmail" type="text" inputMode="email" autoComplete="email" value={confirmEmail} onChange={(event) => setConfirmEmail(event.target.value)} />
           <Field label="Suburb" name="suburb" value={suburb} onChange={(event) => setSuburb(event.target.value)} required />
         </>
       ) : null}
@@ -132,35 +144,23 @@ export function ApplyForm() {
         </>
       ) : null}
       {step === 2 ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {ticketFields.map(([key, label]) => (
-            <label key={key} className="block text-sm font-semibold" htmlFor={key}>
-              {label}
-              <select
-                id={key}
-                className={fieldClass}
-                value={tickets[key]}
-                onChange={(event) => setTickets({ ...tickets, [key]: event.target.value })}
-              >
-                {(key === "whiteCard" ? WHITE_CARD_CHOICES : HELD_CHOICES).map((choice) => (
-                  <option key={choice}>{choice}</option>
-                ))}
-              </select>
-            </label>
+            <TicketChoices
+              key={key}
+              name={key}
+              label={label}
+              value={tickets[key] || "No"}
+              course={key === "whiteCard"}
+              onChange={(choice) => setTickets({ ...tickets, [key]: choice })}
+            />
           ))}
-          <label className="block text-sm font-semibold" htmlFor="driverLicence">
-            Driver licence
-            <select
-              id="driverLicence"
-              className={fieldClass}
-              value={tickets.driverLicence}
-              onChange={(event) => setTickets({ ...tickets, driverLicence: event.target.value })}
-            >
-              {DRIVER_CLASSES.map((choice) => (
-                <option key={choice}>{choice}</option>
-              ))}
-            </select>
-          </label>
+          <TicketChoices
+            name="driverLicence"
+            label="Driver licence"
+            value={tickets.driverLicence || "No"}
+            onChange={(choice) => setTickets({ ...tickets, driverLicence: choice })}
+          />
         </div>
       ) : null}
       {step === 3 ? (

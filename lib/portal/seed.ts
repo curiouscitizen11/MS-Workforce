@@ -2,7 +2,7 @@ import { addDays, sydneyToday } from "@/lib/portal/dates"
 import { payFortnight } from "@/lib/portal/pay"
 import { blankTickets, type Offer, type PortalDocument, type StoredBlob, type Timesheet, type Worker } from "@/lib/portal/types"
 
-export const SEED_VERSION = 3
+export const SEED_VERSION = 4
 
 export const WHAT_TO_BRING =
   "You must bring a hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses."
@@ -98,10 +98,10 @@ export function buildSeed(now = new Date()): SeedData {
       verificationMethod: "Sighted original",
       tickets: {
         ...blankTickets(),
-        whiteCard: { status: "Held", number: "WC-102938", state: "NSW" },
-        heights: { status: "Held", number: "HT-2201", expiry: addDays(today, 20) },
-        firstAid: { status: "Held", number: "FA-5521", expiry: addDays(today, 50) },
-        driverLicence: { status: "Car", expiry: addDays(today, 400) },
+        whiteCard: { status: "Yes, I have it" },
+        heights: { status: "Yes, I have it" },
+        firstAid: { status: "Yes, I have it" },
+        driverLicence: { status: "Yes, I have it" },
       },
     },
     nowIso,
@@ -118,7 +118,7 @@ export function buildSeed(now = new Date()): SeedData {
       roles: ["General labourer"],
       rightToWork: "Yes",
       ticketsVerified: true,
-      tickets: { ...blankTickets(), whiteCard: { status: "Expired", expiry: addDays(today, -3) } },
+      tickets: { ...blankTickets(), whiteCard: { status: "No" } },
     },
     nowIso,
   )
@@ -139,8 +139,8 @@ export function buildSeed(now = new Date()): SeedData {
       visaExpiry: addDays(today, 200),
       tickets: {
         ...blankTickets(),
-        whiteCard: { status: "Held", state: "NSW" },
-        asbestosB: { status: "Expired", expiry: addDays(today, -1) },
+        whiteCard: { status: "Yes, I have it" },
+        asbestosB: { status: "No" },
       },
     },
     nowIso,
@@ -157,8 +157,8 @@ export function buildSeed(now = new Date()): SeedData {
       rightToWork: "Yes",
       tickets: {
         ...blankTickets(),
-        whiteCard: { status: "Held", state: "NSW" },
-        heights: { status: "Expired", expiry: addDays(today, -12) },
+        whiteCard: { status: "Yes, I have it" },
+        heights: { status: "No" },
       },
     },
     nowIso,
@@ -175,7 +175,7 @@ export function buildSeed(now = new Date()): SeedData {
       roles: ["Site clean"],
       experience: "Keen to start. Finished school last year.",
       whatsappOk: true,
-      tickets: { ...blankTickets(), whiteCard: { status: "Held", state: "NSW" } },
+      tickets: { ...blankTickets(), whiteCard: { status: "Yes, I have it" } },
     },
     nowIso,
   )

@@ -108,8 +108,8 @@ export async function checkAdminCode(code: string) {
   return { ok: true as const, next: "/portal/admin" }
 }
 
-export async function sendMagicLink(email: string) {
-  return requestMagicLink(await ctx(), { email, origin: siteOrigin() })
+export async function sendMagicLink(email: string, confirmEmail: string) {
+  return requestMagicLink(await ctx(), { email, confirmEmail, origin: siteOrigin() })
 }
 
 export async function logOut() {

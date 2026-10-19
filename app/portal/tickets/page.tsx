@@ -20,26 +20,27 @@ export default async function TicketsPage() {
     <div className="space-y-4">
       <Heading kicker="Tickets" title="Your cards" text="A White card is required on every job. Changing a card sends it back for MS Workforce to check." />
       <ul className="space-y-2">
-        {check.tickets.map((ticket) => (
-          <li key={ticket.type} className="flex items-center justify-between gap-2 rounded-2xl bg-white px-3 py-3">
-            <span className="text-sm font-semibold">{ticket.label}</span>
-            <StatusChip
-              level={
-                ticket.validity === "valid"
-                  ? worker.ticketsVerified
-                    ? "ok"
-                    : "pending"
-                  : ticket.validity === "expiring"
-                    ? "warning"
-                    : ticket.validity === "not-held"
-                      ? "neutral"
-                      : "do-not-book"
-              }
-            >
-              {ticket.validity === "valid" ? (worker.ticketsVerified ? "Verified" : "Pending check") : ticket.validity === "expiring" ? "Expiring soon" : ticket.validity === "not-held" ? "Not held" : ticket.validity === "missing" ? "Missing" : "Expired"}
-            </StatusChip>
-          </li>
-        ))}
+        {check.tickets.map((ticket) => {
+          const status = worker.tickets[ticket.type]?.status || "No"
+          return (
+            <li key={ticket.type} className="flex items-center justify-between gap-2 rounded-2xl bg-white px-3 py-3">
+              <span className="text-sm font-semibold">{ticket.label}</span>
+              <StatusChip
+                level={
+                  status === "Yes, I have it"
+                    ? worker.ticketsVerified
+                      ? "ok"
+                      : "pending"
+                    : ticket.type === "whiteCard"
+                      ? "do-not-book"
+                      : "neutral"
+                }
+              >
+                {status}
+              </StatusChip>
+            </li>
+          )
+        })}
       </ul>
       {docs.map((doc) => (
         <a key={doc.id} className="block text-sm font-semibold text-teal-600 underline" href={signedFilePath(doc.id, Date.now(), signingSecret())}>

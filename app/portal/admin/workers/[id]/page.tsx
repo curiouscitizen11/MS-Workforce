@@ -31,7 +31,7 @@ export default async function AdminWorkerPage({ params }: { params: { id: string
         {TICKET_TYPES.map((type) => (
           <li key={type} className="flex justify-between gap-2">
             <span>{TICKET_LABELS[type]}</span>
-            <span className="font-semibold">{worker.tickets[type].status || "Not held"}{worker.tickets[type].expiry ? " · " + worker.tickets[type].expiry : ""}</span>
+            <span className="font-semibold">{worker.tickets[type].status || "No"}</span>
           </li>
         ))}
       </ul>

@@ -4,31 +4,29 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { saveProfile, updateTicket } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
+import { TicketChoices } from "@/components/portal/TicketChoices"
 import { fieldClass } from "@/components/portal/ui"
 import {
   ALLERGY_ANSWERS,
   ALLERGY_TYPES,
   ANAPHYLAXIS_ANSWERS,
-  CONSTRUCTION_RECENT,
-  DRIVER_CLASSES,
   EMERGENCY_RELATIONSHIPS,
   EPIPEN_ANSWERS,
   EXPERIENCE_LEVELS,
   FITNESS_OPTIONS,
-  HELD_CHOICES,
   INJURY_ANSWERS,
-  LICENCE_STATES,
   MEDICAL_CONDITIONS,
   MEDICAL_SHARING,
   MEDICATION_ANSWERS,
   OTHER_TICKETS,
   RTW_OPTIONS,
   TASKS_AFFECTED,
+  TICKET_ANSWERS,
+  TICKET_LABELS,
   TICKET_TYPES,
   TRANSPORT_OPTIONS,
   VEVO_METHODS,
   WEEKDAYS,
-  WHITE_CARD_CHOICES,
   WORK_AREAS,
   type TicketType,
   type Worker,
@@ -261,33 +259,34 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
   )
 }
 
+function knownAnswer(status: string | undefined) {
+  return TICKET_ANSWERS.includes(status as (typeof TICKET_ANSWERS)[number]) ? status || "No" : "No"
+}
+
 function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) {
   const [pending, start] = useTransition()
   const [error, setError] = useState("")
+  const [answers, setAnswers] = useState<Record<TicketType, string>>(() => {
+    const next = {} as Record<TicketType, string>
+    for (const type of TICKET_TYPES) next[type] = knownAnswer(worker.tickets[type]?.status)
+    return next
+  })
   return (
     <form
-      className="space-y-3"
+      className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
         start(async () => {
           for (const type of TICKET_TYPES) {
-            const status = String(data.get(type) || (type === "whiteCard" ? "Not completed" : "Not held"))
-            const result = await updateTicket(type, {
-              status,
-              number: String(data.get(type + "-number") || "") || undefined,
-              expiry: String(data.get(type + "-expiry") || "") || null,
-              issued: type === "whiteCard" ? String(data.get("whiteCard-issued") || "") || null : undefined,
-              state: String(data.get(type + "-state") || "") || undefined,
-            })
+            const status = answers[type] || "No"
+            const result = await updateTicket(type, { status })
             if (!result.ok) {
               setError(result.error)
               return
             }
           }
           const profile = await saveProfile({
-            constructionRecent: String(data.get("constructionRecent") || ""),
-            licenceState: String(data.get("licenceState") || ""),
             otherTicketsHeld: OTHER_TICKETS.filter((item) => data.get("other-" + item) === "on"),
           })
           if (!profile.ok) {
@@ -299,46 +298,21 @@ function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) 
       }}
     >
       {TICKET_TYPES.map((type) => (
-        <TicketRow key={type} type={type} ticket={worker.tickets[type]} />
+        <TicketChoices
+          key={type}
+          name={type}
+          label={TICKET_LABELS[type]}
+          value={answers[type]}
+          course={type === "whiteCard"}
+          onChange={(choice) => setAnswers({ ...answers, [type]: choice })}
+        />
       ))}
-      <Select label="Have you done any construction work in the last 2 years?" name="constructionRecent" defaultValue={worker.constructionRecent} options={CONSTRUCTION_RECENT} />
-      <Select label="Driver licence: state" name="licenceState" defaultValue={worker.licenceState} options={LICENCE_STATES} />
       <Checks legend="Do you hold any of these other tickets?" name="other" options={OTHER_TICKETS} selected={worker.otherTicketsHeld} />
       {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       <button className="pill pill-teal w-full" disabled={pending}>
         Save tickets
       </button>
     </form>
-  )
-}
-
-function TicketRow({ type, ticket }: { type: TicketType; ticket: Worker["tickets"][TicketType] }) {
-  const status = ticket.status
-  const options = type === "driverLicence" ? DRIVER_CLASSES : type === "whiteCard" ? WHITE_CARD_CHOICES : HELD_CHOICES
-  const labels: Record<TicketType, string> = {
-    whiteCard: "White card",
-    heights: "Work at heights",
-    asbestosA: "Asbestos Class A",
-    asbestosB: "Asbestos Class B",
-    confinedSpace: "Confined space",
-    firstAid: "First aid",
-    driverLicence: "Driver licence",
-    other: "Other ticket",
-  }
-  return (
-    <label className="block text-sm font-semibold">
-      {labels[type]}
-      <select
-        name={type}
-        defaultValue={type === "whiteCard" && (!status || status === "Not held") ? "Not completed" : status || "Not held"}
-        className={fieldClass}
-      >
-        {options.map((option) => (
-          <option key={option}>{option}</option>
-        ))}
-      </select>
-      {type === "whiteCard" ? <Text label="Date issued" name="whiteCard-issued" type="date" defaultValue={ticket.issued || ""} /> : null}
-    </label>
   )
 }
 

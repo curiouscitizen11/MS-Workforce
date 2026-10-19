@@ -29,9 +29,9 @@ The login screen shows the demo code. No real text is sent.
 
 Other demo people:
 
-- Alex Nguyen `0400 333 444` — white card expired. The portal will not let this person accept a shift.
-- Priya Shah `0400 555 666` — asbestos Class B expired. Same block.
-- Jordan Blake `0400 777 888` — heights expired. Marked "Restricted – check before booking". Can still accept a normal labour shift.
+- Alex Nguyen `0400 333 444` — answered No to the white card. The portal will not let this person accept a shift.
+- Priya Shah `0400 555 666` — answered No to asbestos Class B. Ordinary labour is still allowed.
+- Jordan Blake `0400 777 888` — answered No to heights. Can still accept a normal labour shift.
 - Casey Morgan `0400 999 000` — new applicant.
 
 ## What you need before it goes live
@@ -158,13 +158,33 @@ On Vercel’s free plan, scheduled jobs usually run once a day. Once a day is en
 
 In mock mode these addresses are open and they do not call Notion.
 
+## Email on file
+
+Apply and the email login link both ask for the email twice. The two answers must match after trimming, and capital letters do not matter. If they differ, the form shows "Emails don't match." and does not send. A badly formed address shows "That email does not look right." Apply can leave both boxes empty. Only one address is saved. Onboarding does not ask for an email.
+
+## Licence and ticket questions
+
+Each of these questions has the same three answers: **Yes, I have it**, **No**, **Booked in for the course**.
+
+- White card
+- Work at heights
+- Asbestos Class A
+- Asbestos Class B
+- Confined space
+- First aid
+- Driver licence
+- Other ticket
+
+The form does not ask for a card number, expiry, issue date, issuing state, lost-card reason, driver licence class, or whether they have done construction work in the last 2 years. When White card is No or Booked in for the course, the form keeps the TAFE NSW course link and the SafeWork NSW white card link. The tickets page still links to the training provider list.
+
+Tally and Notion selects for those eight questions should use the same three answers. Drop the old choices (Held, Not held, Expired, Booked in / training now, Not completed, Lost – replacement needed, and the driver licence classes).
+
 ## How booking rules work
 
-- A white card is required. Missing, blank or expired means **DO NOT BOOK**.
-- Asbestos Class A or Class B, if the person holds it and it is expired, also means **DO NOT BOOK**.
-- Any other expired ticket means **Restricted – check before booking**. You can still offer ordinary labour if that ticket is not required for the job.
-- Amber warning: 60 days for asbestos A/B and first aid, 30 days for the rest.
-- NSW white cards often have no expiry. Held, with no date, stays valid.
+- A white card is required. **No**, **Booked in for the course**, or a blank answer means **DO NOT BOOK**.
+- Only **Yes, I have it** counts as holding a ticket.
+- Asbestos Class A or B answered No or Booked in does not block ordinary labour.
+- The form no longer collects expiry dates. If a date is already stored on a ticket marked Yes, I have it, the old warning still applies: 60 days for asbestos A/B and first aid, 30 days for the rest. A stored expiry that has passed still means DO NOT BOOK for a white card or asbestos A/B, and Restricted for any other ticket.
 
 You send a shift to everyone who is Ready, or to people you pick. Anyone marked DO NOT BOOK is skipped if you choose “all”, and the send is refused if you pick them by name.
 

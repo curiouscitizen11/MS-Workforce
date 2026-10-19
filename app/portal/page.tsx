@@ -112,7 +112,7 @@ export default async function DashboardPage() {
               <li key={ticket.type} className="flex items-center justify-between gap-2 text-sm">
                 <span>{ticket.label}</span>
                 <StatusChip level={ticket.validity === "expired" || ticket.validity === "missing" ? "do-not-book" : "warning"}>
-                  {ticket.validity === "missing" ? "Missing" : ticket.validity === "expired" ? "Expired" : "Expiring soon"}
+                  {worker.tickets[ticket.type]?.status || "No"}
                 </StatusChip>
               </li>
             ))}
