@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { finishInduction } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { fieldClass } from "@/components/portal/ui"
+import { INDUCTION_FITNESS_LINE } from "@/lib/portal/fitness"
 import type { PublicQuestion } from "@/lib/portal/induction"
 
 export function InductionForm({ questions, name }: { questions: PublicQuestion[]; name: string }) {
@@ -57,6 +58,7 @@ export function InductionForm({ questions, name }: { questions: PublicQuestion[]
         }}
       >
         <p className="text-sm leading-relaxed">You passed. Type your name and sign to finish.</p>
+        <p className="text-sm leading-relaxed">{INDUCTION_FITNESS_LINE}</p>
         <label className="block text-sm font-semibold" htmlFor="typed">
           Full name
           <input id="typed" className={fieldClass} value={typedName} onChange={(event) => setTypedName(event.target.value)} />

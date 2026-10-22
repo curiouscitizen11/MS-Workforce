@@ -414,8 +414,8 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
   if (worker.status === "Applicant") worker.status = "Onboarding"
   if (patch.finish === true) {
     if (!worker.signaturePng || !stringOf(patch.typedName)) return fail("Type your name and sign to finish.")
-    if (!worker.policiesAck || !worker.privacyConsent || !worker.healthConsent) {
-      return fail("Tick the policy, privacy and health boxes to finish.")
+    if (!worker.policiesAck || !worker.privacyConsent || !worker.healthConsent || !worker.declaration) {
+      return fail("Tick the policy, privacy, health and fitness boxes to finish.")
     }
     if (!worker.onboardingSubmitted) {
       const missing = missingPhotoMessage(slotsFromWorker(worker), await workerDocs(ctx, workerId), workerId)

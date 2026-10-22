@@ -8,6 +8,7 @@ import { TicketChoices } from "@/components/portal/TicketChoices"
 import { TicketMeta, ticketDraft, type TicketDraft } from "@/components/portal/TicketMeta"
 import { TicketPhotoPair } from "@/components/portal/TicketPhotos"
 import { fieldClass } from "@/components/portal/ui"
+import { FITNESS_DECLARATION } from "@/lib/portal/fitness"
 import {
   ALLERGY_ANSWERS,
   ALLERGY_TYPES,
@@ -236,9 +237,9 @@ export function OnboardingForm({ worker, photos }: { worker: Worker; photos: Pho
             <input type="checkbox" name="privacy" defaultChecked={worker.privacyConsent} />
             I agree to the privacy notice
           </label>
-          <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-            <input type="checkbox" name="declaration" defaultChecked={worker.declaration} />
-            I declare these answers are true
+          <label className="flex min-h-12 items-start gap-3 py-3 text-sm font-semibold leading-snug">
+            <input type="checkbox" name="declaration" className="mt-0.5 h-5 w-5 shrink-0" defaultChecked={worker.declaration} />
+            {FITNESS_DECLARATION}
           </label>
           <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
             <input type="checkbox" name="da" defaultChecked={worker.daConsent} />

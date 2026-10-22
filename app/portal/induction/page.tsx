@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { InductionForm } from "@/components/portal/InductionForm"
 import { Heading } from "@/components/portal/ui"
+import { INDUCTION_FITNESS_LINE } from "@/lib/portal/fitness"
 import { publicQuiz } from "@/lib/portal/induction"
 import { requireUser } from "@/lib/portal/session"
 import Link from "next/link"
@@ -23,6 +24,7 @@ export default async function InductionPage() {
     return (
       <div className="space-y-4">
         <Heading kicker="Induction" title="You're done" text={"Passed " + worker.inductionPassed + " · score " + worker.inductionScore + "/8 · " + worker.inductionVersion} />
+        <p className="text-sm leading-relaxed">{INDUCTION_FITNESS_LINE}</p>
         <Link href="/portal" className="pill pill-teal w-full">
           Back home
         </Link>
