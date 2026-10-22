@@ -61,6 +61,13 @@ export default async function AdminWorkerPage({ params }: { params: { id: string
         Call {formatAuMobile(worker.mobile)}
       </a>
       <TicketCheckList workerId={worker.id} items={ordered} />
+      <section className="space-y-2 rounded-2xl border border-navy/10 bg-white p-4">
+        <h2 className="text-sm font-semibold">Safety info</h2>
+        <p className="text-xs leading-relaxed text-navy/70">Private. Only you and this worker can see it. It is not on the ID card.</p>
+        <p className="text-sm">Emergency contact: {worker.emergencyContact || "Not added"} {worker.emergencyPhone ? "· " + worker.emergencyPhone : ""}</p>
+        <p className="text-sm">Allergies: {worker.allergies || "Not added"}</p>
+        <p className="text-sm">Who may see this: {worker.medicalSharing || "Not added"}</p>
+      </section>
       <VerifyPanel workerId={worker.id} visa={worker.rtw === "Visa holder"} />
     </div>
   )
