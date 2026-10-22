@@ -2,9 +2,10 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { saveProfile, updateTicket } from "@/app/portal/actions"
+import { saveProfile, saveTicketStep } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { TicketChoices } from "@/components/portal/TicketChoices"
+import { TicketPhotoPair } from "@/components/portal/TicketPhotos"
 import { fieldClass } from "@/components/portal/ui"
 import {
   ALLERGY_ANSWERS,
@@ -28,11 +29,13 @@ import {
   VEVO_METHODS,
   WEEKDAYS,
   WORK_AREAS,
+  type PhotoSide,
   type TicketType,
   type Worker,
 } from "@/lib/portal/types"
+import type { PhotoRef } from "@/lib/portal/ticket-photos"
 
-export function OnboardingForm({ worker }: { worker: Worker }) {
+export function OnboardingForm({ worker, photos }: { worker: Worker; photos: PhotoRef[] }) {
   const router = useRouter()
   const [step, setStep] = useState(worker.onboardingSubmitted ? 5 : 0)
   const [error, setError] = useState("")
@@ -97,7 +100,7 @@ export function OnboardingForm({ worker }: { worker: Worker }) {
           }
         />
       ) : null}
-      {step === 2 ? <TicketStep worker={worker} onDone={() => setStep(3)} /> : null}
+      {step === 2 ? <TicketStep worker={worker} photos={photos} onDone={() => setStep(3)} /> : null}
       {step === 3 ? (
         <Form
           pending={pending}
@@ -263,53 +266,106 @@ function knownAnswer(status: string | undefined) {
   return TICKET_ANSWERS.includes(status as (typeof TICKET_ANSWERS)[number]) ? status || "No" : "No"
 }
 
-function TicketStep({ worker, onDone }: { worker: Worker; onDone: () => void }) {
+function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoRef[]; onDone: () => void }) {
   const [pending, start] = useTransition()
   const [error, setError] = useState("")
+  const [savedPhotos, setSavedPhotos] = useState<PhotoRef[]>(photos)
   const [answers, setAnswers] = useState<Record<TicketType, string>>(() => {
     const next = {} as Record<TicketType, string>
     for (const type of TICKET_TYPES) next[type] = knownAnswer(worker.tickets[type]?.status)
     return next
   })
+  const [held, setHeld] = useState<string[]>(worker.otherTicketsHeld || [])
+  const needed = [
+    ...TICKET_TYPES.filter((type) => answers[type] === "Yes, I have it").map((type) => ({ key: type, label: TICKET_LABELS[type] })),
+    ...held.filter((item) => item !== "None of these").map((item) => ({ key: item, label: item })),
+  ]
+  const ready = needed.every(
+    (item) => savedPhotos.some((photo) => photo.key === item.key && photo.side === "front") && savedPhotos.some((photo) => photo.key === item.key && photo.side === "back"),
+  )
+
+  function onSaved(key: string, side: PhotoSide) {
+    setSavedPhotos((current) => (current.some((photo) => photo.key === key && photo.side === side) ? current : [...current, { key, side }]))
+  }
+
   return (
     <form
       className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault()
-        const data = new FormData(event.currentTarget)
+        if (!ready) {
+          setError("Add a photo of the front and the back of each card you hold before you continue.")
+          return
+        }
         start(async () => {
-          for (const type of TICKET_TYPES) {
-            const status = answers[type] || "No"
-            const result = await updateTicket(type, { status })
-            if (!result.ok) {
-              setError(result.error)
-              return
-            }
-          }
-          const profile = await saveProfile({
-            otherTicketsHeld: OTHER_TICKETS.filter((item) => data.get("other-" + item) === "on"),
-          })
-          if (!profile.ok) {
-            setError(profile.error)
+          const result = await saveTicketStep({ tickets: answers, otherTicketsHeld: held })
+          if (!result.ok) {
+            setError(result.error)
             return
           }
           onDone()
         })
       }}
     >
+      <p className="text-sm leading-relaxed text-navy/80">
+        If you have a card, add a photo of the front and the back. You need both before you can continue. MS Workforce reads the number and expiry. You will not be able to open the photos again.
+      </p>
       {TICKET_TYPES.map((type) => (
-        <TicketChoices
-          key={type}
-          name={type}
-          label={TICKET_LABELS[type]}
-          value={answers[type]}
-          course={type === "whiteCard"}
-          onChange={(choice) => setAnswers({ ...answers, [type]: choice })}
-        />
+        <div key={type} className="space-y-2">
+          <TicketChoices
+            name={type}
+            label={TICKET_LABELS[type]}
+            value={answers[type]}
+            course={type === "whiteCard"}
+            onChange={(choice) => setAnswers({ ...answers, [type]: choice })}
+          />
+          {answers[type] === "Yes, I have it" ? (
+            <TicketPhotoPair
+              licenceKey={type}
+              label={TICKET_LABELS[type]}
+              front={savedPhotos.some((photo) => photo.key === type && photo.side === "front")}
+              back={savedPhotos.some((photo) => photo.key === type && photo.side === "back")}
+              onSaved={(side) => onSaved(type, side)}
+            />
+          ) : null}
+        </div>
       ))}
-      <Checks legend="Do you hold any of these other tickets?" name="other" options={OTHER_TICKETS} selected={worker.otherTicketsHeld} />
-      {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
-      <button className="pill pill-teal w-full" disabled={pending}>
+      <fieldset>
+        <legend className="text-sm font-semibold">Do you hold any of these other tickets?</legend>
+        <div className="mt-2 space-y-1">
+          {OTHER_TICKETS.map((item) => {
+            const on = held.includes(item)
+            return (
+              <label key={item} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  checked={on}
+                  onChange={(event) => setHeld(event.target.checked ? [...held, item] : held.filter((value) => value !== item))}
+                />
+                {item}
+              </label>
+            )
+          })}
+        </div>
+      </fieldset>
+      {held
+        .filter((item) => item !== "None of these")
+        .map((item) => (
+          <TicketPhotoPair
+            key={item}
+            licenceKey={item}
+            label={item}
+            front={savedPhotos.some((photo) => photo.key === item && photo.side === "front")}
+            back={savedPhotos.some((photo) => photo.key === item && photo.side === "back")}
+            onSaved={(side) => onSaved(item, side)}
+          />
+        ))}
+      {error ? (
+        <p role="alert" className="text-sm font-semibold text-[#B91C1C]">
+          {error}
+        </p>
+      ) : null}
+      <button className="pill pill-teal w-full" disabled={pending || !ready}>
         Save tickets
       </button>
     </form>

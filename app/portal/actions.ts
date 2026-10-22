@@ -13,9 +13,12 @@ import {
   respondToOffer,
   revealPassport,
   revokeSessions,
+  markTicketChecked as markTicketCheckedRecord,
   saveOnboarding,
+  saveOtherLicences,
   saveTicket,
-  saveUpload,
+  saveTicketAnswers,
+  saveTicketPhoto,
   submitApplication,
   submitInduction,
   correctTimesheet,
@@ -38,7 +41,7 @@ import {
   writeSessionCookie,
 } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
-import type { Ticket, TicketType } from "@/lib/portal/types"
+import type { PhotoSide, Ticket, TicketType } from "@/lib/portal/types"
 
 async function ctx(): Promise<Ctx> {
   const store = await getStore()
@@ -146,19 +149,42 @@ export async function updateTicket(type: TicketType, ticket: Ticket) {
   return result
 }
 
-export async function uploadDocument(formData: FormData) {
+export async function saveTicketStep(input: { tickets: Partial<Record<TicketType, string>>; otherTicketsHeld: string[] }) {
+  const current = await readSession()
+  if (!current || current.worker.role === "admin") return { ok: false as const, error: "Log in as a worker." }
+  const result = await saveTicketAnswers(await ctx(), current.worker.id, input)
+  if (result.ok) refresh()
+  return result
+}
+
+export async function saveHeldLicences(otherTicketsHeld: string[]) {
+  const current = await readSession()
+  if (!current || current.worker.role === "admin") return { ok: false as const, error: "Log in as a worker." }
+  const result = await saveOtherLicences(await ctx(), current.worker.id, otherTicketsHeld)
+  if (result.ok) refresh()
+  return result
+}
+
+export async function uploadTicketPhoto(formData: FormData) {
   const current = await readSession()
   if (!current || current.worker.role === "admin") return { ok: false as const, error: "Log in as a worker." }
   const file = formData.get("file")
   if (!(file instanceof File)) return { ok: false as const, error: "Choose a photo." }
-  const bytes = Buffer.from(await file.arrayBuffer())
-  const kind = formData.get("kind") === "id" ? "id" : "ticket"
-  const ticketType = String(formData.get("ticketType") || "") as TicketType
-  const result = await saveUpload(await ctx(), current.worker.id, {
-    bytes,
-    kind,
-    ticketType: kind === "ticket" ? ticketType : undefined,
+  const side = String(formData.get("side") || "")
+  if (side !== "front" && side !== "back") return { ok: false as const, error: "Choose the front or the back of the card." }
+  const result = await saveTicketPhoto(await ctx(), current.worker.id, {
+    bytes: Buffer.from(await file.arrayBuffer()),
+    licenceKey: String(formData.get("licenceKey") || ""),
+    side: side as PhotoSide,
   })
+  if (result.ok) refresh()
+  return result
+}
+
+export async function markTicketChecked(input: { workerId: string; licenceKey: string; number: string; expiry: string; noExpiry: boolean }) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  const result = await markTicketCheckedRecord(await ctx(), current.worker.id, input.workerId, input)
   if (result.ok) refresh()
   return result
 }

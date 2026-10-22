@@ -21,6 +21,7 @@ import {
   canAcceptShift,
   dueReminderStage,
   earliestExpiry,
+  foldLicenceExpiries,
   warningWindowDays,
 } from "@/lib/portal/compliance"
 import { decryptString } from "@/lib/portal/crypto"
@@ -29,6 +30,19 @@ import { WHAT_TO_BRING } from "@/lib/portal/seed"
 import { addDays, daysBetween, formatDate, isMondayInSydney, sydneyParts, sydneyToday } from "@/lib/portal/dates"
 import { deletePrivateBlob, storePrivateBlob } from "@/lib/portal/blob"
 import { contentTypeFor, sniffFile, stripJpegExif } from "@/lib/portal/files"
+import {
+  TICKET_PHOTO_MAX_BYTES,
+  TICKET_PHOTO_TYPES,
+  activeTicketPhotos,
+  heldLicenceExpiries,
+  isOtherLicence,
+  isPhotoLicenceKey,
+  isTicketType,
+  licenceLabel,
+  missingPhotoMessage,
+  requiredPhotoSlots,
+  slotsFromWorker,
+} from "@/lib/portal/ticket-photos"
 import { formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
 import { MS_PHONE, fortnightContaining, olderThanDays, payFortnight, timesheetReminder } from "@/lib/portal/pay"
 import { randomInt } from "crypto"
@@ -40,14 +54,18 @@ import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
 import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
 import {
+  OTHER_TICKETS,
   ROLES,
   SUPERVISOR_ROLES,
   TICKET_ANSWERS,
   TICKET_LABELS,
+  TICKET_TYPES,
   TIMESHEET_TASKS,
   VEVO_RESULTS,
   VERIFICATION_METHODS,
+  type LicenceCheck,
   type Offer,
+  type PhotoSide,
   type Session,
   type Ticket,
   type TicketType,
@@ -372,7 +390,6 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
   if (typeof patch.medicalSharing === "string") worker.medicalSharing = patch.medicalSharing
   if (typeof patch.medicalNotes === "string") worker.medicalNotes = patch.medicalNotes
   if (typeof patch.licenceState === "string") worker.licenceState = patch.licenceState
-  if (Array.isArray(patch.otherTicketsHeld)) worker.otherTicketsHeld = patch.otherTicketsHeld.map(String)
   if (typeof patch.daConsent === "boolean") worker.daConsent = patch.daConsent
   if (typeof patch.declaration === "boolean") worker.declaration = patch.declaration
   if (typeof patch.healthConsent === "boolean") worker.healthConsent = patch.healthConsent
@@ -386,6 +403,10 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
     if (!worker.signaturePng || !stringOf(patch.typedName)) return fail("Type your name and sign to finish.")
     if (!worker.policiesAck || !worker.privacyConsent || !worker.healthConsent) {
       return fail("Tick the policy, privacy and health boxes to finish.")
+    }
+    if (!worker.onboardingSubmitted) {
+      const missing = missingPhotoMessage(slotsFromWorker(worker), await workerDocs(ctx, workerId), workerId)
+      if (missing) return fail(missing)
     }
     const today = sydneyToday(ctx.now)
     worker.termsSignedOn = today
@@ -401,14 +422,29 @@ function stringOf(value: unknown) {
   return typeof value === "string" ? value : ""
 }
 
+function freshTicket(status: string): Ticket {
+  return {
+    status,
+    pendingCheck: status === "Yes, I have it",
+  }
+}
+
+async function workerDocs(ctx: Ctx, workerId: string) {
+  return (await ctx.store.documents.all()).filter((doc) => doc.workerId === workerId)
+}
+
 export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, ticket: Ticket) {
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Log in again.")
   if (!TICKET_ANSWERS.includes(ticket.status as (typeof TICKET_ANSWERS)[number])) return fail("Choose one of the listed options.")
-  worker.tickets[type] = {
-    status: ticket.status,
-    pendingCheck: ticket.status === "Yes, I have it",
+  const docs = await workerDocs(ctx, workerId)
+  if (ticket.status === "Yes, I have it") {
+    const missing = missingPhotoMessage([{ key: type, label: TICKET_LABELS[type] }], docs, workerId)
+    if (missing) return fail(missing)
   }
+  if (ticket.status !== "Yes, I have it") await deleteLicencePhotos(ctx, workerId, type, workerId, "Removed because the worker no longer holds this card.")
+  else await clearPhotoSchedule(ctx, workerId, type)
+  worker.tickets[type] = freshTicket(ticket.status)
   worker.ticketsVerified = false
   const note = "Ticket updated in the portal on " + sydneyToday(ctx.now) + ". Needs a new check."
   worker.notes = worker.notes ? worker.notes + "\n" + note : note
@@ -417,14 +453,71 @@ export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, t
   return { ok: true as const }
 }
 
-export async function saveUpload(
+export async function saveTicketAnswers(
   ctx: Ctx,
   workerId: string,
-  input: { bytes: Buffer; kind: "ticket" | "id"; ticketType?: TicketType },
+  input: { tickets: Partial<Record<TicketType, string>>; otherTicketsHeld: string[] },
 ) {
-  if (input.bytes.length > 10 * 1024 * 1024) return fail("Files need to be 10 MB or smaller.")
+  const worker = await ctx.store.workers.get(workerId)
+  if (!worker) return fail("Log in again.")
+  const tickets = {} as Record<TicketType, string>
+  for (const type of TICKET_TYPES) {
+    const status = input.tickets[type] || "No"
+    if (!TICKET_ANSWERS.includes(status as (typeof TICKET_ANSWERS)[number])) return fail("Choose one of the listed options.")
+    tickets[type] = status
+  }
+  const held = input.otherTicketsHeld.map(String)
+  if (held.some((item) => !(OTHER_TICKETS as readonly string[]).includes(item))) return fail("Choose tickets from the list.")
+  const docs = await workerDocs(ctx, workerId)
+  const missing = missingPhotoMessage(requiredPhotoSlots({ tickets, otherTicketsHeld: held }), docs, workerId)
+  if (missing) return fail(missing)
+  for (const type of TICKET_TYPES) {
+    if (tickets[type] === "Yes, I have it") await clearPhotoSchedule(ctx, workerId, type)
+    else await deleteLicencePhotos(ctx, workerId, type, workerId, "Removed because the worker no longer holds this card.")
+    worker.tickets[type] = freshTicket(tickets[type])
+  }
+  await syncOtherLicences(ctx, worker, held)
+  worker.ticketsVerified = false
+  const note = "Ticket updated in the portal on " + sydneyToday(ctx.now) + ". Needs a new check."
+  worker.notes = worker.notes ? worker.notes + "\n" + note : note
+  await persistWorker(ctx, worker)
+  await audit(ctx, workerId, "ticket-update", workerId)
+  return { ok: true as const }
+}
+
+export async function saveOtherLicences(ctx: Ctx, workerId: string, held: string[]) {
+  const worker = await ctx.store.workers.get(workerId)
+  if (!worker) return fail("Log in again.")
+  const next = held.map(String)
+  if (next.some((item) => !(OTHER_TICKETS as readonly string[]).includes(item))) return fail("Choose tickets from the list.")
+  const docs = await workerDocs(ctx, workerId)
+  const missing = missingPhotoMessage(
+    next.filter(isOtherLicence).map((label) => ({ key: label, label })),
+    docs,
+    workerId,
+  )
+  if (missing) return fail(missing)
+  await syncOtherLicences(ctx, worker, next)
+  worker.ticketsVerified = allHeldChecked(worker)
+  await persistWorker(ctx, worker)
+  await audit(ctx, workerId, "ticket-update", "other")
+  return { ok: true as const }
+}
+
+export async function saveTicketPhoto(
+  ctx: Ctx,
+  workerId: string,
+  input: { bytes: Buffer; licenceKey: string; side: PhotoSide },
+) {
+  if (!isPhotoLicenceKey(input.licenceKey)) return fail("Choose a ticket from the list.")
+  if (input.side !== "front" && input.side !== "back") return fail("Choose the front or the back of the card.")
+  if (input.bytes.length > TICKET_PHOTO_MAX_BYTES) {
+    return fail("That photo is over 8 MB. Take it again a little further from the card.")
+  }
   const sniffed = sniffFile(input.bytes)
-  if (!sniffed) return fail("Use a JPG, PNG, WEBP, PDF or HEIC photo.")
+  if (!sniffed || !(TICKET_PHOTO_TYPES as readonly string[]).includes(sniffed)) {
+    return fail("Use a JPG, PNG or HEIC photo.")
+  }
   const bytes = sniffed === "jpeg" ? stripJpegExif(input.bytes) : input.bytes
   const id = newId("doc")
   const contentType = contentTypeFor(sniffed)
@@ -434,6 +527,7 @@ export async function saveUpload(
   } catch {
     return fail("The private file store did not accept this photo. Try again, or call MS Workforce on " + MS_PHONE + ".")
   }
+  await deleteLicencePhotos(ctx, workerId, input.licenceKey, workerId, "Replaced by a new " + input.side + " photo.", input.side)
   await ctx.store.blobs.save({
     id,
     contentType,
@@ -443,21 +537,87 @@ export async function saveUpload(
   await ctx.store.documents.save({
     id,
     workerId,
-    kind: input.kind,
-    ticketType: input.ticketType,
+    kind: "ticket",
+    ticketType: isTicketType(input.licenceKey) ? input.licenceKey : undefined,
+    licenceKey: input.licenceKey,
+    side: input.side,
     contentType,
     bytes: bytes.length,
     createdAt: ctx.now.toISOString(),
   })
-  if (input.kind === "ticket") {
-    const worker = await ctx.store.workers.get(workerId)
-    if (worker) {
-      worker.ticketsVerified = false
-      await persistWorker(ctx, worker)
-    }
+  const worker = await ctx.store.workers.get(workerId)
+  if (worker) {
+    await clearPhotoSchedule(ctx, workerId, input.licenceKey)
+    clearLicenceCheck(worker, input.licenceKey)
+    worker.ticketsVerified = false
+    await persistWorker(ctx, worker)
   }
-  await audit(ctx, workerId, "upload-document", id)
+  await audit(ctx, workerId, "upload-ticket-photo", id, licenceLabel(input.licenceKey) + " " + input.side)
   return { ok: true as const, id }
+}
+
+function clearLicenceCheck(worker: Worker, key: string) {
+  if (isTicketType(key)) {
+    const status = worker.tickets[key]?.status || "No"
+    worker.tickets[key] = freshTicket(status)
+    return
+  }
+  if (!worker.licenceChecks) return
+  delete worker.licenceChecks[key]
+}
+
+function allHeldChecked(worker: Worker): boolean {
+  for (const type of TICKET_TYPES) {
+    if (worker.tickets[type]?.status === "Yes, I have it" && !worker.tickets[type]?.checkedAt) return false
+  }
+  for (const label of worker.otherTicketsHeld || []) {
+    if (!isOtherLicence(label)) continue
+    if (!worker.licenceChecks?.[label]?.checkedAt) return false
+  }
+  return true
+}
+
+async function syncOtherLicences(ctx: Ctx, worker: Worker, held: string[]) {
+  const previous = worker.otherTicketsHeld || []
+  for (const label of previous) {
+    if (held.includes(label)) continue
+    await deleteLicencePhotos(ctx, worker.id, label, worker.id, "Removed because the worker no longer holds this card.")
+    if (worker.licenceChecks) delete worker.licenceChecks[label]
+  }
+  worker.otherTicketsHeld = held
+}
+
+async function clearPhotoSchedule(ctx: Ctx, workerId: string, licenceKey: string) {
+  const docs = activeTicketPhotos(await workerDocs(ctx, workerId), workerId, licenceKey)
+  for (const doc of docs) {
+    if (!doc.verifiedAt && !doc.deleteBy) continue
+    doc.verifiedAt = undefined
+    doc.deleteBy = undefined
+    await ctx.store.documents.save(doc)
+  }
+}
+
+async function deleteLicencePhotos(ctx: Ctx, workerId: string, licenceKey: string, actorId: string, detail: string, side?: PhotoSide) {
+  const docs = activeTicketPhotos(await workerDocs(ctx, workerId), workerId, licenceKey).filter((doc) => !side || doc.side === side)
+  for (const doc of docs) {
+    doc.deletedAt = ctx.now.toISOString()
+    await ctx.store.documents.save(doc)
+    await forgetBlob(ctx, doc.id)
+    await audit(ctx, actorId, "delete-ticket-photos", doc.id, licenceLabel(licenceKey) + " " + (doc.side || "photo") + ". " + detail)
+  }
+}
+
+function rememberPhotoDeletion(worker: Worker, licenceKey: string | undefined, day: string) {
+  if (!licenceKey) return
+  if (isTicketType(licenceKey)) {
+    const ticket = worker.tickets[licenceKey]
+    if (ticket && !ticket.photosDeletedAt) ticket.photosDeletedAt = day
+    return
+  }
+  worker.licenceChecks = worker.licenceChecks || {}
+  const row: LicenceCheck = worker.licenceChecks[licenceKey] || {}
+  if (!row.photosDeletedAt) row.photosDeletedAt = day
+  worker.licenceChecks[licenceKey] = row
 }
 
 export async function submitInduction(
@@ -848,6 +1008,78 @@ export async function createOffers(
   return { ok: true as const, created, skipped }
 }
 
+export async function markTicketChecked(
+  ctx: Ctx,
+  adminId: string,
+  workerId: string,
+  input: { licenceKey: string; number: string; expiry: string; noExpiry: boolean },
+) {
+  const admin = await ctx.store.workers.get(adminId)
+  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  const worker = await ctx.store.workers.get(workerId)
+  if (!worker || worker.role === "admin") return fail("Worker not found.")
+  if (!isPhotoLicenceKey(input.licenceKey)) return fail("Choose a ticket from the list.")
+  const number = input.number.trim()
+  if (!number) return fail("Enter the number printed on the card.")
+  if (number.length > 40) return fail("That number is too long.")
+  if (sensitiveMessage(number)) return fail(SENSITIVE_MESSAGE)
+  let expiry: string | null = null
+  if (!input.noExpiry) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(input.expiry)) return fail("Enter the expiry date on the card, or tick no expiry date.")
+    expiry = input.expiry
+  }
+  const held = isTicketType(input.licenceKey)
+    ? worker.tickets[input.licenceKey]?.status === "Yes, I have it"
+    : Boolean(worker.otherTicketsHeld?.includes(input.licenceKey))
+  if (!held) return fail("The worker has not said they hold this card.")
+  const docs = activeTicketPhotos(await workerDocs(ctx, workerId), workerId, input.licenceKey)
+  const front = docs.find((doc) => doc.side === "front")
+  const back = docs.find((doc) => doc.side === "back")
+  const previous = isTicketType(input.licenceKey) ? worker.tickets[input.licenceKey] : worker.licenceChecks?.[input.licenceKey]
+  if ((!front || !back) && !previous?.checkedAt) return fail("Both photos have to be uploaded before this can be marked checked.")
+  const checkedAt = ctx.now.toISOString()
+  const photosDeletedAt = front && back ? undefined : previous?.photosDeletedAt
+  if (isTicketType(input.licenceKey)) {
+    worker.tickets[input.licenceKey] = {
+      ...worker.tickets[input.licenceKey],
+      status: "Yes, I have it",
+      number,
+      expiry,
+      checkedBy: admin.name,
+      checkedAt,
+      pendingCheck: false,
+      photosDeletedAt,
+    }
+  } else {
+    worker.licenceChecks = {
+      ...worker.licenceChecks,
+      [input.licenceKey]: { number, expiry, checkedBy: admin.name, checkedAt, photosDeletedAt },
+    }
+  }
+  const deleteBy = new Date(ctx.now.getTime() + DOCUMENT_KEEP_MS).toISOString()
+  for (const doc of [front, back]) {
+    if (!doc) continue
+    doc.verifiedAt = checkedAt
+    doc.deleteBy = deleteBy
+    await ctx.store.documents.save(doc)
+  }
+  if (allHeldChecked(worker)) {
+    worker.ticketsVerified = true
+    worker.verifiedBy = admin.name
+    worker.verifiedOn = sydneyToday(ctx.now)
+    if (!worker.verificationMethod) worker.verificationMethod = "Photo in portal"
+  }
+  await persistWorker(ctx, worker)
+  await audit(
+    ctx,
+    adminId,
+    "mark-ticket-checked",
+    workerId,
+    licenceLabel(input.licenceKey) + " checked by " + admin.name + ". Expiry " + (expiry || "none") + ".",
+  )
+  return { ok: true as const }
+}
+
 export async function verifyWorker(
   ctx: Ctx,
   adminId: string,
@@ -884,14 +1116,6 @@ export async function verifyWorker(
     if (patch.vevoResult === "No work rights") worker.rightToWork = "No"
     else worker.rightToWork = "Yes"
   }
-  if (patch.ticketsVerified) {
-    const docs = await ctx.store.documents.all()
-    for (const doc of docs.filter((item) => item.workerId === workerId && !item.deletedAt)) {
-      doc.verifiedAt = ctx.now.toISOString()
-      doc.deleteBy = new Date(ctx.now.getTime() + DOCUMENT_KEEP_MS).toISOString()
-      await ctx.store.documents.save(doc)
-    }
-  }
   await persistWorker(ctx, worker)
   await audit(ctx, adminId, "verify-worker", workerId)
   return { ok: true as const }
@@ -916,13 +1140,19 @@ export async function deleteWorkerImages(ctx: Ctx, adminId: string, workerId: st
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Worker not found.")
   const docs = (await ctx.store.documents.all()).filter((doc) => doc.workerId === workerId && !doc.deletedAt)
+  const day = sydneyToday(ctx.now)
   for (const doc of docs) {
     doc.deletedAt = ctx.now.toISOString()
     await ctx.store.documents.save(doc)
     await forgetBlob(ctx, doc.id)
-    await audit(ctx, adminId, "delete-document", doc.id)
+    if (doc.kind === "ticket") {
+      rememberPhotoDeletion(worker, doc.licenceKey, day)
+      await audit(ctx, adminId, "delete-ticket-photos", doc.id, "Deleted by admin before the 7 days. The number, expiry and check record are kept.")
+    } else {
+      await audit(ctx, adminId, "delete-document", doc.id)
+    }
   }
-  worker.imagesDeletedOn = sydneyToday(ctx.now)
+  worker.imagesDeletedOn = day
   await persistWorker(ctx, worker)
   return { ok: true as const, removed: docs.length }
 }
@@ -939,6 +1169,8 @@ export async function revokeSessions(ctx: Ctx, adminId: string, workerId: string
 export async function purgeDocuments(ctx: Ctx) {
   let removed = 0
   const docs = await ctx.store.documents.all()
+  const touched = new Set<string>()
+  const day = sydneyToday(ctx.now)
   for (const doc of docs) {
     if (doc.deletedAt || !doc.verifiedAt) continue
     if (ctx.now.getTime() - Date.parse(doc.verifiedAt) < DOCUMENT_KEEP_MS) continue
@@ -946,14 +1178,34 @@ export async function purgeDocuments(ctx: Ctx) {
     await ctx.store.documents.save(doc)
     await forgetBlob(ctx, doc.id)
     removed += 1
-    const rest = (await ctx.store.documents.all()).filter((item) => item.workerId === doc.workerId && !item.deletedAt)
-    if (!rest.length) {
-      const worker = await ctx.store.workers.get(doc.workerId)
-      if (worker && !worker.imagesDeletedOn) {
-        worker.imagesDeletedOn = sydneyToday(ctx.now)
-        await persistWorker(ctx, worker)
-      }
+    touched.add(doc.workerId)
+    const label = doc.licenceKey ? licenceLabel(doc.licenceKey) : "stored file"
+    const side = doc.side ? doc.side + " " : ""
+    await audit(
+      ctx,
+      "cron",
+      "delete-ticket-photos",
+      doc.id,
+      "Deleted the " + side + "photo of " + label + " 7 days after it was marked checked. The number, expiry and check record are kept.",
+    )
+  }
+  for (const workerId of Array.from(touched)) {
+    const worker = await ctx.store.workers.get(workerId)
+    if (!worker) continue
+    const remaining = await ctx.store.documents.all()
+    const seen = new Set<string>()
+    for (const doc of docs) {
+      if (doc.workerId !== workerId || doc.kind !== "ticket" || !doc.licenceKey || !doc.deletedAt) continue
+      if (seen.has(doc.licenceKey)) continue
+      seen.add(doc.licenceKey)
+      const stillThere = remaining.some(
+        (item) => item.workerId === workerId && !item.deletedAt && item.kind === "ticket" && item.licenceKey === doc.licenceKey,
+      )
+      if (!stillThere) rememberPhotoDeletion(worker, doc.licenceKey, day)
     }
+    const rest = (await ctx.store.documents.all()).filter((item) => item.workerId === workerId && !item.deletedAt)
+    if (!rest.length && !worker.imagesDeletedOn) worker.imagesDeletedOn = day
+    await persistWorker(ctx, worker)
   }
   return { ok: true as const, removed }
 }
@@ -994,6 +1246,22 @@ export async function runReminders(ctx: Ctx) {
       await ctx.notify.sms(worker.mobile, body)
       if (worker.email) await ctx.notify.email({ to: worker.email, subject: label + " expiry", body })
       await ctx.store.reminders.save({ id, workerId: worker.id, ticket: ticket.type, kind: stage, expiry: ticket.expiry, sentAt: ctx.now.toISOString() })
+      sent += 1
+    }
+    for (const extra of heldLicenceExpiries(worker)) {
+      if (!extra.expiry) continue
+      const days = daysBetween(today, extra.expiry)
+      const stage = dueReminderStage(days, warningWindowDays("other"), [])
+      if (!stage) continue
+      const id = worker.id + ":licence:" + extra.label + ":" + extra.expiry + ":" + stage
+      if (await ctx.store.reminders.get(id)) continue
+      const body =
+        stage === "0"
+          ? extra.label + " expires today. Upload the new card in the MS Workforce portal."
+          : extra.label + " expires in " + days + " days. Renew it before you are booked."
+      await ctx.notify.sms(worker.mobile, body)
+      if (worker.email) await ctx.notify.email({ to: worker.email, subject: extra.label + " expiry", body })
+      await ctx.store.reminders.save({ id, workerId: worker.id, ticket: extra.label, kind: stage, expiry: extra.expiry, sentAt: ctx.now.toISOString() })
       sent += 1
     }
     const shiftToday = offers.find((offer) => offer.workerId === worker.id && offer.status === "Accepted" && offer.shiftDate === today && !offer.remindersOff)
@@ -1159,11 +1427,18 @@ function databaseId(kind: string) {
 }
 
 export function complianceFor(worker: Worker, checkDate: string) {
-  return assessTickets(asTicketInputs(worker.tickets), checkDate)
+  return foldLicenceExpiries(assessTickets(asTicketInputs(worker.tickets), checkDate), heldLicenceExpiries(worker), checkDate)
 }
 
 export function nextExpiryFor(worker: Worker) {
-  return earliestExpiry(asTicketInputs(worker.tickets), worker.visaExpiry || null)
+  const dates: string[] = []
+  const first = earliestExpiry(asTicketInputs(worker.tickets), worker.visaExpiry || null)
+  if (first) dates.push(first)
+  for (const extra of heldLicenceExpiries(worker)) {
+    if (extra.expiry) dates.push(extra.expiry)
+  }
+  dates.sort()
+  return dates[0] || null
 }
 
 export { addDays }

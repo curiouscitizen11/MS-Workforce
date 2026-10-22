@@ -1,4 +1,5 @@
 import { asTicketInputs, earliestExpiry } from "@/lib/portal/compliance"
+import { heldLicenceExpiries } from "@/lib/portal/ticket-photos"
 import { sensitiveFindings } from "@/lib/portal/privacy"
 import {
   EXPERIENCE_LEVELS,
@@ -60,6 +61,17 @@ function choice(value: string | undefined, allowed: readonly string[]): string |
   return value
 }
 
+function nextTicketExpiry(worker: Worker): string | undefined {
+  const dates: string[] = []
+  const soonest = earliestExpiry(asTicketInputs(worker.tickets), null)
+  if (soonest) dates.push(soonest)
+  for (const extra of heldLicenceExpiries(worker)) {
+    if (extra.expiry) dates.push(extra.expiry)
+  }
+  dates.sort()
+  return dates[0]
+}
+
 function ticketChoice(status: string | undefined) {
   if (!status) return undefined
   return choice(status, TICKET_ANSWERS)
@@ -114,7 +126,14 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "Driver licence", ticketChoice(worker.tickets.driverLicence.status))
   put(props, "First aid", ticketChoice(worker.tickets.firstAid.status))
   put(props, "Other tickets", worker.tickets.other.note || (worker.tickets.other.status === "No" ? undefined : worker.tickets.other.status))
-  put(props, "Next ticket expiry", earliestExpiry(asTicketInputs(worker.tickets), null))
+  put(props, "White card expiry", worker.tickets.whiteCard.expiry)
+  put(props, "Work at heights expiry", worker.tickets.heights.expiry)
+  put(props, "Asbestos class A expiry", worker.tickets.asbestosA.expiry)
+  put(props, "Asbestos class B expiry", worker.tickets.asbestosB.expiry)
+  put(props, "Confined space expiry", worker.tickets.confinedSpace.expiry)
+  put(props, "Driver licence expiry", worker.tickets.driverLicence.expiry)
+  put(props, "First aid expiry", worker.tickets.firstAid.expiry)
+  put(props, "Next ticket expiry", nextTicketExpiry(worker))
   if (worker.otherTicketsHeld?.length) props["Other tickets held"] = worker.otherTicketsHeld
   put(props, "Transport", worker.transport)
   put(props, "Fitness declaration", fitnessChoice(worker.fitness))

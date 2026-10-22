@@ -115,14 +115,18 @@ Before go-live, check that the dropdown names in TEST match the live Notion opti
 
 ### 5. Private photo store (Vercel Blob)
 
-Ticket photos and ID photos are private. A link lasts at most 5 minutes.
+Ticket photos are private. A link lasts at most 5 minutes.
 
 1. In the Vercel project, open Storage → Blob → Create. Choose a **private** store.
 2. Copy the read-write token → `BLOB_READ_WRITE_TOKEN`.
 
-If this token is missing while the portal is live, photos are kept in the database instead. Add the token before real workers upload ID.
+If this token is missing while the portal is live, photos are kept in the database instead. Add the token before real workers upload ticket photos. HEIC files are stored as taken. JPG and PNG are reduced on the phone first.
 
-Photos of a verified ticket are deleted 7 days after you mark them verified. You can also delete them immediately on the worker’s admin page.
+When a worker answers **Yes, I have it**, they must add a photo of the front and a photo of the back before they can continue. They can use the phone camera or the gallery. JPG, PNG and HEIC are accepted, and large photos are reduced before they are sent. Workers cannot open the photos again. Only you can, from the worker’s admin page, and each link lasts 5 minutes.
+
+On that page the two photos sit side by side. You type the number and the expiry date you can see on the card, then choose **Mark checked**. That records your name and the time. If the card has no expiry date, tick **No expiry date on this card**.
+
+Both photos are deleted 7 days after you mark that card checked. The number, the expiry, who checked it and when stay on file. **Delete images now** removes them sooner and writes the same audit note.
 
 ### 6. Your admin login (second code)
 
@@ -152,7 +156,7 @@ These addresses do the quiet work. Call them with header `Authorization: Bearer`
 
 - `/api/portal/cron/outbox` — sends queued Notion updates.
 - `/api/portal/cron/reminders` — texts workers when a ticket is inside the warning window (60 days for asbestos A/B and first aid, 30 days for other tickets), then again at 14 days, 7 days and on the day. On Mondays it also emails you a list of anyone who is not clear to book.
-- `/api/portal/cron/purge` — deletes verified photos older than 7 days, and passport numbers older than 14 days.
+- `/api/portal/cron/purge` — deletes ticket photos 7 days after that card was marked checked, and passport numbers older than 14 days. The number, expiry and check record stay. Each deletion is written to the audit log. Vercel runs this once a day, at 16:15 UTC, after this branch is merged. Preview links do not run it. `CRON_SECRET` must be set or the live job is refused.
 
 On Vercel’s free plan, scheduled jobs usually run once a day. Once a day is enough for reminders and the photo purge. For Notion updates, once a day is slow; a paid plan can run the outbox every few minutes. Until then, worker actions are saved in the database and reach Notion on the next run.
 
@@ -175,7 +179,9 @@ Each of these questions has the same three answers: **Yes, I have it**, **No**, 
 - Driver licence
 - Other ticket
 
-The form does not ask for a card number, expiry, issue date, issuing state, lost-card reason, driver licence class, or whether they have done construction work in the last 2 years. When White card is No or Booked in for the course, the form keeps the TAFE NSW course link and the SafeWork NSW white card link. The tickets page still links to the training provider list.
+The worker does not type a card number, expiry, issue date, issuing state, lost-card reason, driver licence class, or whether they have done construction work in the last 2 years. You enter the number and expiry when you check the photos. When White card is No or Booked in for the course, the form keeps the TAFE NSW course link and the SafeWork NSW white card link. The tickets page still links to the training provider list.
+
+Forklift, EWP and the other listed licences work the same way. If the worker says they hold one, they add the front and the back before they can continue.
 
 Tally and Notion selects for those eight questions should use the same three answers. Drop the old choices (Held, Not held, Expired, Booked in / training now, Not completed, Lost – replacement needed, and the driver licence classes).
 
@@ -184,7 +190,7 @@ Tally and Notion selects for those eight questions should use the same three ans
 - A white card is required. **No**, **Booked in for the course**, or a blank answer means **DO NOT BOOK**.
 - Only **Yes, I have it** counts as holding a ticket.
 - Asbestos Class A or B answered No or Booked in does not block ordinary labour.
-- The form no longer collects expiry dates. If a date is already stored on a ticket marked Yes, I have it, the old warning still applies: 60 days for asbestos A/B and first aid, 30 days for the rest. A stored expiry that has passed still means DO NOT BOOK for a white card or asbestos A/B, and Restricted for any other ticket.
+- Expiry warnings use the date you enter when you mark the card checked. 60 days for asbestos A/B and first aid, 30 days for the rest, including forklift and EWP. A date that has passed still means DO NOT BOOK for a white card or asbestos A/B, and Restricted for any other ticket. A card with no expiry date does not raise a warning.
 
 You send a shift to everyone who is Ready, or to people you pick. Anyone marked DO NOT BOOK is skipped if you choose “all”, and the send is refused if you pick them by name.
 

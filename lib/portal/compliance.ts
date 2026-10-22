@@ -159,6 +159,32 @@ export function canAcceptShift(input: {
   return { ok: true, badge: assessment.badge, label: assessment.label }
 }
 
+function worseBadge(current: Badge, next: Badge): Badge {
+  return RANK[next] > RANK[current] ? next : current
+}
+
+/** Extra licences (forklift, EWP, and the rest) use the same 30-day flag as other tickets. */
+export function foldLicenceExpiries(
+  assessment: Assessment,
+  extras: { label: string; expiry?: string | null }[],
+  checkDate: string,
+): Assessment {
+  let badge = assessment.badge
+  const reasons = [...assessment.reasons]
+  for (const extra of extras) {
+    if (!extra.expiry || !/^\d{4}-\d{2}-\d{2}$/.test(extra.expiry)) continue
+    const days = daysBetween(checkDate, extra.expiry)
+    if (days < 0) {
+      badge = worseBadge(badge, "restricted")
+      reasons.push(extra.label + " is expired")
+    } else if (days <= warningWindowDays("other")) {
+      badge = worseBadge(badge, "warning")
+      reasons.push(extra.label + " expires in " + days + " days")
+    }
+  }
+  return { badge, label: BADGE_LABELS[badge], reasons, tickets: assessment.tickets }
+}
+
 export function earliestExpiry(tickets: TicketInput[], visaExpiry?: string | null): string | null {
   const dates: string[] = []
   for (const ticket of tickets) {

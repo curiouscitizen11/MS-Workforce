@@ -219,6 +219,8 @@ export const VERIFICATION_METHODS = [
 export const OFFER_STATUSES = ["Offered", "Accepted", "Declined", "Expired", "Cancelled"] as const
 export type OfferStatus = (typeof OFFER_STATUSES)[number]
 
+export type PhotoSide = "front" | "back"
+
 export type Ticket = {
   status: string
   number?: string
@@ -227,6 +229,17 @@ export type Ticket = {
   issued?: string | null
   note?: string
   pendingCheck?: boolean
+  checkedBy?: string
+  checkedAt?: string
+  photosDeletedAt?: string
+}
+
+export type LicenceCheck = {
+  number?: string
+  expiry?: string | null
+  checkedBy?: string
+  checkedAt?: string
+  photosDeletedAt?: string
 }
 
 export type PassportRecord = {
@@ -293,6 +306,7 @@ export type Worker = {
   constructionRecent?: string
   licenceState?: string
   otherTicketsHeld?: string[]
+  licenceChecks?: Record<string, LicenceCheck>
   daConsent?: boolean
   declaration?: boolean
   allergies?: string
@@ -391,6 +405,8 @@ export type PortalDocument = {
   workerId: string
   kind: "ticket" | "id"
   ticketType?: TicketType
+  licenceKey?: string
+  side?: PhotoSide
   contentType: string
   bytes: number
   createdAt: string

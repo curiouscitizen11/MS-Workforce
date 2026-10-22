@@ -1,8 +1,9 @@
+import { demoCardPng } from "@/lib/portal/demo-card"
 import { addDays, sydneyToday } from "@/lib/portal/dates"
 import { payFortnight } from "@/lib/portal/pay"
 import { blankTickets, type Offer, type PortalDocument, type StoredBlob, type Timesheet, type Worker } from "@/lib/portal/types"
 
-export const SEED_VERSION = 4
+export const SEED_VERSION = 5
 
 export const WHAT_TO_BRING =
   "You must bring a hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses."
@@ -12,9 +13,6 @@ export const DEMO_SIGNATURE =
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="90" viewBox="0 0 320 90"><path d="M12 58c28-36 42-8 58 2 18 12 14-30 36-28 22 2 8 40 28 36 18-4 22-40 46-24 20 14 8 32 30 24" fill="none" stroke="#0A2540" stroke-width="2.5" stroke-linecap="round"/><path d="M210 60c18-8 30-2 46 4" fill="none" stroke="#0A2540" stroke-width="2" stroke-linecap="round"/></svg>',
   )
-
-const TINY_PNG =
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
 
 export type SeedData = {
   version: number
@@ -95,10 +93,17 @@ export function buildSeed(now = new Date()): SeedData {
       ticketsVerified: true,
       verifiedOn: addDays(today, -2),
       verifiedBy: "Mav",
-      verificationMethod: "Sighted original",
+      verificationMethod: "Photo in portal",
+      otherTicketsHeld: ["Forklift (LF)"],
       tickets: {
         ...blankTickets(),
-        whiteCard: { status: "Yes, I have it" },
+        whiteCard: {
+          status: "Yes, I have it",
+          number: "WC-441928",
+          expiry: addDays(today, 400),
+          checkedBy: "Mav",
+          checkedAt: addDays(today, -2) + "T00:00:00.000Z",
+        },
         heights: { status: "Yes, I have it" },
         firstAid: { status: "Yes, I have it" },
         driverLicence: { status: "Yes, I have it" },
@@ -309,19 +314,40 @@ export function buildSeed(now = new Date()): SeedData {
     },
   ]
 
+  const frontPng = demoCardPng("front").toString("base64")
+  const backPng = demoCardPng("back").toString("base64")
+  const checkedAt = addDays(today, -2) + "T00:00:00.000Z"
+  const photo = (
+    id: string,
+    licenceKey: string,
+    side: "front" | "back",
+    verified: boolean,
+  ): PortalDocument => ({
+    id,
+    workerId: "w-sam",
+    kind: "ticket",
+    ticketType: licenceKey === "whiteCard" ? "whiteCard" : undefined,
+    licenceKey,
+    side,
+    contentType: "image/png",
+    bytes: Buffer.from(side === "front" ? frontPng : backPng, "base64").length,
+    createdAt: nowIso,
+    verifiedAt: verified ? checkedAt : undefined,
+    deleteBy: verified ? new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+  })
   const documents: PortalDocument[] = [
-    {
-      id: "doc-sam-white",
-      workerId: "w-sam",
-      kind: "id",
-      contentType: "image/png",
-      bytes: Buffer.from(TINY_PNG, "base64").length,
-      createdAt: nowIso,
-      verifiedAt: addDays(today, -2) + "T00:00:00.000Z",
-    },
+    photo("doc-sam-wc-front", "whiteCard", "front", true),
+    photo("doc-sam-wc-back", "whiteCard", "back", true),
+    photo("doc-sam-lf-front", "Forklift (LF)", "front", false),
+    photo("doc-sam-lf-back", "Forklift (LF)", "back", false),
   ]
 
-  const blobs: StoredBlob[] = [{ id: "doc-sam-white", contentType: "image/png", base64: TINY_PNG }]
+  const blobs: StoredBlob[] = [
+    { id: "doc-sam-wc-front", contentType: "image/png", base64: frontPng },
+    { id: "doc-sam-wc-back", contentType: "image/png", base64: backPng },
+    { id: "doc-sam-lf-front", contentType: "image/png", base64: frontPng },
+    { id: "doc-sam-lf-back", contentType: "image/png", base64: backPng },
+  ]
 
   return {
     version: SEED_VERSION,

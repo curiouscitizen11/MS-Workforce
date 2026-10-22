@@ -1,16 +1,22 @@
 import { readPrivateBlob } from "@/lib/portal/blob"
 import { signingSecret } from "@/lib/portal/config"
 import { verifyFileToken } from "@/lib/portal/files"
+import { readSession } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+import { ticketPhotoDecision } from "@/lib/portal/ticket-photos"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   const url = new URL(request.url)
   const exp = Number(url.searchParams.get("exp"))
   const signature = url.searchParams.get("sig") || ""
-  if (!verifyFileToken(params.id, exp, signature, signingSecret(), Date.now())) {
-    return new NextResponse("This link has expired.", { status: 401 })
-  }
+  const current = await readSession()
+  const decision = ticketPhotoDecision({
+    signatureOk: verifyFileToken(params.id, exp, signature, signingSecret(), Date.now()),
+    role: current?.worker.role || null,
+  })
+  if (decision === "expired") return new NextResponse("This link has expired.", { status: 401 })
+  if (decision === "forbidden") return new NextResponse("Only the MS Workforce admin can open these photos.", { status: 403 })
   const store = await getStore()
   const doc = await store.documents.get(params.id)
   const blob = await store.blobs.get(params.id)
