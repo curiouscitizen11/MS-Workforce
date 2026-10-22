@@ -1,7 +1,9 @@
 "use client"
 
+import { useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { renewSession } from "@/app/portal/actions"
 
 const workerItems = [
   { href: "/portal", label: "Home" },
@@ -19,6 +21,9 @@ const adminItems = [
 
 export function PortalNav({ role }: { role: "worker" | "admin" }) {
   const pathname = usePathname() || ""
+  useEffect(() => {
+    if (role === "worker") void renewSession()
+  }, [role])
   const items = role === "admin" ? adminItems : workerItems
   return (
     <nav

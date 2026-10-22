@@ -139,6 +139,10 @@ function within(iso: string, now: Date, windowMs: number) {
   return now.getTime() - Date.parse(iso) <= windowMs
 }
 
+export function loginSms(code: string) {
+  return code + " is your MS Workforce code. It expires in 10 minutes.\n\n@www.msworkforce.au #" + code
+}
+
 export async function requestOtp(ctx: Ctx, input: { mobile: string; ip: string }) {
   const mobile = toE164(input.mobile)
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
@@ -164,7 +168,7 @@ export async function requestOtp(ctx: Ctx, input: { mobile: string; ip: string }
     createdAt: ctx.now.toISOString(),
     ip: input.ip,
   })
-  await ctx.notify.sms(mobile, "Your MS Workforce code is " + code + ". It expires in 10 minutes.", "Login code sent")
+  await ctx.notify.sms(mobile, loginSms(code), "Login code sent")
   return { ok: true as const, devCode: ctx.mode === "mock" ? code : undefined }
 }
 
@@ -221,6 +225,14 @@ async function openSession(ctx: Ctx, worker: Worker): Promise<Session> {
   await ctx.store.sessions.save(session)
   await audit(ctx, worker.id, "login", worker.id)
   return session
+}
+
+export async function renewWorkerSession(ctx: Ctx, sessionId: string) {
+  const session = await ctx.store.sessions.get(sessionId)
+  if (!session || session.role !== "worker") return { ok: true as const, renewed: false as const }
+  const next = { ...session, expiresAt: new Date(ctx.now.getTime() + WORKER_SESSION_MS).toISOString() }
+  await ctx.store.sessions.save(next)
+  return { ok: true as const, renewed: true as const, session: next }
 }
 
 export async function requestMagicLink(ctx: Ctx, input: { email: string; confirmEmail: string; origin: string }) {
@@ -415,6 +427,90 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
   }
   await persistWorker(ctx, worker)
   await audit(ctx, worker.id, "onboarding", worker.id)
+  return { ok: true as const }
+}
+
+export async function saveMyDetails(
+  ctx: Ctx,
+  workerId: string,
+  input: { preferredName: string; suburb: string; postcode: string },
+) {
+  const worker = await ctx.store.workers.get(workerId)
+  if (!worker || worker.role !== "worker") return fail("Log in again.")
+  const sensitive = texts([input.preferredName, input.suburb, input.postcode])
+  if (sensitive) return fail(SENSITIVE_MESSAGE)
+  worker.preferredName = input.preferredName.trim()
+  worker.suburb = input.suburb.trim()
+  worker.postcode = input.postcode.trim()
+  await persistWorker(ctx, worker)
+  await audit(ctx, workerId, "update-details", workerId, "Updated preferred name, suburb or postcode.")
+  return { ok: true as const }
+}
+
+export async function readSafety(ctx: Ctx, actorId: string, workerId: string) {
+  const actor = await ctx.store.workers.get(actorId)
+  const worker = await ctx.store.workers.get(workerId)
+  if (!actor || !worker || worker.role !== "worker") return fail("Log in again.")
+  if (actor.role !== "admin" && actor.id !== workerId) return fail("You can't open another person's safety info.")
+  return {
+    ok: true as const,
+    safety: {
+      emergencyContact: worker.emergencyContact || "",
+      emergencyRelationship: worker.emergencyRelationship || "",
+      emergencyPhone: worker.emergencyPhone || "",
+      allergies: worker.allergies || "",
+      allergyTypes: worker.allergyTypes || [],
+      anaphylaxis: worker.anaphylaxis || "",
+      epipen: worker.epipen || "",
+      medicalConditions: worker.medicalConditions || [],
+      injury: worker.injury || "",
+      tasksAffected: worker.tasksAffected || [],
+      safetyMedication: worker.safetyMedication || "",
+      medicalSharing: worker.medicalSharing || "",
+      healthConsent: Boolean(worker.healthConsent),
+    },
+  }
+}
+
+export async function saveSafety(
+  ctx: Ctx,
+  workerId: string,
+  input: {
+    consent: boolean
+    emergencyContact: string
+    emergencyRelationship: string
+    emergencyPhone: string
+    allergies: string
+    allergyTypes: string[]
+    anaphylaxis: string
+    epipen: string
+    medicalConditions: string[]
+    injury: string
+    tasksAffected: string[]
+    safetyMedication: string
+    medicalSharing: string
+  },
+) {
+  const worker = await ctx.store.workers.get(workerId)
+  if (!worker || worker.role !== "worker") return fail("Log in again.")
+  if (!input.consent) return fail("Tick the box to let MS Workforce keep this.")
+  const sensitive = texts([input.emergencyContact, input.emergencyPhone, input.injury])
+  if (sensitive) return fail(SENSITIVE_MESSAGE)
+  worker.emergencyContact = input.emergencyContact.trim()
+  worker.emergencyRelationship = input.emergencyRelationship
+  worker.emergencyPhone = toE164(input.emergencyPhone) || input.emergencyPhone.trim()
+  worker.allergies = input.allergies
+  worker.allergyTypes = input.allergyTypes
+  worker.anaphylaxis = input.anaphylaxis
+  worker.epipen = input.epipen
+  worker.medicalConditions = input.medicalConditions
+  worker.injury = input.injury.trim()
+  worker.tasksAffected = input.tasksAffected
+  worker.safetyMedication = input.safetyMedication
+  worker.medicalSharing = input.medicalSharing
+  worker.healthConsent = true
+  await persistWorker(ctx, worker)
+  await audit(ctx, workerId, "update-safety", workerId, "Safety info updated.")
   return { ok: true as const }
 }
 

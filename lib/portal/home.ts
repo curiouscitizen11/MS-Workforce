@@ -57,3 +57,9 @@ export function cardsAwaitingCheck(
 export function photosAwaitingApproval(docs: { kind: string; headshotStatus?: string; deletedAt?: string }[]) {
   return docs.filter((doc) => doc.kind === "headshot" && doc.headshotStatus === "Pending" && !doc.deletedAt).length
 }
+
+export function portalHome(role: "worker" | "admin" | null) {
+  if (role === "admin") return "/portal/admin"
+  if (role === "worker") return "/portal"
+  return "/portal/login"
+}

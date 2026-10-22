@@ -8,6 +8,7 @@ import type { OtpChallenge, Session, Worker } from "@/lib/portal/types"
 const COOKIE = "msw_portal"
 const PENDING = "msw_admin_pending"
 const OTP = "msw_demo_otp"
+const MOBILE = "msw_mobile"
 
 function cookieOptions(maxAge?: number, expires?: Date) {
   return {
@@ -77,6 +78,14 @@ export function clearOtpCookie() {
 
 export function clearSessionCookie() {
   cookies().set(COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 })
+}
+
+export function writeMobileCookie(mobile: string) {
+  cookies().set(MOBILE, mobile, cookieOptions(365 * 24 * 60 * 60))
+}
+
+export function readMobileCookie() {
+  return cookies().get(MOBILE)?.value || ""
 }
 
 export function writePendingCookie(workerId: string, nowMs: number) {

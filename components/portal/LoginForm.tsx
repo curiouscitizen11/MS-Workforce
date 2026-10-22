@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useEffect, useRef, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { checkAdminCode, checkLoginCode, sendLoginCode, sendMagicLink } from "@/app/portal/actions"
 import { Field, fieldClass } from "@/components/portal/ui"
@@ -9,12 +9,14 @@ import { emailError, emailProblem } from "@/lib/portal/email"
 export function LoginForm({
   mock,
   demos,
+  initialMobile = "",
 }: {
   mock: boolean
   demos: { name: string; mobile: string; hint: string }[]
+  initialMobile?: string
 }) {
   const router = useRouter()
-  const [mobile, setMobile] = useState("")
+  const [mobile, setMobile] = useState(initialMobile)
   const [code, setCode] = useState("")
   const [email, setEmail] = useState("")
   const [confirmEmail, setConfirmEmail] = useState("")
@@ -23,6 +25,33 @@ export function LoginForm({
   const [error, setError] = useState("")
   const [step, setStep] = useState<"mobile" | "code" | "email">("mobile")
   const [pending, start] = useTransition()
+  const tried = useRef("")
+  const busy = useRef(false)
+
+  function submitCode(nextCode: string) {
+    if (busy.current || !/^\d{6}$/.test(nextCode)) return
+    busy.current = true
+    setError("")
+    start(async () => {
+      const result = await checkLoginCode(mobile, nextCode)
+      if (!result.ok) {
+        busy.current = false
+        tried.current = ""
+        setError(result.error)
+        return
+      }
+      router.push(result.next)
+      router.refresh()
+    })
+  }
+
+  useEffect(() => {
+    if (step !== "code" || !/^\d{6}$/.test(code) || tried.current === code) return
+    tried.current = code
+    submitCode(code)
+    // submitCode closes over the latest mobile and router.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, step])
 
   return (
     <form
@@ -30,6 +59,10 @@ export function LoginForm({
       onSubmit={(event) => {
         event.preventDefault()
         setError("")
+        if (step === "code") {
+          submitCode(code)
+          return
+        }
         start(async () => {
           if (step === "email") {
             const emailIssue = emailError(emailProblem(email, confirmEmail, true))
@@ -54,15 +87,7 @@ export function LoginForm({
             }
             setDevCode(result.devCode || "")
             setStep("code")
-            return
           }
-          const result = await checkLoginCode(mobile, code)
-          if (!result.ok) {
-            setError(result.error)
-            return
-          }
-          router.push(result.next)
-          router.refresh()
         })
       }}
     >

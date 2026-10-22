@@ -10,12 +10,15 @@ import {
   deleteWorkerImages,
   requestMagicLink,
   requestOtp,
+  renewWorkerSession,
   respondToOffer,
   revealPassport,
   revokeSessions,
   markTicketChecked as markTicketCheckedRecord,
   saveOnboarding,
+  saveMyDetails,
   saveOtherLicences,
+  saveSafety,
   saveTicket,
   saveTicketAnswers,
   saveTicketPhoto,
@@ -36,6 +39,7 @@ import {
   readOtpCookie,
   readPendingWorkerId,
   readSession,
+  writeMobileCookie,
   writeOtpCookie,
   writePendingCookie,
   writeSessionCookie,
@@ -78,8 +82,19 @@ async function rememberDemoOtp(mobile: string) {
 
 export async function sendLoginCode(mobile: string) {
   const result = await requestOtp(await ctx(), { mobile, ip: ip() })
-  if (result.ok) await rememberDemoOtp(mobile)
+  if (result.ok) {
+    writeMobileCookie(mobile)
+    await rememberDemoOtp(mobile)
+  }
   return result
+}
+
+export async function renewSession() {
+  const current = await readSession()
+  if (!current || current.worker.role !== "worker") return { ok: true as const }
+  const result = await renewWorkerSession(await ctx(), current.session.id)
+  if (result.renewed) writeSessionCookie(result.session)
+  return { ok: true as const }
 }
 
 export async function checkLoginCode(mobile: string, code: string) {
@@ -129,6 +144,36 @@ export async function logOut() {
 
 export async function applyForWork(input: unknown) {
   const result = await submitApplication(await ctx(), input)
+  if (result.ok) refresh()
+  return result
+}
+
+export async function saveDetails(input: { preferredName: string; suburb: string; postcode: string }) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "worker") return { ok: false as const, error: "Log in again." }
+  const result = await saveMyDetails(await ctx(), current.worker.id, input)
+  if (result.ok) refresh()
+  return result
+}
+
+export async function saveSafetyInfo(input: {
+  consent: boolean
+  emergencyContact: string
+  emergencyRelationship: string
+  emergencyPhone: string
+  allergies: string
+  allergyTypes: string[]
+  anaphylaxis: string
+  epipen: string
+  medicalConditions: string[]
+  injury: string
+  tasksAffected: string[]
+  safetyMedication: string
+  medicalSharing: string
+}) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "worker") return { ok: false as const, error: "Log in again." }
+  const result = await saveSafety(await ctx(), current.worker.id, input)
   if (result.ok) refresh()
   return result
 }
