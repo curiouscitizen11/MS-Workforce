@@ -18,7 +18,7 @@ export default async function TicketsPage() {
     .map((doc) => ({ key: doc.licenceKey as string, side: doc.side as "front" | "back" }))
   return (
     <div className="space-y-4">
-      <Heading kicker="Tickets" title="Your cards" text="A White card is required on every job. If you have a card, add the front and the back. Changing a card sends it back for MS Workforce to check. You cannot open the photos after they are saved." />
+      <Heading kicker="Tickets" title="Your cards" text="A White card is required on every job. If you have a card, type the number and expiry on it and add the front and the back. MS Workforce checks them against the photos. Changing a number, expiry or photo sends the card back for a new check. You cannot open the photos after they are saved." />
       <ul className="space-y-2">
         {check.tickets.map((ticket) => {
           const record = worker.tickets[ticket.type]
@@ -27,7 +27,15 @@ export default async function TicketsPage() {
           const checked = Boolean(record?.checkedAt)
           return (
             <li key={ticket.type} className="flex items-center justify-between gap-2 rounded-2xl bg-white px-3 py-3">
-              <span className="text-sm font-semibold">{ticket.label}</span>
+              <span>
+                <span className="block text-sm font-semibold">{ticket.label}</span>
+                {record?.number ? (
+                  <span className="block text-xs text-navy/70">
+                    {record.number}
+                    {record.expiry ? " · expires " + record.expiry : " · no expiry"}
+                  </span>
+                ) : null}
+              </span>
               <StatusChip level={held ? (checked ? "ok" : "pending") : ticket.type === "whiteCard" ? "do-not-book" : "neutral"}>
                 {held ? (checked ? "Checked" : "Waiting for a check") : status}
               </StatusChip>
@@ -35,7 +43,7 @@ export default async function TicketsPage() {
           )
         })}
       </ul>
-      <TicketEditor photos={photos} otherHeld={worker.otherTicketsHeld || []} />
+      <TicketEditor photos={photos} otherHeld={worker.otherTicketsHeld || []} tickets={worker.tickets} otherDetails={worker.licenceChecks || {}} />
       <Link href="/candidates" className="text-sm font-semibold text-teal-600 underline">
         Training providers
       </Link>

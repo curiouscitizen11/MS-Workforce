@@ -51,6 +51,7 @@ import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
 import { offerNotionProperties, timesheetNotionProperties, toNotionProperties, workerNotionProperties } from "@/lib/portal/notion/map"
 import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
+import { ticketEntryProblem, ticketNumberProblem, type TicketEntry } from "@/lib/portal/ticket-entry"
 import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
 import {
@@ -525,11 +526,33 @@ function freshTicket(status: string): Ticket {
   }
 }
 
+function withWorkerEntry(previous: Ticket | undefined, status: string, entry: TicketEntry, today: string): { ok: true; ticket: Ticket; changed: boolean } | { ok: false; error: string } {
+  if (status !== "Yes, I have it") return { ok: true, ticket: freshTicket(status), changed: previous?.status !== status || Boolean(previous?.checkedAt) }
+  const problem = ticketEntryProblem(entry, today)
+  if (problem) return { ok: false, error: problem }
+  const number = (entry.number || "").trim()
+  const expiry = entry.noExpiry ? null : entry.expiry || null
+  const changed = !previous?.checkedAt || previous.number !== number || (previous.expiry || null) !== expiry || previous.status !== status
+  return {
+    ok: true,
+    changed,
+    ticket: {
+      status,
+      number,
+      expiry,
+      pendingCheck: changed,
+      checkedBy: changed ? undefined : previous?.checkedBy,
+      checkedAt: changed ? undefined : previous?.checkedAt,
+      photosDeletedAt: changed ? undefined : previous?.photosDeletedAt,
+    },
+  }
+}
+
 async function workerDocs(ctx: Ctx, workerId: string) {
   return (await ctx.store.documents.all()).filter((doc) => doc.workerId === workerId)
 }
 
-export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, ticket: Ticket) {
+export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, ticket: Ticket & TicketEntry) {
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Log in again.")
   if (!TICKET_ANSWERS.includes(ticket.status as (typeof TICKET_ANSWERS)[number])) return fail("Choose one of the listed options.")
@@ -538,12 +561,16 @@ export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, t
     const missing = missingPhotoMessage([{ key: type, label: TICKET_LABELS[type] }], docs, workerId)
     if (missing) return fail(missing)
   }
+  const built = withWorkerEntry(worker.tickets[type], ticket.status, ticket, sydneyToday(ctx.now))
+  if (!built.ok) return fail(built.error)
   if (ticket.status !== "Yes, I have it") await deleteLicencePhotos(ctx, workerId, type, workerId, "Removed because the worker no longer holds this card.")
-  else await clearPhotoSchedule(ctx, workerId, type)
-  worker.tickets[type] = freshTicket(ticket.status)
-  worker.ticketsVerified = false
-  const note = "Ticket updated in the portal on " + sydneyToday(ctx.now) + ". Needs a new check."
-  worker.notes = worker.notes ? worker.notes + "\n" + note : note
+  else if (built.changed) await clearPhotoSchedule(ctx, workerId, type)
+  worker.tickets[type] = built.ticket
+  if (built.changed) {
+    worker.ticketsVerified = allHeldChecked(worker)
+    const note = "Ticket updated in the portal on " + sydneyToday(ctx.now) + ". Needs a new check."
+    worker.notes = worker.notes ? worker.notes + "\n" + note : note
+  }
   await persistWorker(ctx, worker)
   await audit(ctx, workerId, "ticket-update", type)
   return { ok: true as const }
@@ -552,40 +579,81 @@ export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, t
 export async function saveTicketAnswers(
   ctx: Ctx,
   workerId: string,
-  input: { tickets: Partial<Record<TicketType, string>>; otherTicketsHeld: string[] },
+  input: {
+    tickets: Partial<Record<TicketType, string | TicketEntry & { status?: string }>>
+    otherTicketsHeld: string[]
+    otherDetails?: Record<string, TicketEntry>
+  },
 ) {
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Log in again.")
-  const tickets = {} as Record<TicketType, string>
+  const today = sydneyToday(ctx.now)
+  const answers = {} as Record<TicketType, TicketEntry & { status: string }>
   for (const type of TICKET_TYPES) {
-    const status = input.tickets[type] || "No"
-    if (!TICKET_ANSWERS.includes(status as (typeof TICKET_ANSWERS)[number])) return fail("Choose one of the listed options.")
-    tickets[type] = status
+    const raw = input.tickets[type]
+    const answer = typeof raw === "string" || !raw ? { status: raw || "No" } : { status: raw.status || "No", number: raw.number, expiry: raw.expiry, noExpiry: raw.noExpiry }
+    if (!TICKET_ANSWERS.includes(answer.status as (typeof TICKET_ANSWERS)[number])) return fail("Choose one of the listed options.")
+    answers[type] = answer
   }
   const held = input.otherTicketsHeld.map(String)
   if (held.some((item) => !(OTHER_TICKETS as readonly string[]).includes(item))) return fail("Choose tickets from the list.")
+  const statusMap = {} as Record<TicketType, string>
+  for (const type of TICKET_TYPES) statusMap[type] = answers[type].status
   const docs = await workerDocs(ctx, workerId)
-  const missing = missingPhotoMessage(requiredPhotoSlots({ tickets, otherTicketsHeld: held }), docs, workerId)
+  const missing = missingPhotoMessage(requiredPhotoSlots({ tickets: statusMap, otherTicketsHeld: held }), docs, workerId)
   if (missing) return fail(missing)
   for (const type of TICKET_TYPES) {
-    if (tickets[type] === "Yes, I have it") await clearPhotoSchedule(ctx, workerId, type)
-    else await deleteLicencePhotos(ctx, workerId, type, workerId, "Removed because the worker no longer holds this card.")
-    worker.tickets[type] = freshTicket(tickets[type])
+    if (answers[type].status !== "Yes, I have it") continue
+    const problem = ticketEntryProblem(answers[type], today)
+    if (problem) return fail(TICKET_LABELS[type] + ": " + problem)
+  }
+  for (const label of held.filter(isOtherLicence)) {
+    const problem = ticketEntryProblem(input.otherDetails?.[label] || {}, today)
+    if (problem) return fail(label + ": " + problem)
+  }
+  let changed = false
+  for (const type of TICKET_TYPES) {
+    const built = withWorkerEntry(worker.tickets[type], answers[type].status, answers[type], today)
+    if (!built.ok) return fail(built.error)
+    if (answers[type].status === "Yes, I have it") {
+      if (built.changed) await clearPhotoSchedule(ctx, workerId, type)
+    } else if (worker.tickets[type]?.status === "Yes, I have it" || built.changed) {
+      await deleteLicencePhotos(ctx, workerId, type, workerId, "Removed because the worker no longer holds this card.")
+    }
+    if (built.changed) changed = true
+    worker.tickets[type] = built.ticket
   }
   await syncOtherLicences(ctx, worker, held)
-  worker.ticketsVerified = false
-  const note = "Ticket updated in the portal on " + sydneyToday(ctx.now) + ". Needs a new check."
-  worker.notes = worker.notes ? worker.notes + "\n" + note : note
+  for (const label of held.filter(isOtherLicence)) {
+    const entry = input.otherDetails?.[label] || {}
+    const previous = worker.licenceChecks?.[label]
+    const number = (entry.number || "").trim()
+    const expiry = entry.noExpiry ? null : entry.expiry || null
+    const same = previous?.checkedAt && previous.number === number && (previous.expiry || null) === expiry
+    worker.licenceChecks = {
+      ...worker.licenceChecks,
+      [label]: same
+        ? previous
+        : { number, expiry },
+    }
+    if (!same) changed = true
+  }
+  if (changed) {
+    worker.ticketsVerified = allHeldChecked(worker)
+    const note = "Ticket updated in the portal on " + sydneyToday(ctx.now) + ". Needs a new check."
+    worker.notes = worker.notes ? worker.notes + "\n" + note : note
+  }
   await persistWorker(ctx, worker)
   await audit(ctx, workerId, "ticket-update", workerId)
   return { ok: true as const }
 }
 
-export async function saveOtherLicences(ctx: Ctx, workerId: string, held: string[]) {
+export async function saveOtherLicences(ctx: Ctx, workerId: string, held: string[], details: Record<string, TicketEntry> = {}) {
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Log in again.")
   const next = held.map(String)
   if (next.some((item) => !(OTHER_TICKETS as readonly string[]).includes(item))) return fail("Choose tickets from the list.")
+  const today = sydneyToday(ctx.now)
   const docs = await workerDocs(ctx, workerId)
   const missing = missingPhotoMessage(
     next.filter(isOtherLicence).map((label) => ({ key: label, label })),
@@ -593,8 +661,26 @@ export async function saveOtherLicences(ctx: Ctx, workerId: string, held: string
     workerId,
   )
   if (missing) return fail(missing)
+  for (const label of next.filter(isOtherLicence)) {
+    const problem = ticketEntryProblem(details[label] || {}, today)
+    if (problem) return fail(label + ": " + problem)
+  }
+  const previousHeld = worker.otherTicketsHeld || []
+  let changed =
+    previousHeld.length !== next.length ||
+    previousHeld.some((item) => !next.includes(item)) ||
+    next.some((item) => !previousHeld.includes(item))
   await syncOtherLicences(ctx, worker, next)
-  worker.ticketsVerified = allHeldChecked(worker)
+  for (const label of next.filter(isOtherLicence)) {
+    const entry = details[label] || {}
+    const previous = worker.licenceChecks?.[label]
+    const number = (entry.number || "").trim()
+    const expiry = entry.noExpiry ? null : entry.expiry || null
+    const same = Boolean(previous?.checkedAt) && previous?.number === number && (previous?.expiry || null) === expiry
+    worker.licenceChecks = { ...worker.licenceChecks, [label]: same && previous ? previous : { number, expiry } }
+    if (!same) changed = true
+  }
+  if (changed) worker.ticketsVerified = allHeldChecked(worker)
   await persistWorker(ctx, worker)
   await audit(ctx, workerId, "ticket-update", "other")
   return { ok: true as const }
@@ -1116,9 +1202,8 @@ export async function markTicketChecked(
   if (!worker || worker.role === "admin") return fail("Worker not found.")
   if (!isPhotoLicenceKey(input.licenceKey)) return fail("Choose a ticket from the list.")
   const number = input.number.trim()
-  if (!number) return fail("Enter the number printed on the card.")
-  if (number.length > 40) return fail("That number is too long.")
-  if (sensitiveMessage(number)) return fail(SENSITIVE_MESSAGE)
+  const numberProblem = ticketNumberProblem(number)
+  if (numberProblem) return fail(numberProblem)
   let expiry: string | null = null
   if (!input.noExpiry) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(input.expiry)) return fail("Enter the expiry date on the card, or tick no expiry date.")
@@ -1173,6 +1258,30 @@ export async function markTicketChecked(
     workerId,
     licenceLabel(input.licenceKey) + " checked by " + admin.name + ". Expiry " + (expiry || "none") + ".",
   )
+  return { ok: true as const }
+}
+
+export async function flagTicketMismatch(ctx: Ctx, adminId: string, workerId: string, licenceKey: string) {
+  const admin = await ctx.store.workers.get(adminId)
+  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  const worker = await ctx.store.workers.get(workerId)
+  if (!worker || worker.role === "admin") return fail("Worker not found.")
+  if (!isPhotoLicenceKey(licenceKey)) return fail("Choose a ticket from the list.")
+  if (isTicketType(licenceKey)) {
+    const current = worker.tickets[licenceKey]
+    worker.tickets[licenceKey] = {
+      ...current,
+      status: current?.status || "Yes, I have it",
+      checkedBy: undefined,
+      checkedAt: undefined,
+      pendingCheck: true,
+    }
+  } else if (worker.licenceChecks?.[licenceKey]) {
+    worker.licenceChecks[licenceKey] = { ...worker.licenceChecks[licenceKey], checkedBy: undefined, checkedAt: undefined }
+  }
+  worker.ticketsVerified = allHeldChecked(worker)
+  await persistWorker(ctx, worker)
+  await audit(ctx, adminId, "ticket-mismatch", workerId, licenceLabel(licenceKey) + " does not match the photo.")
   return { ok: true as const }
 }
 

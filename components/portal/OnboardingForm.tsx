@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { saveProfile, saveTicketStep } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { TicketChoices } from "@/components/portal/TicketChoices"
+import { TicketMeta, ticketDraft, type TicketDraft } from "@/components/portal/TicketMeta"
 import { TicketPhotoPair } from "@/components/portal/TicketPhotos"
 import { fieldClass } from "@/components/portal/ui"
 import {
@@ -276,6 +277,12 @@ function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoR
     return next
   })
   const [held, setHeld] = useState<string[]>(worker.otherTicketsHeld || [])
+  const [entries, setEntries] = useState<Record<string, TicketDraft>>(() => {
+    const next: Record<string, TicketDraft> = {}
+    for (const type of TICKET_TYPES) next[type] = ticketDraft(type, worker.tickets[type])
+    for (const [label, check] of Object.entries(worker.licenceChecks || {})) next[label] = ticketDraft(label, check)
+    return next
+  })
   const needed = [
     ...TICKET_TYPES.filter((type) => answers[type] === "Yes, I have it").map((type) => ({ key: type, label: TICKET_LABELS[type] })),
     ...held.filter((item) => item !== "None of these").map((item) => ({ key: item, label: item })),
@@ -298,7 +305,16 @@ function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoR
           return
         }
         start(async () => {
-          const result = await saveTicketStep({ tickets: answers, otherTicketsHeld: held })
+          const tickets = {} as Record<TicketType, TicketDraft & { status: string }>
+          for (const type of TICKET_TYPES) {
+            tickets[type] = { status: answers[type], ...(entries[type] || ticketDraft(type, worker.tickets[type])) }
+          }
+          const otherDetails: Record<string, TicketDraft> = {}
+          for (const label of held) {
+            if (label === "None of these") continue
+            otherDetails[label] = entries[label] || ticketDraft(label, worker.licenceChecks?.[label])
+          }
+          const result = await saveTicketStep({ tickets, otherTicketsHeld: held, otherDetails })
           if (!result.ok) {
             setError(result.error)
             return
@@ -308,7 +324,7 @@ function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoR
       }}
     >
       <p className="text-sm leading-relaxed text-navy/80">
-        If you have a card, add a photo of the front and the back. You need both before you can continue. MS Workforce reads the number and expiry. You will not be able to open the photos again.
+        If you have a card, type the number and the expiry printed on it, then add a photo of the front and the back. You need both photos before you can continue. MS Workforce checks the number and expiry against the photos. You will not be able to open the photos again.
       </p>
       {TICKET_TYPES.map((type) => (
         <div key={type} className="space-y-2">
@@ -320,13 +336,20 @@ function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoR
             onChange={(choice) => setAnswers({ ...answers, [type]: choice })}
           />
           {answers[type] === "Yes, I have it" ? (
-            <TicketPhotoPair
-              licenceKey={type}
-              label={TICKET_LABELS[type]}
-              front={savedPhotos.some((photo) => photo.key === type && photo.side === "front")}
-              back={savedPhotos.some((photo) => photo.key === type && photo.side === "back")}
-              onSaved={(side) => onSaved(type, side)}
-            />
+            <>
+              <TicketMeta
+                id={type}
+                draft={entries[type] || ticketDraft(type, worker.tickets[type])}
+                onChange={(draft) => setEntries({ ...entries, [type]: draft })}
+              />
+              <TicketPhotoPair
+                licenceKey={type}
+                label={TICKET_LABELS[type]}
+                front={savedPhotos.some((photo) => photo.key === type && photo.side === "front")}
+                back={savedPhotos.some((photo) => photo.key === type && photo.side === "back")}
+                onSaved={(side) => onSaved(type, side)}
+              />
+            </>
           ) : null}
         </div>
       ))}
@@ -351,14 +374,20 @@ function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoR
       {held
         .filter((item) => item !== "None of these")
         .map((item) => (
-          <TicketPhotoPair
-            key={item}
-            licenceKey={item}
-            label={item}
-            front={savedPhotos.some((photo) => photo.key === item && photo.side === "front")}
-            back={savedPhotos.some((photo) => photo.key === item && photo.side === "back")}
-            onSaved={(side) => onSaved(item, side)}
-          />
+          <div key={item} className="space-y-3">
+            <TicketMeta
+              id={"other-" + item}
+              draft={entries[item] || ticketDraft(item, worker.licenceChecks?.[item])}
+              onChange={(draft) => setEntries({ ...entries, [item]: draft })}
+            />
+            <TicketPhotoPair
+              licenceKey={item}
+              label={item}
+              front={savedPhotos.some((photo) => photo.key === item && photo.side === "front")}
+              back={savedPhotos.some((photo) => photo.key === item && photo.side === "back")}
+              onSaved={(side) => onSaved(item, side)}
+            />
+          </div>
         ))}
       {error ? (
         <p role="alert" className="text-sm font-semibold text-[#B91C1C]">

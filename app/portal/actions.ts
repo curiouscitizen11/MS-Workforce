@@ -14,6 +14,7 @@ import {
   respondToOffer,
   revealPassport,
   revokeSessions,
+  flagTicketMismatch as flagTicketMismatchRecord,
   markTicketChecked as markTicketCheckedRecord,
   saveOnboarding,
   saveMyDetails,
@@ -45,6 +46,7 @@ import {
   writeSessionCookie,
 } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+import type { TicketEntry } from "@/lib/portal/ticket-entry"
 import type { PhotoSide, Ticket, TicketType } from "@/lib/portal/types"
 
 async function ctx(): Promise<Ctx> {
@@ -186,7 +188,7 @@ export async function saveProfile(patch: Record<string, unknown>) {
   return result
 }
 
-export async function updateTicket(type: TicketType, ticket: Ticket) {
+export async function updateTicket(type: TicketType, ticket: Ticket & TicketEntry) {
   const current = await readSession()
   if (!current || current.worker.role === "admin") return { ok: false as const, error: "Log in as a worker." }
   const result = await saveTicket(await ctx(), current.worker.id, type, ticket)
@@ -194,7 +196,11 @@ export async function updateTicket(type: TicketType, ticket: Ticket) {
   return result
 }
 
-export async function saveTicketStep(input: { tickets: Partial<Record<TicketType, string>>; otherTicketsHeld: string[] }) {
+export async function saveTicketStep(input: {
+  tickets: Partial<Record<TicketType, string | (TicketEntry & { status?: string })>>
+  otherTicketsHeld: string[]
+  otherDetails?: Record<string, TicketEntry>
+}) {
   const current = await readSession()
   if (!current || current.worker.role === "admin") return { ok: false as const, error: "Log in as a worker." }
   const result = await saveTicketAnswers(await ctx(), current.worker.id, input)
@@ -202,10 +208,10 @@ export async function saveTicketStep(input: { tickets: Partial<Record<TicketType
   return result
 }
 
-export async function saveHeldLicences(otherTicketsHeld: string[]) {
+export async function saveHeldLicences(otherTicketsHeld: string[], details: Record<string, TicketEntry> = {}) {
   const current = await readSession()
   if (!current || current.worker.role === "admin") return { ok: false as const, error: "Log in as a worker." }
-  const result = await saveOtherLicences(await ctx(), current.worker.id, otherTicketsHeld)
+  const result = await saveOtherLicences(await ctx(), current.worker.id, otherTicketsHeld, details)
   if (result.ok) refresh()
   return result
 }
@@ -222,6 +228,14 @@ export async function uploadTicketPhoto(formData: FormData) {
     licenceKey: String(formData.get("licenceKey") || ""),
     side: side as PhotoSide,
   })
+  if (result.ok) refresh()
+  return result
+}
+
+export async function flagTicketMismatch(input: { workerId: string; licenceKey: string }) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  const result = await flagTicketMismatchRecord(await ctx(), current.worker.id, input.workerId, input.licenceKey)
   if (result.ok) refresh()
   return result
 }

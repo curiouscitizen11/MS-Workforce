@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { markTicketChecked } from "@/app/portal/actions"
+import { flagTicketMismatch, markTicketChecked } from "@/app/portal/actions"
 import { fieldClass } from "@/components/portal/ui"
 
 export type TicketCheckItem = {
@@ -23,7 +23,7 @@ export function TicketCheckList({ workerId, items }: { workerId: string; items: 
     <section className="space-y-3">
       <h2 className="text-sm font-semibold">Check tickets and licences</h2>
       <p className="text-sm leading-relaxed text-navy/80">
-        Read the number and the expiry off the photos. Both photos are deleted 7 days after you mark the card checked. The number, expiry, and who checked it stay on file.
+        The worker typed the number and the expiry. Check them against the photos, and correct them if the card says something else. Both photos are deleted 7 days after you mark the card checked. The number, expiry, and who checked it stay on file.
       </p>
       {items.length ? items.map((item) => <TicketCheckCard key={item.key} workerId={workerId} item={item} />) : (
         <p className="rounded-2xl bg-white p-4 text-sm">This worker has not said they hold a card yet.</p>
@@ -36,7 +36,7 @@ function TicketCheckCard({ workerId, item }: { workerId: string; item: TicketChe
   const router = useRouter()
   const [error, setError] = useState("")
   const [saved, setSaved] = useState("")
-  const [noExpiry, setNoExpiry] = useState(!item.expiry && Boolean(item.checkedBy))
+  const [noExpiry, setNoExpiry] = useState(!item.expiry && (Boolean(item.checkedBy) || Boolean(item.number) || item.key === "whiteCard"))
   const [pending, start] = useTransition()
   return (
     <form
@@ -81,7 +81,7 @@ function TicketCheckCard({ workerId, item }: { workerId: string; item: TicketChe
           defaultValue={item.number}
           autoComplete="off"
           className={fieldClass}
-          maxLength={40}
+          maxLength={30}
         />
       </label>
       <label className="block text-sm font-semibold" htmlFor={"expiry-" + item.key}>
@@ -112,9 +112,31 @@ function TicketCheckCard({ workerId, item }: { workerId: string; item: TicketChe
         </p>
       ) : null}
       {saved ? <p className="text-sm font-semibold text-[#15803D]">{saved}</p> : null}
-      <button className="pill pill-teal w-full" disabled={pending || !item.ready}>
-        {pending ? "Saving" : "Mark checked"}
-      </button>
+      <div className="flex flex-col gap-2">
+        <button className="pill pill-teal w-full" disabled={pending || !item.ready}>
+          {pending ? "Saving" : "Matches the photo"}
+        </button>
+        <button
+          type="button"
+          className="pill pill-line-dark w-full"
+          disabled={pending}
+          onClick={() => {
+            setError("")
+            setSaved("")
+            start(async () => {
+              const result = await flagTicketMismatch({ workerId, licenceKey: item.key })
+              if (!result.ok) {
+                setError(result.error)
+                return
+              }
+              setSaved("Marked as not matching. The photos stay until the usual delete date.")
+              router.refresh()
+            })
+          }}
+        >
+          Doesn't match
+        </button>
+      </div>
       {item.ready ? null : (
         <p className="text-xs leading-relaxed text-navy/70">Both photos have to be here before this card can be marked checked.</p>
       )}
