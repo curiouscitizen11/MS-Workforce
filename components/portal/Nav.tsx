@@ -5,16 +5,16 @@ import { usePathname } from "next/navigation"
 
 const workerItems = [
   { href: "/portal", label: "Home" },
-  { href: "/portal/offers", label: "Offers" },
+  { href: "/portal/offers", label: "Shifts" },
   { href: "/portal/timesheet", label: "Hours" },
-  { href: "/portal/tickets", label: "Tickets" },
+  { href: "/portal/me", label: "Me" },
 ]
 
 const adminItems = [
   { href: "/portal/admin", label: "Home" },
   { href: "/portal/admin/offers", label: "Offers" },
   { href: "/portal/admin/timesheets", label: "Hours" },
-  { href: "/portal/account", label: "Account" },
+  { href: "/portal/me", label: "Me" },
 ]
 
 export function PortalNav({ role }: { role: "worker" | "admin" }) {

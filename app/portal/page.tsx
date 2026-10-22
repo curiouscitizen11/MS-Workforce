@@ -1,13 +1,26 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
+import {
+  DetailsIcon,
+  HelpIcon,
+  HoursIcon,
+  InductionIcon,
+  PassIcon,
+  ShiftsIcon,
+  TicketsIcon,
+  Tile,
+} from "@/components/portal/Tiles"
 import { isMock } from "@/lib/portal/config"
 import { complianceFor } from "@/lib/portal/services"
 import { formatDate, formatTime, sydneyParts, sydneyToday } from "@/lib/portal/dates"
+import { inductionTodoCount, offersWaiting, ticketActionCount, unsignedFortnightDays } from "@/lib/portal/home"
 import { formatHours } from "@/lib/portal/hours"
 import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+import { TICKET_LABELS } from "@/lib/portal/types"
+import { sidesPresent, slotsFromWorker } from "@/lib/portal/ticket-photos"
 
 export const metadata: Metadata = { title: "Home" }
 
@@ -37,6 +50,19 @@ export default async function DashboardPage() {
     .sort((a, b) => b.workDate.localeCompare(a.workDate))
   const latest = sheets[0]
   const expiring = check.tickets.filter((ticket) => ticket.validity === "expiring" || ticket.validity === "expired" || ticket.validity === "missing")
+  const docs = await store.documents.all()
+  const waiting = offersWaiting(offers, worker.id)
+  const unsigned = unsignedFortnightDays(offers, sheets, worker.id, today)
+  const todos = inductionTodoCount(Boolean(worker.inductionPassed), offers, worker.id, today)
+  const photoLabels = slotsFromWorker(worker)
+    .filter((slot) => {
+      const sides = sidesPresent(docs, worker.id, slot.key)
+      return !sides.front || !sides.back
+    })
+    .map((slot) => slot.label)
+  const watchLabels = expiring.map((ticket) => ticket.label)
+  if (worker.tickets.whiteCard?.status !== "Yes, I have it") watchLabels.push(TICKET_LABELS.whiteCard)
+  const ticketActions = ticketActionCount([...photoLabels, ...watchLabels])
 
   return (
     <div className="space-y-4">
@@ -79,6 +105,15 @@ export default async function DashboardPage() {
           Log today&apos;s hours
         </Link>
       ) : null}
+      <div className="portal-grid">
+        <Tile href="/portal/offers" label="Shifts" count={waiting} countLabel={waiting + " offers waiting"} icon={<ShiftsIcon />} />
+        <Tile href="/portal/timesheet" label="Hours" count={unsigned} countLabel={unsigned + " days not signed"} icon={<HoursIcon />} />
+        <Tile href="/portal/pass" label="Site pass" icon={<PassIcon />} />
+        <Tile href="/portal/tickets" label="Tickets and documents" count={ticketActions} countLabel={ticketActions + " needing action"} icon={<TicketsIcon />} />
+        <Tile href="/portal/inductions" label="Inductions" count={todos} countLabel={todos + " to do"} icon={<InductionIcon />} />
+        <Tile href="/portal/me" label="My details" icon={<DetailsIcon />} />
+        <Tile href="/portal/help" label="Help" icon={<HelpIcon />} />
+      </div>
       <section className="rounded-2xl border border-navy/10 bg-white p-3">
         <h2 className="text-sm font-semibold">This fortnight</h2>
         <ul className="mt-2 space-y-1">

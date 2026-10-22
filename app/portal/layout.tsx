@@ -42,8 +42,8 @@ export default async function PortalLayout({ children }: { children: React.React
             <span className="mt-0.5 block text-[10px] font-medium tracking-[0.18em] text-white/70">WORKER PORTAL</span>
           </Link>
           {current ? (
-            <Link href="/portal/account" className="inline-flex min-h-12 items-center text-sm font-semibold text-white">
-              {current.worker.role === "admin" ? "Admin" : "Account"}
+            <Link href="/portal/me" className="inline-flex min-h-12 items-center text-sm font-semibold text-white">
+              Me
             </Link>
           ) : (
             <Link href="/" className="inline-flex min-h-12 items-center text-sm font-semibold text-white">

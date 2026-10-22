@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
+import { HoursIcon, PhotoIcon, ShiftsIcon, TicketsIcon, Tile, WorkersIcon } from "@/components/portal/Tiles"
 import { isMock } from "@/lib/portal/config"
 import { complianceFor } from "@/lib/portal/services"
 import { sydneyToday } from "@/lib/portal/dates"
+import { cardsAwaitingCheck, photosAwaitingApproval } from "@/lib/portal/home"
 import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 
@@ -16,18 +18,23 @@ export default async function AdminHomePage() {
   const workers = (await store.workers.all()).filter((worker) => worker.role === "worker")
   const offers = await store.offers.all()
   const sheets = (await store.timesheets.all()).filter((sheet) => sheet.status === "Approved")
+  const docs = await store.documents.all()
   const accepted = offers.filter((offer) => offer.status === "Accepted").length
   const waiting = offers.filter((offer) => offer.status === "Offered").length
+  const toCheck = cardsAwaitingCheck(workers)
+  const photos = photosAwaitingApproval(docs)
   return (
     <div className="space-y-4">
       <DemoBanner mock={isMock()} />
       <Heading kicker="Admin" title="Admin desk" text="Check tickets, send offers, and read signed hours." />
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <Stat label="People" value={String(workers.length)} />
-        <Stat label="Waiting" value={String(waiting)} />
-        <Stat label="Signed" value={String(sheets.length)} />
+      <div className="portal-grid">
+        <Tile href="/portal/admin/offers" label="Offers" count={waiting} countLabel={waiting + " offers waiting"} icon={<ShiftsIcon />} />
+        <Tile href="/portal/admin/timesheets" label="Hours" count={sheets.length} countLabel={sheets.length + " signed"} icon={<HoursIcon />} />
+        <Tile href="#people" label="Tickets to check" count={toCheck} countLabel={toCheck + " to check"} icon={<TicketsIcon />} />
+        <Tile href="/portal/admin/photos" label="Photos to approve" count={photos} countLabel={photos + " photos to approve"} icon={<PhotoIcon />} />
+        <Tile href="#people" label="Workers" count={workers.length} countLabel={workers.length + " workers"} icon={<WorkersIcon />} />
       </div>
-      <section className="space-y-2">
+      <section id="people" className="space-y-2">
         {workers.map((worker) => {
           const check = complianceFor(worker, today)
           return (
@@ -44,21 +51,6 @@ export default async function AdminHomePage() {
       <p className="text-sm text-navy/70">
         {accepted} accepted · {waiting} still open
       </p>
-      <Link href="/portal/admin/offers" className="pill pill-teal w-full">
-        New shift offer
-      </Link>
-      <Link href="/portal/admin/timesheets" className="pill pill-line-dark w-full">
-        Signed timesheets
-      </Link>
-    </div>
-  )
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-white px-2 py-3">
-      <p className="text-xl font-semibold">{value}</p>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-navy/70">{label}</p>
     </div>
   )
 }
