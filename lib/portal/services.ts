@@ -1312,7 +1312,11 @@ export async function verifyWorker(
   if (patch.verifiedBy) worker.verifiedBy = patch.verifiedBy
   if (typeof patch.ticketsVerified === "boolean") worker.ticketsVerified = patch.ticketsVerified
   if (patch.rightToWork) worker.rightToWork = patch.rightToWork
-  if (patch.status) worker.status = patch.status
+  if (patch.status) {
+    if (patch.status === "Inactive" && worker.status !== "Inactive") worker.inactiveOn = ctx.now.toISOString()
+    if (patch.status !== "Inactive") worker.inactiveOn = undefined
+    worker.status = patch.status
+  }
   if (patch.vevoResult) {
     if (!VEVO_RESULTS.includes(patch.vevoResult as never)) return fail("Choose a VEVO result from the list.")
     worker.vevoResult = patch.vevoResult

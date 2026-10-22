@@ -322,6 +322,7 @@ export type Worker = {
   idSighted?: boolean
   idSightedMethod?: string
   idSightedOn?: string
+  inactiveOn?: string
   createdAt: string
   updatedAt: string
 }
@@ -400,10 +401,12 @@ export type Timesheet = {
   confirmationSentAt?: string
 }
 
+export type HeadshotStatus = "Pending" | "Approved" | "Rejected"
+
 export type PortalDocument = {
   id: string
   workerId: string
-  kind: "ticket" | "id"
+  kind: "ticket" | "id" | "headshot"
   ticketType?: TicketType
   licenceKey?: string
   side?: PhotoSide
@@ -413,6 +416,9 @@ export type PortalDocument = {
   verifiedAt?: string
   deleteBy?: string
   deletedAt?: string
+  headshotStatus?: HeadshotStatus
+  rejectReason?: string
+  rejectedAt?: string
 }
 
 export type AuditEvent = {

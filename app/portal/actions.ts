@@ -32,6 +32,7 @@ import {
   verifyWorker,
   type Ctx,
 } from "@/lib/portal/services"
+import { approveHeadshot as approveHeadshotRecord, rejectHeadshot as rejectHeadshotRecord, saveHeadshot } from "@/lib/portal/headshot"
 import { toE164 } from "@/lib/portal/phone"
 import {
   clearOtpCookie,
@@ -212,6 +213,35 @@ export async function saveHeldLicences(otherTicketsHeld: string[], details: Reco
   const current = await readSession()
   if (!current || current.worker.role === "admin") return { ok: false as const, error: "Log in as a worker." }
   const result = await saveOtherLicences(await ctx(), current.worker.id, otherTicketsHeld, details)
+  if (result.ok) refresh()
+  return result
+}
+
+export async function uploadHeadshot(formData: FormData) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "worker") return { ok: false as const, error: "Log in as a worker." }
+  const file = formData.get("file")
+  if (!(file instanceof File)) return { ok: false as const, error: "Choose a photo." }
+  const result = await saveHeadshot(await ctx(), current.worker.id, {
+    bytes: Buffer.from(await file.arrayBuffer()),
+    consent: formData.get("consent") === "yes",
+  })
+  if (result.ok) refresh()
+  return result
+}
+
+export async function approveHeadshot(documentId: string) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  const result = await approveHeadshotRecord(await ctx(), current.worker.id, documentId)
+  if (result.ok) refresh()
+  return result
+}
+
+export async function rejectHeadshot(documentId: string, reason: string) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  const result = await rejectHeadshotRecord(await ctx(), current.worker.id, documentId, reason)
   if (result.ok) refresh()
   return result
 }

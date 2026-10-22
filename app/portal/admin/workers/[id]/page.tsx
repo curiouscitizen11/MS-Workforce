@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { VerifyPanel } from "@/components/portal/AdminForms"
+import { HeadshotReview } from "@/components/portal/HeadshotReview"
 import { TicketCheckList, type TicketCheckItem } from "@/components/portal/TicketCheck"
 import { Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { signingSecret } from "@/lib/portal/config"
@@ -9,6 +10,7 @@ import { signedFilePath } from "@/lib/portal/files"
 import { formatAuMobile } from "@/lib/portal/phone"
 import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+import { approvedHeadshot, pendingHeadshot, workerInitials } from "@/lib/portal/headshot"
 import { isTicketType, latestPhoto, slotsFromWorker } from "@/lib/portal/ticket-photos"
 import { notFound } from "next/navigation"
 
@@ -60,6 +62,30 @@ export default async function AdminWorkerPage({ params }: { params: { id: string
       <a className="pill pill-teal w-full" href={"tel:" + worker.mobile}>
         Call {formatAuMobile(worker.mobile)}
       </a>
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold">Headshot</h2>
+        {pendingHeadshot(docs, worker.id) ? (
+          <HeadshotReview
+            id={pendingHeadshot(docs, worker.id)!.id}
+            name={worker.name}
+            url={signedFilePath(pendingHeadshot(docs, worker.id)!.id, now, secret)}
+          />
+        ) : approvedHeadshot(docs, worker.id) ? (
+          <figure className="space-y-2 rounded-2xl bg-white p-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={signedFilePath(approvedHeadshot(docs, worker.id)!.id, now, secret)}
+              alt={"Approved headshot of " + worker.name}
+              className="mx-auto h-36 w-36 rounded-full object-cover"
+            />
+            <figcaption className="text-center text-sm font-semibold">Approved</figcaption>
+          </figure>
+        ) : (
+          <p className="rounded-2xl bg-white p-4 text-sm">
+            {workerInitials(worker.name)} · Photo pending
+          </p>
+        )}
+      </section>
       <TicketCheckList workerId={worker.id} items={ordered} />
       <section className="space-y-2 rounded-2xl border border-navy/10 bg-white p-4">
         <h2 className="text-sm font-semibold">Safety info</h2>

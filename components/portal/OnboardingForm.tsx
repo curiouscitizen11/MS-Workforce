@@ -4,6 +4,7 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { saveProfile, saveTicketStep } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
+import { HeadshotForm } from "@/components/portal/HeadshotForm"
 import { TicketChoices } from "@/components/portal/TicketChoices"
 import { TicketMeta, ticketDraft, type TicketDraft } from "@/components/portal/TicketMeta"
 import { TicketPhotoPair } from "@/components/portal/TicketPhotos"
@@ -39,7 +40,7 @@ import type { PhotoRef } from "@/lib/portal/ticket-photos"
 
 export function OnboardingForm({ worker, photos }: { worker: Worker; photos: PhotoRef[] }) {
   const router = useRouter()
-  const [step, setStep] = useState(worker.onboardingSubmitted ? 5 : 0)
+  const [step, setStep] = useState(worker.onboardingSubmitted ? 6 : 0)
   const [error, setError] = useState("")
   const [pending, start] = useTransition()
   const [signature, setSignature] = useState<string | null>(worker.signaturePng || null)
@@ -63,7 +64,7 @@ export function OnboardingForm({ worker, photos }: { worker: Worker; photos: Pho
 
   return (
     <div className="space-y-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Step {Math.min(step + 1, 6)} of 6</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Step {Math.min(step + 1, 7)} of 7</p>
       {step === 0 ? (
         <Form
           pending={pending}
@@ -204,7 +205,8 @@ export function OnboardingForm({ worker, photos }: { worker: Worker; photos: Pho
           }
         />
       ) : null}
-      {step === 5 ? (
+      {step === 5 ? <HeadshotForm onDone={() => setStep(6)} /> : null}
+      {step === 6 ? (
         <form
           className="space-y-3"
           onSubmit={(event) => {
@@ -259,7 +261,7 @@ export function OnboardingForm({ worker, photos }: { worker: Worker; photos: Pho
           </button>
         </form>
       ) : null}
-      {error && step !== 5 ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
+      {error && step !== 6 ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
     </div>
   )
 }

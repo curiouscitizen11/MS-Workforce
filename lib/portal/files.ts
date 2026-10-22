@@ -27,6 +27,26 @@ export function contentTypeFor(kind: NonNullable<ReturnType<typeof sniffFile>>):
   return "image/heic"
 }
 
+const PNG_KEEP = new Set(["IHDR", "PLTE", "IDAT", "IEND", "tRNS"])
+
+/** Drop PNG text and location chunks. The picture itself stays. */
+export function stripPngMetadata(input: Buffer): Buffer {
+  const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+  if (input.length < 8 || !input.subarray(0, 8).equals(signature)) return input
+  const parts: Buffer[] = [signature]
+  let i = 8
+  while (i + 12 <= input.length) {
+    const length = input.readUInt32BE(i)
+    const type = input.subarray(i + 4, i + 8).toString("ascii")
+    const end = i + 12 + length
+    if (length < 0 || end > input.length) break
+    if (PNG_KEEP.has(type)) parts.push(input.subarray(i, end))
+    if (type === "IEND") break
+    i = end
+  }
+  return Buffer.concat(parts)
+}
+
 /** Drop the JPEG APP1 segment, which is where cameras store location data. */
 export function stripJpegExif(input: Buffer): Buffer {
   if (input.length < 4 || input[0] !== 0xff || input[1] !== 0xd8) return input

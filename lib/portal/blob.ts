@@ -8,10 +8,10 @@ export function blobConfigured(): boolean {
   return !isMock() && Boolean(token())
 }
 
-export async function storePrivateBlob(id: string, bytes: Buffer, contentType: string): Promise<string | null> {
+export async function storePrivateBlob(id: string, bytes: Buffer, contentType: string, folder = "portal"): Promise<string | null> {
   if (!blobConfigured()) return null
   const url = new URL("https://vercel.com/api/blob")
-  url.searchParams.set("pathname", "portal/" + id)
+  url.searchParams.set("pathname", folder.replace(/\/+$/, "") + "/" + id)
   const response = await fetch(url, {
     method: "PUT",
     headers: {
