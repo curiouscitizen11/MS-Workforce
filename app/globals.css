@@ -177,6 +177,161 @@ main section.bg-navy::before {
 }
 main .page-enter > section.bg-navy:first-of-type::before { display: none; }
 /* Cards lift off the tint */
+/* Portal themes. Public pages do not use .portal-root. Hex values match lib/portal/theme.ts. */
+.portal-root {
+  background: #0a1a2f;
+  color: #e8eef4;
+  color-scheme: dark;
+}
+.portal-root[data-theme="dark"] {
+  --p-page: #0a1a2f;
+  --p-card: #132b47;
+  --p-text: #e8eef4;
+  --p-muted: #d5e2ef;
+  --p-button: #33bfaf;
+  --p-button-text: #0a2540;
+  --p-accent: #7ddbc8;
+  --p-ok-bg: #14532d;
+  --p-ok-text: #dcfce7;
+  --p-warn-bg: #78350f;
+  --p-warn-text: #fef3c7;
+  --p-bad-bg: #7f1d1d;
+  --p-bad-text: #fee2e2;
+  --p-border: #1f6f66;
+  background: var(--p-page);
+  color: var(--p-text);
+  color-scheme: dark;
+}
+.portal-root[data-theme="light"] {
+  --p-page: #eef3f7;
+  --p-card: #ffffff;
+  --p-text: #0a2540;
+  --p-muted: #3e5166;
+  --p-button: #33bfaf;
+  --p-button-text: #0a2540;
+  --p-accent: #0f766e;
+  --p-ok-bg: #dcfce7;
+  --p-ok-text: #166534;
+  --p-warn-bg: #fef3c7;
+  --p-warn-text: #9a3412;
+  --p-bad-bg: #fee2e2;
+  --p-bad-text: #991b1b;
+  --p-border: #d5dee8;
+  background: var(--p-page);
+  color: var(--p-text);
+  color-scheme: light;
+}
+.portal-root[data-theme="dark"] .bg-white,
+.portal-root[data-theme="dark"] .bg-tint {
+  background-color: var(--p-card);
+  color: var(--p-text);
+}
+.portal-root[data-theme="dark"] [class*="border-navy"] {
+  border-color: var(--p-border);
+}
+.portal-root[data-theme="dark"] [class*="text-navy"] {
+  color: var(--p-text);
+}
+.portal-root[data-theme="dark"] [class*="text-navy/"] {
+  color: var(--p-muted);
+}
+.portal-root[data-theme="dark"] .text-teal-600,
+.portal-root[data-theme="dark"] [class*="text-teal-600"] {
+  color: var(--p-accent);
+}
+.portal-root[data-theme="dark"] [class*="B91C1C"] {
+  color: #fca5a5;
+}
+.portal-root[data-theme="dark"] [class*="B45309"] {
+  color: #fcd34d;
+}
+.portal-root[data-theme="dark"] [class*="15803D"] {
+  color: #86efac;
+}
+.portal-root[data-theme="dark"] .pill-dark {
+  border-color: var(--p-text);
+  background: var(--p-text);
+  color: var(--p-page);
+}
+.portal-root[data-theme="dark"] .pill-line-dark {
+  border-color: var(--p-accent);
+  color: var(--p-text);
+}
+.portal-root[data-theme="dark"] .pill-line-dark:hover {
+  background: var(--p-accent);
+  color: var(--p-button-text);
+}
+.portal-root .portal-nav {
+  background: var(--p-card);
+  border-top: 1px solid var(--p-border);
+  color: var(--p-muted);
+}
+.portal-root .portal-nav a[aria-current="page"] {
+  color: var(--p-accent);
+}
+.portal-root .portal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 999px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.portal-root .portal-chip-ok { background: var(--p-ok-bg); color: var(--p-ok-text); }
+.portal-root .portal-chip-warning,
+.portal-root .portal-chip-restricted,
+.portal-root .portal-chip-pending { background: var(--p-warn-bg); color: var(--p-warn-text); }
+.portal-root .portal-chip-do-not-book { background: var(--p-bad-bg); color: var(--p-bad-text); }
+.portal-root .portal-chip-neutral { background: var(--p-card); color: var(--p-text); border: 1px solid var(--p-border); }
+.portal-root .portal-choice {
+  border-color: var(--p-border);
+  background: transparent;
+  color: var(--p-text);
+}
+.portal-root .portal-tile {
+  display: flex;
+  min-height: 96px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 1rem;
+  border: 1px solid var(--p-border);
+  background: var(--p-card);
+  padding: 12px;
+  color: var(--p-text);
+  -webkit-tap-highlight-color: transparent;
+}
+.portal-root .portal-tile:focus-visible {
+  outline: 2px solid var(--p-button);
+  outline-offset: 3px;
+}
+.portal-root .portal-tile:active { transform: scale(0.98); }
+.portal-root .portal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (min-width: 640px) {
+  .portal-root .portal-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+.portal-root .portal-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 1.5rem;
+  border-radius: 999px;
+  background: var(--p-button);
+  color: var(--p-button-text);
+  padding: 0 0.4rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) {
+  .portal-root .portal-tile:active { transform: none; }
+}
+
 main section.bg-tint .rounded-3xl.bg-white,
 main section.bg-tint .rounded-2xl.bg-white,
 main section.bg-tint li.bg-white {

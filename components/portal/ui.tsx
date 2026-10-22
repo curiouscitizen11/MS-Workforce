@@ -1,19 +1,19 @@
 import type { Badge } from "@/lib/portal/compliance"
 
 const chipClass = {
-  ok: "bg-[#DCFCE7] text-[#15803D]",
-  warning: "bg-[#FEF3C7] text-[#B45309]",
-  restricted: "bg-[#FEF3C7] text-[#B45309]",
-  "do-not-book": "bg-[#FEE2E2] text-[#B91C1C]",
-  pending: "bg-[#FEF3C7] text-[#B45309]",
-  neutral: "bg-navy-50 text-navy",
+  ok: "portal-chip portal-chip-ok",
+  warning: "portal-chip portal-chip-warning",
+  restricted: "portal-chip portal-chip-restricted",
+  "do-not-book": "portal-chip portal-chip-do-not-book",
+  pending: "portal-chip portal-chip-pending",
+  neutral: "portal-chip portal-chip-neutral",
 } as const
 
 export type ChipLevel = keyof typeof chipClass
 
 export function StatusChip({ level, children }: { level: ChipLevel; children: React.ReactNode }) {
   return (
-    <span className={"inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold " + chipClass[level]}>
+    <span className={chipClass[level]}>
       <ChipIcon level={level} />
       {children}
     </span>

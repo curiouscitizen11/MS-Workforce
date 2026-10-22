@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { cookies } from "next/headers"
 import { PortalNav } from "@/components/portal/Nav"
 import { readSession } from "@/lib/portal/session"
+import { THEME_COOKIE, themeFromCookie } from "@/lib/portal/theme"
 
 export const metadata: Metadata = {
   title: {
@@ -28,8 +30,9 @@ export const dynamic = "force-dynamic"
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
   const current = await readSession()
   const home = current?.worker.role === "admin" ? "/portal/admin" : "/portal"
+  const theme = themeFromCookie(cookies().get(THEME_COOKIE)?.value)
   return (
-    <div className="portal-root min-h-svh bg-tint text-navy">
+    <div className="portal-root min-h-svh" data-theme={theme}>
       <header className="bg-navy text-white">
         <div className="mx-auto flex h-14 max-w-xl items-center justify-between px-4">
           <Link href={current ? home : "/portal/login"} className="leading-none">
