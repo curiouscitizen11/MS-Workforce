@@ -157,7 +157,7 @@ describe("portal flows", () => {
       signaturePng: "data:image/png;base64,abc",
     })
     expect(refused.ok).toBe(false)
-    const result = await submitTimesheet(ctx, {
+    const missingStart = await submitTimesheet(ctx, {
       workerId: "w-sam",
       offerId: "offer-sam-today",
       workDate: "2026-10-17",
@@ -171,13 +171,41 @@ describe("portal flows", () => {
       supervisorConfirmed: true,
       signaturePng: "data:image/png;base64,abc",
     })
+    expect(missingStart.ok).toBe(false)
+    const result = await submitTimesheet(ctx, {
+      workerId: "w-sam",
+      offerId: "offer-sam-today",
+      workDate: "2026-10-17",
+      start: "07:00",
+      finish: "15:30",
+      breakMinutes: 30,
+      breakStart: "12:00",
+      breakNote: "took lunch",
+      incident: false,
+      workerConfirmed: true,
+      supervisorName: "Pat Riley",
+      supervisorRole: "Site supervisor",
+      supervisorConfirmed: true,
+      signaturePng: "data:image/png;base64,abc",
+    })
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.hours).toBe(8)
     expect(result.status).toBe("Approved")
-    const changed = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 15 })
+    expect((await ctx.store.timesheets.get(result.id))?.breakStart).toBe("12:00")
+    expect((await ctx.store.timesheets.get(result.id))?.breakNote).toBeUndefined()
+    const changed = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 15, breakStart: "12:00" })
     expect(changed.ok).toBe(false)
     expect((await ctx.store.timesheets.get(result.id))?.breakMinutes).toBe(30)
+    const short = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "10:00", breakMinutes: 0 })
+    expect(short.ok).toBe(true)
+    expect((await ctx.store.timesheets.get(result.id))?.breakMinutes).toBe(0)
+    expect((await ctx.store.timesheets.get(result.id))?.breakStart).toBeUndefined()
+    expect((await ctx.store.timesheets.get(result.id))?.totalHours).toBe(3)
+    const longAgain = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 0 })
+    expect(longAgain.ok).toBe(false)
+    const restored = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "12:00" })
+    expect(restored.ok).toBe(true)
     const messages = await ctx.store.notifications.all()
     const body = messages.map((item) => item.body).join("\n")
     expect(body).toContain("This signature is the approval")

@@ -373,6 +373,7 @@ export type Timesheet = {
   start: string
   finish: string
   breakMinutes: number
+  breakStart?: string
   breakNote?: string
   totalHours: number
   tasks: string[]

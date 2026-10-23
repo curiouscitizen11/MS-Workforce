@@ -6,7 +6,7 @@ import { lodgeTimesheet } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { fieldClass } from "@/components/portal/ui"
 import { formatDate } from "@/lib/portal/dates"
-import { STANDARD_BREAK_MINUTES, formatHours, hoursWarnings, paidHours } from "@/lib/portal/hours"
+import { STANDARD_BREAK_MINUTES, breakChoiceProblem, formatBreak, formatHours, hoursWarnings, paidHours, parseTime } from "@/lib/portal/hours"
 import { SUPERVISOR_ROLES, TIMESHEET_TASKS } from "@/lib/portal/types"
 
 export type TimesheetShift = {
@@ -27,7 +27,7 @@ type Payload = {
   start: string
   finish: string
   breakMinutes: number
-  breakNote?: string
+  breakStart?: string
   tasks: string[]
   taskNote?: string
   incident: boolean
@@ -62,7 +62,8 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
   const shift = dayShifts.find((item) => item.id === offerId) || dayShifts[0]
   const [start, setStart] = useState(shift?.start || "07:00")
   const [finish, setFinish] = useState(shift?.finish || "15:30")
-  const breakMinutes = STANDARD_BREAK_MINUTES
+  const [breakChoice, setBreakChoice] = useState<0 | 30>(STANDARD_BREAK_MINUTES)
+  const [breakStart, setBreakStart] = useState("")
   const [tasks, setTasks] = useState<string[]>([])
   const [taskNote, setTaskNote] = useState("")
   const [incident, setIncident] = useState<boolean | null>(null)
@@ -78,7 +79,25 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
   const [error, setError] = useState("")
   const [queued, setQueued] = useState("")
   const [pending, startTransition] = useTransition()
+  const span = useMemo(() => {
+    const startMin = parseTime(start)
+    const finishMin = parseTime(finish)
+    if (startMin === null || finishMin === null) return null
+    return finishMin - startMin
+  }, [start, finish])
+  const shortShift = span !== null && span > 0 && span < 4 * 60
+  const breakMinutes = shortShift ? breakChoice : STANDARD_BREAK_MINUTES
   const preview = useMemo(() => paidHours(start, finish, breakMinutes), [start, finish, breakMinutes])
+  const breakProblem = breakChoiceProblem({ start, finish, breakMinutes, breakStart })
+  const breakSlots = useMemo(() => {
+    const startMin = parseTime(start)
+    const finishMin = parseTime(finish)
+    if (startMin === null || finishMin === null) return TIMES
+    return TIMES.filter((time) => {
+      const minutes = parseTime(time)
+      return minutes !== null && minutes >= startMin && minutes + STANDARD_BREAK_MINUTES <= finishMin
+    })
+  }, [start, finish])
   const warnings = preview.ok ? hoursWarnings(preview.hours) : []
   const needsConfirm = warnings.some((warning) => warning.level === "confirm")
 
@@ -86,19 +105,21 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
     const raw = window.localStorage.getItem(DRAFT_KEY)
     if (!raw) return
     try {
-      const saved = JSON.parse(raw) as { offerId?: string; start?: string; finish?: string; workDate?: string }
+      const saved = JSON.parse(raw) as { offerId?: string; start?: string; finish?: string; workDate?: string; breakMinutes?: number; breakStart?: string }
       if (saved.workDate) setWorkDate(saved.workDate)
       if (saved.offerId) setOfferId(saved.offerId)
       if (saved.start) setStart(saved.start)
       if (saved.finish) setFinish(saved.finish)
+      if (saved.breakMinutes === 0) setBreakChoice(0)
+      if (saved.breakStart) setBreakStart(saved.breakStart)
     } catch {
       window.localStorage.removeItem(DRAFT_KEY)
     }
   }, [])
 
   useEffect(() => {
-    window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ offerId, workDate, start, finish, breakMinutes, tasks, incident, workerNote }))
-  }, [offerId, workDate, start, finish, breakMinutes, tasks, incident, workerNote])
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ offerId, workDate, start, finish, breakMinutes, breakStart, tasks, incident, workerNote }))
+  }, [offerId, workDate, start, finish, breakMinutes, breakStart, tasks, incident, workerNote])
 
   useEffect(() => {
     const raw = window.localStorage.getItem(QUEUE_KEY)
@@ -111,7 +132,7 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
       let sentId = ""
       for (const item of queue) {
         try {
-          const result = await lodgeTimesheet({ ...item, breakMinutes: STANDARD_BREAK_MINUTES })
+          const result = await lodgeTimesheet(item)
           if (result.ok) sentId = result.id
         } catch {
           left.push(item)
@@ -150,6 +171,7 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
       start,
       finish,
       breakMinutes,
+      breakStart: breakMinutes === 0 ? undefined : breakStart,
       tasks,
       taskNote: tasks.includes("Other, please explain") ? taskNote : undefined,
       incident,
@@ -181,6 +203,10 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
           }
           if (!preview.ok) {
             setError(preview.error)
+            return
+          }
+          if (breakProblem) {
+            setError(breakProblem)
             return
           }
           if (incident === null) {
@@ -290,10 +316,33 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
           </div>
           <fieldset>
             <legend className="text-sm font-semibold">Unpaid break</legend>
+            {shortShift ? (
+              <label className="mt-2 flex min-h-12 items-center gap-3 text-sm font-semibold">
+                <input type="radio" name="break" value="0" checked={breakMinutes === 0} onChange={() => setBreakChoice(0)} />
+                No break
+              </label>
+            ) : null}
             <label className="mt-2 flex min-h-12 items-center gap-3 text-sm font-semibold">
-              <input type="radio" name="break" value="30" checked onChange={() => undefined} />
+              <input
+                type="radio"
+                name="break"
+                value="30"
+                checked={breakMinutes === STANDARD_BREAK_MINUTES}
+                onChange={() => setBreakChoice(STANDARD_BREAK_MINUTES)}
+              />
               30-minute break
             </label>
+            {breakMinutes === STANDARD_BREAK_MINUTES ? (
+              <label className="mt-2 block text-sm font-semibold" htmlFor="break-start">
+                Break start time
+                <select id="break-start" className={fieldClass} value={breakStart} onChange={(event) => setBreakStart(event.target.value)}>
+                  <option value="">Choose a time</option>
+                  {breakSlots.map((time) => (
+                    <option key={time}>{time}</option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
           </fieldset>
           <p className="rounded-2xl bg-white px-3 py-3" data-testid="paid-hours">
             <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Paid hours today</span>
@@ -371,7 +420,7 @@ export function TimesheetForm({ shifts, today, workerName }: { shifts: Timesheet
             </p>
             <p className="text-sm">{shift ? formatDate(shift.workDate) : ""}</p>
             <p className="mt-2 text-base font-semibold">
-              Start {start} · Finish {finish} · 30-minute break · {preview.ok ? formatHours(preview.hours) : "0.0"} paid hours
+              Start {start} · Finish {finish} · {formatBreak(breakMinutes, breakStart)} · {preview.ok ? formatHours(preview.hours) : "0.0"} paid hours
             </p>
             {tasks.length ? <p className="mt-1 text-sm">{tasks.join(", ")}</p> : null}
             <p className="mt-1 text-sm">Incident reported: {incident ? "Yes" : "No"}</p>

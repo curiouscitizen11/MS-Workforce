@@ -5,7 +5,7 @@ import { encryptString } from "@/lib/portal/crypto"
 import { createMemoryStore } from "@/lib/portal/store"
 import { sydneyToday } from "@/lib/portal/dates"
 import { signedFilePath, stripJpegExif, verifyFileToken } from "@/lib/portal/files"
-import { formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
+import { breakChoiceProblem, formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
 import { payFortnight, sydneyInstant, xeroCsv } from "@/lib/portal/pay"
 import { QUESTIONS, scoreAnswers } from "@/lib/portal/induction"
 import { toNotionProperties } from "@/lib/portal/notion/map"
@@ -140,6 +140,18 @@ describe("hours, privacy, induction and file links", () => {
     expect(hoursWarnings(12.5)[0]?.level).toBe("confirm")
     expect(hoursWarnings(3.5)[0]?.level).toBe("confirm")
     expect(hoursWarnings(1.5)).toHaveLength(1)
+    expect(breakChoiceProblem({ start: "07:00", finish: "15:30", breakMinutes: 0 })).toMatch(/4 hours/)
+    expect(breakChoiceProblem({ start: "07:00", finish: "11:00", breakMinutes: 0 })).toMatch(/4 hours/)
+    expect(breakChoiceProblem({ start: "07:00", finish: "10:45", breakMinutes: 0 })).toBeNull()
+    expect(breakChoiceProblem({ start: "07:00", finish: "10:45", breakMinutes: 15 })).toMatch(/no break/)
+    expect(breakChoiceProblem({ start: "07:00", finish: "15:30", breakMinutes: 30 })).toMatch(/break start/)
+    expect(breakChoiceProblem({ start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "12:00" })).toBeNull()
+    expect(breakChoiceProblem({ start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "07:00" })).toBeNull()
+    expect(breakChoiceProblem({ start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "15:00" })).toBeNull()
+    expect(breakChoiceProblem({ start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "15:15" })).toMatch(/clock off/)
+    expect(breakChoiceProblem({ start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "06:45" })).toMatch(/clock off/)
+    expect(breakChoiceProblem({ start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "12:07" })).toMatch(/15-minute/)
+    expect(breakChoiceProblem({ start: "07:00", finish: "10:00", breakMinutes: 0, breakStart: "08:00" })).toBeNull()
   })
 
   it("keeps 5:59 pm on the cut-off Wednesday and rolls 6:01 pm to the next fortnight", () => {

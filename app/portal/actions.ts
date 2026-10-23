@@ -300,7 +300,7 @@ export async function lodgeTimesheet(input: {
   start: string
   finish: string
   breakMinutes: number
-  breakNote?: string
+  breakStart?: string
   tasks?: string[]
   taskNote?: string
   incident: boolean
@@ -325,7 +325,7 @@ export async function lodgeTimesheet(input: {
   return result
 }
 
-export async function adjustTimesheet(sheetId: string, patch: { start: string; finish: string; breakMinutes: number; note?: string }) {
+export async function adjustTimesheet(sheetId: string, patch: { start: string; finish: string; breakMinutes: number; breakStart?: string; note?: string }) {
   const current = await readSession()
   if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
   const result = await correctTimesheet(await ctx(), current.worker.id, sheetId, patch)

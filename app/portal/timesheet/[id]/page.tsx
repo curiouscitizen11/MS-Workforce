@@ -3,7 +3,7 @@ import { TimesheetAdmin } from "@/components/portal/TimesheetAdmin"
 import { DemoBanner, Heading } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
 import { formatDate } from "@/lib/portal/dates"
-import { formatHours } from "@/lib/portal/hours"
+import { formatBreak, formatHours } from "@/lib/portal/hours"
 import { MS_PHONE, cutoffMessage } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
@@ -49,9 +49,9 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
           <dt className="text-navy/70">Finish</dt>
           <dd className="font-semibold">{sheet.finish}</dd>
         </div>
-        <div>
+        <div className="min-w-0">
           <dt className="text-navy/70">Break</dt>
-          <dd className="font-semibold">{sheet.breakMinutes === 30 ? "30-minute break" : sheet.breakMinutes + " min"}</dd>
+          <dd className="break-words font-semibold">{formatBreak(sheet.breakMinutes, sheet.breakStart)}</dd>
         </div>
       </dl>
       <p className="text-sm">
@@ -73,7 +73,9 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
       <Link href="/portal" className="pill pill-teal w-full">
         Back to home
       </Link>
-      {worker.role === "admin" ? <TimesheetAdmin sheetId={sheet.id} start={sheet.start} finish={sheet.finish} /> : null}
+      {worker.role === "admin" ? (
+        <TimesheetAdmin sheetId={sheet.id} start={sheet.start} finish={sheet.finish} breakMinutes={sheet.breakMinutes} breakStart={sheet.breakStart} />
+      ) : null}
     </div>
   )
 }

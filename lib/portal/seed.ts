@@ -293,6 +293,7 @@ export function buildSeed(now = new Date()): SeedData {
       start: "07:00",
       finish: "15:30",
       breakMinutes: 30,
+      breakStart: "12:00",
       totalHours: 8,
       tasks: ["Carrying materials"],
       incident: false,

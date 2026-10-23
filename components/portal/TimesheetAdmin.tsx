@@ -1,23 +1,40 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { adjustTimesheet, markTimesheetQueried } from "@/app/portal/actions"
-import { STANDARD_BREAK_MINUTES } from "@/lib/portal/hours"
 import { fieldClass } from "@/components/portal/ui"
+import { STANDARD_BREAK_MINUTES, parseTime } from "@/lib/portal/hours"
 
 export function TimesheetAdmin({
   sheetId,
   start,
   finish,
+  breakMinutes,
+  breakStart,
 }: {
   sheetId: string
   start: string
   finish: string
+  breakMinutes: number
+  breakStart?: string
 }) {
   const router = useRouter()
+  const [startValue, setStartValue] = useState(start)
+  const [finishValue, setFinishValue] = useState(finish)
+  const [choice, setChoice] = useState<0 | 30>(breakMinutes === 0 ? 0 : STANDARD_BREAK_MINUTES)
+  const [breakAt, setBreakAt] = useState(breakStart || "")
   const [error, setError] = useState("")
   const [pending, startTransition] = useTransition()
+  const short = useMemo(() => {
+    const startMin = parseTime(startValue)
+    const finishMin = parseTime(finishValue)
+    if (startMin === null || finishMin === null) return false
+    const span = finishMin - startMin
+    return span > 0 && span < 4 * 60
+  }, [startValue, finishValue])
+  const minutes = short && choice === 0 ? 0 : STANDARD_BREAK_MINUTES
+
   return (
     <form
       className="space-y-3 rounded-2xl border border-navy/10 bg-white p-3"
@@ -29,9 +46,10 @@ export function TimesheetAdmin({
             data.get("mode") === "query"
               ? await markTimesheetQueried(sheetId, String(data.get("note") || ""))
               : await adjustTimesheet(sheetId, {
-                  start: String(data.get("start") || start),
-                  finish: String(data.get("finish") || finish),
-                  breakMinutes: STANDARD_BREAK_MINUTES,
+                  start: startValue,
+                  finish: finishValue,
+                  breakMinutes: minutes,
+                  breakStart: minutes === 0 ? undefined : breakAt,
                   note: String(data.get("note") || ""),
                 })
           if (!result.ok) setError(result.error)
@@ -41,10 +59,35 @@ export function TimesheetAdmin({
     >
       <p className="text-sm font-semibold">Admin correction</p>
       <div className="grid grid-cols-2 gap-2">
-        <input name="start" aria-label="Corrected start" defaultValue={start} className={fieldClass} />
-        <input name="finish" aria-label="Corrected finish" defaultValue={finish} className={fieldClass} />
+        <input name="start" aria-label="Corrected start" value={startValue} onChange={(event) => setStartValue(event.target.value)} className={fieldClass} />
+        <input name="finish" aria-label="Corrected finish" value={finishValue} onChange={(event) => setFinishValue(event.target.value)} className={fieldClass} />
       </div>
-      <p className="text-sm font-semibold">30-minute break</p>
+      <fieldset>
+        <legend className="text-sm font-semibold">Unpaid break</legend>
+        {short ? (
+          <label className="mt-2 flex min-h-12 items-center gap-3 text-sm font-semibold">
+            <input type="radio" name="admin-break" value="0" checked={minutes === 0} onChange={() => setChoice(0)} />
+            No break
+          </label>
+        ) : null}
+        <label className="mt-2 flex min-h-12 items-center gap-3 text-sm font-semibold">
+          <input type="radio" name="admin-break" value="30" checked={minutes === STANDARD_BREAK_MINUTES} onChange={() => setChoice(STANDARD_BREAK_MINUTES)} />
+          30-minute break
+        </label>
+        {minutes === STANDARD_BREAK_MINUTES ? (
+          <label className="mt-2 block text-sm font-semibold" htmlFor="admin-break-start">
+            Break start time
+            <input
+              id="admin-break-start"
+              aria-label="Break start"
+              value={breakAt}
+              placeholder="12:00"
+              onChange={(event) => setBreakAt(event.target.value)}
+              className={fieldClass}
+            />
+          </label>
+        ) : null}
+      </fieldset>
       <input name="note" aria-label="Correction note" placeholder="What changed" className={fieldClass} />
       {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       <button name="mode" value="correct" className="pill pill-teal w-full" disabled={pending}>

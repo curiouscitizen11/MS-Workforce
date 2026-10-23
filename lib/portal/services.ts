@@ -43,7 +43,7 @@ import {
   requiredPhotoSlots,
   slotsFromWorker,
 } from "@/lib/portal/ticket-photos"
-import { formatHours, hoursWarnings, onQuarterHour, paidHours, standardBreakProblem } from "@/lib/portal/hours"
+import { breakChoiceProblem, formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
 import { MS_PHONE, fortnightContaining, olderThanDays, payFortnight, timesheetReminder } from "@/lib/portal/pay"
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
@@ -914,6 +914,7 @@ export async function submitTimesheet(
     start: string
     finish: string
     breakMinutes: number
+    breakStart?: string
     breakNote?: string
     tasks?: string[]
     taskNote?: string
@@ -949,10 +950,15 @@ export async function submitTimesheet(
     return fail("Start and finish need to be between 5:00 am and 8:00 pm.")
   }
   const breakMinutes = Number(input.breakMinutes)
-  const breakProblem = standardBreakProblem(breakMinutes)
-  if (breakProblem) return fail(breakProblem)
   const hours = paidHours(input.start, input.finish, breakMinutes)
   if (!hours.ok) return hours
+  const breakProblem = breakChoiceProblem({
+    start: input.start,
+    finish: input.finish,
+    breakMinutes,
+    breakStart: input.breakStart,
+  })
+  if (breakProblem) return fail(breakProblem)
   const warnings = hoursWarnings(hours.hours)
   if (warnings.some((warning) => warning.level === "confirm") && !input.confirmUnusualHours) {
     return fail(warnings.find((warning) => warning.level === "confirm")?.message || "Confirm the times.")
@@ -972,7 +978,7 @@ export async function submitTimesheet(
   const tasks = (input.tasks || []).filter((task) => TIMESHEET_TASKS.includes(task as (typeof TIMESHEET_TASKS)[number]))
   if ((input.tasks || []).length !== tasks.length) return fail("Choose tasks from the list.")
   const workerNote = input.workerNote?.trim().slice(0, 300)
-  const sensitive = texts([supervisorName, input.breakNote, input.taskNote, input.incidentNote, workerNote])
+  const sensitive = texts([supervisorName, input.taskNote, input.incidentNote, workerNote])
   if (sensitive) return fail(sensitive)
   const existing = (await ctx.store.timesheets.all()).find(
     (sheet) => sheet.workerId === input.workerId && sheet.placementRef === offer.placementRef && sheet.workDate === input.workDate,
@@ -991,7 +997,7 @@ export async function submitTimesheet(
     start: input.start,
     finish: input.finish,
     breakMinutes,
-    breakNote: input.breakNote?.trim() || undefined,
+    breakStart: breakMinutes === 0 ? undefined : input.breakStart?.trim(),
     totalHours: hours.hours,
     tasks,
     taskNote: input.taskNote?.trim() || undefined,
@@ -1027,7 +1033,7 @@ export async function submitTimesheet(
     "Date: " + formatDate(sheet.workDate),
     "Start: " + sheet.start,
     "Finish: " + sheet.finish,
-    "Unpaid break: " + sheet.breakMinutes + " minutes",
+    "Unpaid break: " + (sheet.breakMinutes === 0 ? "none" : sheet.breakMinutes + " minutes" + (sheet.breakStart ? " from " + sheet.breakStart : "")),
     "Paid hours: " + formatHours(sheet.totalHours),
     "",
     "Signed on site by " + sheet.supervisorName + (sheet.supervisorRole ? " (" + sheet.supervisorRole + ")" : "") + ".",
@@ -1058,27 +1064,34 @@ export async function correctTimesheet(
   ctx: Ctx,
   adminId: string,
   sheetId: string,
-  patch: { start: string; finish: string; breakMinutes: number; note?: string },
+  patch: { start: string; finish: string; breakMinutes: number; breakStart?: string; note?: string },
 ) {
   const admin = await ctx.store.workers.get(adminId)
   if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
   const sheet = await ctx.store.timesheets.get(sheetId)
   if (!sheet || sheet.status === "Draft") return fail("Only a signed timesheet can be corrected.")
   const breakMinutes = Number(patch.breakMinutes)
-  const breakProblem = standardBreakProblem(breakMinutes)
-  if (breakProblem) return fail(breakProblem)
   const hours = paidHours(patch.start, patch.finish, breakMinutes)
   if (!hours.ok) return hours
+  const breakProblem = breakChoiceProblem({
+    start: patch.start,
+    finish: patch.finish,
+    breakMinutes,
+    breakStart: patch.breakStart,
+  })
+  if (breakProblem) return fail(breakProblem)
   const before = JSON.stringify({
     start: sheet.start,
     finish: sheet.finish,
     breakMinutes: sheet.breakMinutes,
+    breakStart: sheet.breakStart,
     totalHours: sheet.totalHours,
     status: sheet.status,
   })
   sheet.start = patch.start
   sheet.finish = patch.finish
   sheet.breakMinutes = breakMinutes
+  sheet.breakStart = breakMinutes === 0 ? undefined : patch.breakStart?.trim()
   sheet.totalHours = hours.hours
   sheet.status = "Approved"
   sheet.corrected = true

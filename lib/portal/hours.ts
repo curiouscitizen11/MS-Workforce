@@ -8,10 +8,46 @@ export function parseTime(value: string): number | null {
 }
 
 export const STANDARD_BREAK_MINUTES = 30
+const SHORT_SHIFT_MINUTES = 4 * 60
 
-export function standardBreakProblem(minutes: number): string | null {
-  if (minutes === STANDARD_BREAK_MINUTES) return null
-  return "The unpaid break is 30 minutes."
+export function breakChoiceProblem(input: {
+  start: string
+  finish: string
+  breakMinutes: number
+  breakStart?: string
+}): string | null {
+  const startMin = parseTime(input.start)
+  const finishMin = parseTime(input.finish)
+  if (startMin === null || finishMin === null) return null
+  const span = finishMin - startMin
+  if (span <= 0) return null
+  const minutes = input.breakMinutes
+  const short = span < SHORT_SHIFT_MINUTES
+  if (short) {
+    if (minutes !== 0 && minutes !== STANDARD_BREAK_MINUTES) {
+      return "Choose no break, or a 30-minute unpaid break."
+    }
+  } else if (minutes !== STANDARD_BREAK_MINUTES) {
+    return "Shifts of 4 hours or more need a 30-minute unpaid break."
+  }
+  if (minutes === 0) return null
+  const breakStart = (input.breakStart || "").trim()
+  if (!breakStart) return "Enter the break start time."
+  const breakMin = parseTime(breakStart)
+  if (breakMin === null) return "Enter the break start as a time, like 12:00."
+  if (breakMin % 15 !== 0) return "Use 15-minute steps for the break start."
+  if (breakMin < startMin || breakMin + STANDARD_BREAK_MINUTES > finishMin) {
+    return "The break needs to start during the shift and finish before you clock off."
+  }
+  return null
+}
+
+export function formatBreak(minutes: number, breakStart?: string): string {
+  if (minutes === 0) return "No break"
+  if (minutes === STANDARD_BREAK_MINUTES) {
+    return breakStart ? "30-minute break from " + breakStart : "30-minute break"
+  }
+  return minutes + " min"
 }
 
 export function paidHours(
