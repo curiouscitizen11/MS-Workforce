@@ -526,9 +526,9 @@ function freshTicket(status: string): Ticket {
   }
 }
 
-function withWorkerEntry(previous: Ticket | undefined, status: string, entry: TicketEntry, today: string): { ok: true; ticket: Ticket; changed: boolean } | { ok: false; error: string } {
+function withWorkerEntry(previous: Ticket | undefined, status: string, entry: TicketEntry, today: string, key: string): { ok: true; ticket: Ticket; changed: boolean } | { ok: false; error: string } {
   if (status !== "Yes, I have it") return { ok: true, ticket: freshTicket(status), changed: previous?.status !== status || Boolean(previous?.checkedAt) }
-  const problem = ticketEntryProblem(entry, today)
+  const problem = ticketEntryProblem(entry, today, key)
   if (problem) return { ok: false, error: problem }
   const number = (entry.number || "").trim()
   const expiry = entry.noExpiry ? null : entry.expiry || null
@@ -561,7 +561,7 @@ export async function saveTicket(ctx: Ctx, workerId: string, type: TicketType, t
     const missing = missingPhotoMessage([{ key: type, label: TICKET_LABELS[type] }], docs, workerId)
     if (missing) return fail(missing)
   }
-  const built = withWorkerEntry(worker.tickets[type], ticket.status, ticket, sydneyToday(ctx.now))
+  const built = withWorkerEntry(worker.tickets[type], ticket.status, ticket, sydneyToday(ctx.now), type)
   if (!built.ok) return fail(built.error)
   if (ticket.status !== "Yes, I have it") await deleteLicencePhotos(ctx, workerId, type, workerId, "Removed because the worker no longer holds this card.")
   else if (built.changed) await clearPhotoSchedule(ctx, workerId, type)
@@ -604,16 +604,16 @@ export async function saveTicketAnswers(
   if (missing) return fail(missing)
   for (const type of TICKET_TYPES) {
     if (answers[type].status !== "Yes, I have it") continue
-    const problem = ticketEntryProblem(answers[type], today)
+    const problem = ticketEntryProblem(answers[type], today, type)
     if (problem) return fail(TICKET_LABELS[type] + ": " + problem)
   }
   for (const label of held.filter(isOtherLicence)) {
-    const problem = ticketEntryProblem(input.otherDetails?.[label] || {}, today)
+    const problem = ticketEntryProblem(input.otherDetails?.[label] || {}, today, label)
     if (problem) return fail(label + ": " + problem)
   }
   let changed = false
   for (const type of TICKET_TYPES) {
-    const built = withWorkerEntry(worker.tickets[type], answers[type].status, answers[type], today)
+    const built = withWorkerEntry(worker.tickets[type], answers[type].status, answers[type], today, type)
     if (!built.ok) return fail(built.error)
     if (answers[type].status === "Yes, I have it") {
       if (built.changed) await clearPhotoSchedule(ctx, workerId, type)
@@ -662,7 +662,7 @@ export async function saveOtherLicences(ctx: Ctx, workerId: string, held: string
   )
   if (missing) return fail(missing)
   for (const label of next.filter(isOtherLicence)) {
-    const problem = ticketEntryProblem(details[label] || {}, today)
+    const problem = ticketEntryProblem(details[label] || {}, today, label)
     if (problem) return fail(label + ": " + problem)
   }
   const previousHeld = worker.otherTicketsHeld || []

@@ -66,7 +66,7 @@ export function TicketEditor({
         }}
       >
         <label className="block text-sm font-semibold" htmlFor="ticket-type">
-          Update a ticket
+          Update a ticket or certificate
           <select
             id="ticket-type"
             className={fieldClass}
@@ -114,7 +114,7 @@ export function TicketEditor({
           </p>
         ) : null}
         <button className="pill pill-teal w-full" disabled={pending || !ready}>
-          Save ticket
+          Save ticket or certificate
         </button>
       </form>
       <OtherLicences initial={otherHeld} details={otherDetails} photos={savedPhotos} onSaved={onSaved} />
@@ -211,7 +211,7 @@ function OtherLicenceFields({
       }}
     >
       <fieldset>
-        <legend className="text-sm font-semibold">Other tickets you hold</legend>
+        <legend className="text-sm font-semibold">Other licences and training</legend>
         <div className="mt-2 space-y-1">
           {OTHER_TICKETS.map((item) => {
             const on = selected.includes(item)
@@ -252,7 +252,7 @@ function OtherLicenceFields({
         </p>
       ) : null}
       <button className="pill pill-teal w-full" disabled={pending || !ready}>
-        Save other tickets
+        Save licences and training
       </button>
     </form>
   )

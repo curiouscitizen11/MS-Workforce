@@ -8,7 +8,7 @@ export default async function PassPlaceholder() {
   await requireUser()
   return (
     <div className="space-y-4">
-      <Heading kicker="Site pass" title="Your worker ID card" text="Your card will show here. Builders scan it to check your tickets." />
+      <Heading kicker="Site pass" title="Your worker ID card" text="Your card will show here. Builders scan it to check your tickets and training." />
     </div>
   )
 }

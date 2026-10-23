@@ -7,7 +7,7 @@ import { getStore } from "@/lib/portal/store"
 import { TicketEditor } from "@/components/portal/TicketEditor"
 import Link from "next/link"
 
-export const metadata: Metadata = { title: "Your cards" }
+export const metadata: Metadata = { title: "Tickets & training" }
 
 export default async function TicketsPage() {
   const { worker } = await requireUser()
@@ -18,7 +18,7 @@ export default async function TicketsPage() {
     .map((doc) => ({ key: doc.licenceKey as string, side: doc.side as "front" | "back" }))
   return (
     <div className="space-y-4">
-      <Heading kicker="Tickets" title="Your cards" text="A White card is required on every job. If you have a card, type the number and expiry on it and add the front and the back. MS Workforce checks them against the photos. Changing a number, expiry or photo sends the card back for a new check. You cannot open the photos after they are saved." />
+      <Heading kicker="Tickets & training" title="Your cards and certificates" text="A White card is required on every job. Licences ask for an expiry when the card has one. Asbestos awareness and silica awareness are training certificates, so they do not ask for an expiry. Add the front and the back. MS Workforce checks them against the photos. Changing a number, expiry or photo sends the card back for a new check. You cannot open the photos after they are saved." />
       <ul className="space-y-2">
         {check.tickets.map((ticket) => {
           const record = worker.tickets[ticket.type]

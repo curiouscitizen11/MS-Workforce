@@ -114,6 +114,24 @@ describe("worker ticket number and expiry", () => {
     expect(replaced?.tickets.heights.number).toBeUndefined()
   })
 
+  it("stores a training certificate without an expiry, and still requires one on a licence", async () => {
+    const ctx = harness()
+    await pair(ctx, "Asbestos awareness")
+    const training = await saveOtherLicences(ctx, "w-sam", ["Asbestos awareness"], { "Asbestos awareness": { number: "AA-100" } })
+    expect(training.ok).toBe(true)
+    expect((await ctx.store.workers.get("w-sam"))?.licenceChecks?.["Asbestos awareness"]?.expiry).toBeNull()
+    await pair(ctx, "Silica awareness")
+    const silica = await saveOtherLicences(ctx, "w-sam", ["Asbestos awareness", "Silica awareness"], {
+      "Asbestos awareness": { number: "AA-100" },
+      "Silica awareness": { number: "SA-20" },
+    })
+    expect(silica.ok).toBe(true)
+    await pair(ctx, "Forklift (LF)")
+    const licence = await saveOtherLicences(ctx, "w-sam", ["Forklift (LF)"], { "Forklift (LF)": { number: "LF-1" } })
+    expect(licence.ok).toBe(false)
+    if (!licence.ok) expect(licence.error).toMatch(/expiry/i)
+  })
+
   it("stores a number on an other licence and keeps a matching check", async () => {
     const ctx = harness()
     await pair(ctx, "Forklift (LF)")

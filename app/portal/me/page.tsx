@@ -41,7 +41,7 @@ export default async function MePage() {
       )}
       <nav className="grid gap-2" aria-label="More">
         <Link href="/portal/tickets" className="portal-tile">
-          Tickets and documents
+          Tickets & training
         </Link>
         <Link href="/portal/inductions" className="portal-tile">
           Inductions

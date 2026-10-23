@@ -124,7 +124,7 @@ export default async function DashboardPage() {
         <Tile href="/portal/offers" label="Shifts" count={waiting} countLabel={waiting + " offers waiting"} icon={<ShiftsIcon />} />
         <Tile href="/portal/timesheet" label="Hours" count={unsigned} countLabel={unsigned + " days not signed"} icon={<HoursIcon />} />
         <Tile href="/portal/pass" label="Site pass" icon={<PassIcon />} />
-        <Tile href="/portal/tickets" label="Tickets and documents" count={ticketActions} countLabel={ticketActions + " needing action"} icon={<TicketsIcon />} />
+        <Tile href="/portal/tickets" label="Tickets & training" count={ticketActions} countLabel={ticketActions + " needing action"} icon={<TicketsIcon />} />
         <Tile href="/portal/inductions" label="Inductions" count={todos} countLabel={todos + " to do"} icon={<InductionIcon />} />
         <Tile href="/portal/me" label="My details" icon={<DetailsIcon />} />
         <Tile href="/portal/help" label="Help" icon={<HelpIcon />} />
@@ -156,7 +156,7 @@ export default async function DashboardPage() {
       ) : null}
       {expiring.length ? (
         <section className="rounded-2xl border border-navy/10 bg-white p-4">
-          <h2 className="text-sm font-semibold">Tickets to watch</h2>
+          <h2 className="text-sm font-semibold">Tickets & training to watch</h2>
           <ul className="mt-2 space-y-2">
             {expiring.slice(0, 3).map((ticket) => (
               <li key={ticket.type} className="flex items-center justify-between gap-2 text-sm">

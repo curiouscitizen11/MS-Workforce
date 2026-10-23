@@ -1,6 +1,7 @@
 "use client"
 
 import { fieldClass } from "@/components/portal/ui"
+import { asksForExpiry } from "@/lib/portal/ticket-entry"
 
 export type TicketDraft = { number: string; expiry: string; noExpiry: boolean }
 
@@ -25,6 +26,7 @@ export function TicketMeta({
   draft: TicketDraft
   onChange: (next: TicketDraft) => void
 }) {
+  const showExpiry = asksForExpiry(id.replace(/^other-/, ""))
   return (
     <div className="space-y-2">
       <label className="block text-sm font-semibold" htmlFor={id + "-number"}>
@@ -39,28 +41,32 @@ export function TicketMeta({
           onChange={(event) => onChange({ ...draft, number: event.target.value })}
         />
       </label>
-      <label className="block text-sm font-semibold" htmlFor={id + "-expiry"}>
-        Expiry date
-        <input
-          id={id + "-expiry"}
-          name={id + "-expiry"}
-          type="date"
-          value={draft.noExpiry ? "" : draft.expiry}
-          disabled={draft.noExpiry}
-          className={fieldClass}
-          onChange={(event) => onChange({ ...draft, expiry: event.target.value })}
-        />
-      </label>
-      <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-        <input
-          type="checkbox"
-          name={id + "-no-expiry"}
-          className="h-5 w-5"
-          checked={draft.noExpiry}
-          onChange={(event) => onChange({ ...draft, expiry: event.target.checked ? "" : draft.expiry, noExpiry: event.target.checked })}
-        />
-        This card doesn&apos;t expire
-      </label>
+      {showExpiry ? (
+        <>
+          <label className="block min-w-0 text-sm font-semibold" htmlFor={id + "-expiry"}>
+            Expiry date
+            <input
+              id={id + "-expiry"}
+              name={id + "-expiry"}
+              type="date"
+              value={draft.noExpiry ? "" : draft.expiry}
+              disabled={draft.noExpiry}
+              className={fieldClass + " box-border max-w-full min-w-0"}
+              onChange={(event) => onChange({ ...draft, expiry: event.target.value })}
+            />
+          </label>
+          <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+            <input
+              type="checkbox"
+              name={id + "-no-expiry"}
+              className="h-5 w-5"
+              checked={draft.noExpiry}
+              onChange={(event) => onChange({ ...draft, expiry: event.target.checked ? "" : draft.expiry, noExpiry: event.target.checked })}
+            />
+            This card doesn&apos;t expire
+          </label>
+        </>
+      ) : null}
     </div>
   )
 }

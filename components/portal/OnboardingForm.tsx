@@ -327,7 +327,7 @@ function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoR
       }}
     >
       <p className="text-sm leading-relaxed text-navy/80">
-        If you have a card, type the number and the expiry printed on it, then add a photo of the front and the back. You need both photos before you can continue. MS Workforce checks the number and expiry against the photos. You will not be able to open the photos again.
+        If you have a licence or a training certificate, type the number on it. Add an expiry only when the card has one. Asbestos awareness and silica awareness do not expire. Then add a photo of the front and the back. You need both photos before you can continue. MS Workforce checks them against the photos. You will not be able to open the photos again.
       </p>
       {TICKET_TYPES.map((type) => (
         <div key={type} className="space-y-2">
@@ -357,7 +357,7 @@ function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoR
         </div>
       ))}
       <fieldset>
-        <legend className="text-sm font-semibold">Do you hold any of these other tickets?</legend>
+        <legend className="text-sm font-semibold">Other licences and training</legend>
         <div className="mt-2 space-y-1">
           {OTHER_TICKETS.map((item) => {
             const on = held.includes(item)
@@ -398,7 +398,7 @@ function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoR
         </p>
       ) : null}
       <button className="pill pill-teal w-full" disabled={pending || !ready}>
-        Save tickets
+        Save tickets and training
       </button>
     </form>
   )

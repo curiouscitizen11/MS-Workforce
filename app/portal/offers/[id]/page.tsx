@@ -31,7 +31,7 @@ export default async function OfferPage({ params }: { params: { id: string } }) 
         <p>Start {formatTime(offer.startTime)}</p>
         <p>About {offer.expectedHours} hours</p>
         <p className="font-semibold">{offer.rateToWorker}</p>
-        <p className="mt-2">Tickets: {offer.requiredTickets.map((type) => TICKET_LABELS[type]).join(", ")}</p>
+        <p className="mt-2">Tickets & training: {offer.requiredTickets.map((type) => TICKET_LABELS[type]).join(", ")}</p>
         {offer.bring ? <p>Bring: {offer.bring}</p> : null}
         {showAddress && offer.address ? <p className="mt-2">{offer.address}</p> : <p className="mt-2 text-navy/70">The street address shows after you accept.</p>}
       </section>
