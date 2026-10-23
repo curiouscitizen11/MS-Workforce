@@ -6,23 +6,18 @@ import { saveProfile } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { HeadshotForm } from "@/components/portal/HeadshotForm"
 import { ChosenList } from "@/components/portal/AddPicker"
+import { HealthQuestions } from "@/components/portal/HealthQuestions"
 import { TicketBook } from "@/components/portal/TicketBook"
 import { fieldClass } from "@/components/portal/ui"
 import { FITNESS_DECLARATION } from "@/lib/portal/fitness"
+import { healthFromWorker, healthRecord } from "@/lib/portal/health"
 import {
-  ALLERGY_ANSWERS,
-  ALLERGY_TYPES,
-  ANAPHYLAXIS_ANSWERS,
   EMERGENCY_RELATIONSHIPS,
-  EPIPEN_ANSWERS,
   EXPERIENCE_LEVELS,
   FITNESS_OPTIONS,
-  INJURY_ANSWERS,
-  MEDICAL_CONDITIONS,
   MEDICAL_SHARING,
   MEDICATION_ANSWERS,
   RTW_OPTIONS,
-  TASKS_AFFECTED,
   TRANSPORT_OPTIONS,
   VEVO_METHODS,
   WEEKDAYS,
@@ -39,6 +34,7 @@ export function OnboardingForm({ worker, photos, today }: { worker: Worker; phot
   const [signature, setSignature] = useState<string | null>(worker.signaturePng || null)
   const [typedName, setTypedName] = useState(worker.name)
   const [workAreas, setWorkAreas] = useState<string[]>(worker.workAreas || [])
+  const [health, setHealth] = useState(() => healthFromWorker(worker))
 
   async function save(patch: Record<string, unknown>, next: number) {
     setError("")
@@ -150,43 +146,41 @@ export function OnboardingForm({ worker, photos, today }: { worker: Worker; phot
       {step === 4 ? (
         <Form
           pending={pending}
-          onSubmit={(data) =>
+          onSubmit={(data) => {
+            const record = healthRecord(health)
+            if (!record.ok) {
+              setError(record.error)
+              return
+            }
             start(() =>
               save(
                 {
                   fitness: data.fitness,
                   healthConsent: data.healthConsent === "on",
-                  allergies: data.allergies,
-                  allergyTypes: ALLERGY_TYPES.filter((item) => data["allergy-" + item] === "on"),
-                  anaphylaxis: data.anaphylaxis,
-                  epipen: data.epipen,
-                  medicalConditions: MEDICAL_CONDITIONS.filter((item) => data["condition-" + item] === "on"),
-                  injury: data.injury,
-                  tasksAffected: TASKS_AFFECTED.filter((item) => data["task-" + item] === "on"),
+                  allergies: record.allergies,
+                  allergyTypes: record.allergyTypes,
+                  anaphylaxis: record.anaphylaxis,
+                  epipen: record.epipen,
+                  medicalConditions: record.medicalConditions,
+                  injury: record.injury,
+                  tasksAffected: record.tasksAffected,
                   safetyMedication: data.safetyMedication,
                   medicalSharing: data.medicalSharing,
-                  medicalNotes: data.medicalNotes,
+                  medicalNotes: record.medicalNotes,
                 },
                 5,
               ),
             )
-          }
+          }}
           fields={
             <>
               <p className="text-sm leading-relaxed text-navy/80">
                 Labouring usually means lifting about 20 to 25 kg, being on your feet for 8 hours, and working outdoors.
               </p>
               <Select label="Can you safely do these tasks?" name="fitness" defaultValue={worker.fitness} options={FITNESS_OPTIONS} />
-              <Select label="Do you have any allergies?" name="allergies" defaultValue={worker.allergies} options={ALLERGY_ANSWERS} />
-              <Checks legend="What are you allergic to?" name="allergy" options={ALLERGY_TYPES} selected={worker.allergyTypes} />
-              <Select label="Have you ever had a severe allergic reaction (anaphylaxis)?" name="anaphylaxis" defaultValue={worker.anaphylaxis} options={ANAPHYLAXIS_ANSWERS} />
-              <Select label="Do you carry an adrenaline auto-injector (EpiPen or Anapen)?" name="epipen" defaultValue={worker.epipen} options={EPIPEN_ANSWERS} />
-              <Checks legend="Do you have a medical condition a first aider should know about?" name="condition" options={MEDICAL_CONDITIONS} selected={worker.medicalConditions} />
-              <Select label="Do you have an injury that could affect the work you can do?" name="injury" defaultValue={worker.injury} options={INJURY_ANSWERS} />
-              <Checks legend="Which tasks does it affect?" name="task" options={TASKS_AFFECTED} selected={worker.tasksAffected} />
+              <HealthQuestions value={health} onChange={setHealth} />
               <Select label="Do you take any medication that could affect your safety at work?" name="safetyMedication" defaultValue={worker.safetyMedication} options={MEDICATION_ANSWERS} />
               <Select label="Can we share your allergy and medical information with the site supervisor or first aider?" name="medicalSharing" defaultValue={worker.medicalSharing} options={MEDICAL_SHARING} />
-              <Text label="Anything a first aider should know? (private)" name="medicalNotes" defaultValue={worker.medicalNotes} />
               <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
                 <input type="checkbox" name="healthConsent" defaultChecked={worker.healthConsent} />
                 I agree MS Workforce can store these private health answers
@@ -272,32 +266,6 @@ function TicketStep({ worker, photos, today, onDone }: { worker: Worker; photos:
         onContinue={onDone}
       />
     </div>
-  )
-}
-
-function Checks({
-  legend,
-  name,
-  options,
-  selected,
-}: {
-  legend: string
-  name: string
-  options: readonly string[]
-  selected?: string[]
-}) {
-  return (
-    <fieldset>
-      <legend className="text-sm font-semibold">{legend}</legend>
-      <div className="mt-2 space-y-1">
-        {options.map((item) => (
-          <label key={item} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-            <input type="checkbox" name={name + "-" + item} defaultChecked={selected?.includes(item)} />
-            {item}
-          </label>
-        ))}
-      </div>
-    </fieldset>
   )
 }
 

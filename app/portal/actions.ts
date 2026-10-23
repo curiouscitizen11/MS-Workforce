@@ -172,6 +172,7 @@ export async function saveSafetyInfo(input: {
   medicalConditions: string[]
   injury: string
   tasksAffected: string[]
+  medicalNotes?: string
   safetyMedication: string
   medicalSharing: string
 }) {

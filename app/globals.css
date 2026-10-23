@@ -391,6 +391,41 @@ main .page-enter > section.bg-navy:first-of-type::before { display: none; }
   background: var(--p-page, #0a1a2f);
   padding-bottom: 8px;
 }
+.portal-yn {
+  min-height: 44px;
+  border-radius: 4px;
+  border: 1px solid #c5d4e4;
+  background: #0b1a2e;
+  color: #f4f7fb;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.portal-yn-on {
+  border-color: #2ec4b6;
+  color: #2ec4b6;
+}
+.portal-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(5, 12, 22, 0.72);
+}
+.portal-sheet {
+  width: 100%;
+  max-width: 32rem;
+  max-height: 85vh;
+  overflow: auto;
+  border: 1px solid #c5d4e4;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: #0e2240;
+  color: #f4f7fb;
+  padding: 16px 16px 24px;
+}
 
 main section.bg-tint .rounded-3xl.bg-white,
 main section.bg-tint .rounded-2xl.bg-white,

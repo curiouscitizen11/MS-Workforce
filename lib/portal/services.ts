@@ -52,6 +52,7 @@ import { offerNotionProperties, timesheetNotionProperties, toNotionProperties, w
 import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
 import { acceptedHeldLabel } from "@/lib/portal/ticket-catalogue"
+import { storedHealthProblem } from "@/lib/portal/health"
 import { asksForExpiry, ticketEntryProblem, ticketNumberProblem, type TicketEntry } from "@/lib/portal/ticket-entry"
 import { workDoneProblem, workDoneText } from "@/lib/portal/work-done"
 import type { Notify } from "@/lib/portal/notify"
@@ -365,6 +366,19 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
     stringOf(patch.injury),
   ])
   if (sensitive) return fail(SENSITIVE_MESSAGE)
+  if ("allergies" in patch || "injury" in patch || "medicalConditions" in patch) {
+    const healthProblem = storedHealthProblem({
+      allergies: typeof patch.allergies === "string" ? patch.allergies : worker.allergies,
+      allergyTypes: Array.isArray(patch.allergyTypes) ? patch.allergyTypes.map(String) : worker.allergyTypes,
+      anaphylaxis: typeof patch.anaphylaxis === "string" ? patch.anaphylaxis : worker.anaphylaxis,
+      epipen: typeof patch.epipen === "string" ? patch.epipen : worker.epipen,
+      medicalConditions: Array.isArray(patch.medicalConditions) ? patch.medicalConditions.map(String) : worker.medicalConditions,
+      injury: typeof patch.injury === "string" ? patch.injury : worker.injury,
+      tasksAffected: Array.isArray(patch.tasksAffected) ? patch.tasksAffected.map(String) : worker.tasksAffected,
+      medicalNotes: typeof patch.medicalNotes === "string" ? patch.medicalNotes : worker.medicalNotes,
+    })
+    if (healthProblem) return fail(healthProblem)
+  }
   if (typeof patch.dob === "string") worker.dob = patch.dob
   if (typeof patch.preferredName === "string") worker.preferredName = patch.preferredName
   if (typeof patch.address === "string") worker.address = patch.address
@@ -491,6 +505,7 @@ export async function saveSafety(
     medicalConditions: string[]
     injury: string
     tasksAffected: string[]
+    medicalNotes?: string
     safetyMedication: string
     medicalSharing: string
   },
@@ -498,7 +513,9 @@ export async function saveSafety(
   const worker = await ctx.store.workers.get(workerId)
   if (!worker || worker.role !== "worker") return fail("Log in again.")
   if (!input.consent) return fail("Tick the box to let MS Workforce keep this.")
-  const sensitive = texts([input.emergencyContact, input.emergencyPhone, input.injury])
+  const healthProblem = storedHealthProblem(input)
+  if (healthProblem) return fail(healthProblem)
+  const sensitive = texts([input.emergencyContact, input.emergencyPhone, input.injury, input.medicalNotes])
   if (sensitive) return fail(SENSITIVE_MESSAGE)
   worker.emergencyContact = input.emergencyContact.trim()
   worker.emergencyRelationship = input.emergencyRelationship
@@ -512,6 +529,7 @@ export async function saveSafety(
   worker.tasksAffected = input.tasksAffected
   worker.safetyMedication = input.safetyMedication
   worker.medicalSharing = input.medicalSharing
+  if (typeof input.medicalNotes === "string") worker.medicalNotes = input.medicalNotes
   worker.healthConsent = true
   await persistWorker(ctx, worker)
   await audit(ctx, workerId, "update-safety", workerId, "Safety info updated.")

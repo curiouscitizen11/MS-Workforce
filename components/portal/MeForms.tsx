@@ -2,20 +2,10 @@
 
 import { useState, useTransition } from "react"
 import { saveDetails, saveSafetyInfo } from "@/app/portal/actions"
+import { HealthQuestions } from "@/components/portal/HealthQuestions"
 import { fieldClass } from "@/components/portal/ui"
-import {
-  ALLERGY_ANSWERS,
-  ALLERGY_TYPES,
-  ANAPHYLAXIS_ANSWERS,
-  EMERGENCY_RELATIONSHIPS,
-  EPIPEN_ANSWERS,
-  INJURY_ANSWERS,
-  MEDICAL_CONDITIONS,
-  MEDICAL_SHARING,
-  MEDICATION_ANSWERS,
-  TASKS_AFFECTED,
-  type Worker,
-} from "@/lib/portal/types"
+import { healthFromWorker, healthRecord } from "@/lib/portal/health"
+import { EMERGENCY_RELATIONSHIPS, MEDICAL_SHARING, MEDICATION_ANSWERS, type Worker } from "@/lib/portal/types"
 
 export function DetailsForm({ worker }: { worker: Worker }) {
   const [error, setError] = useState("")
@@ -88,6 +78,7 @@ function SelectField({ label, name, value, options }: { label: string; name: str
 export function SafetyForm({ worker }: { worker: Worker }) {
   const [error, setError] = useState("")
   const [saved, setSaved] = useState("")
+  const [health, setHealth] = useState(() => healthFromWorker(worker))
   const [pending, start] = useTransition()
   return (
     <form
@@ -95,22 +86,27 @@ export function SafetyForm({ worker }: { worker: Worker }) {
       onSubmit={(event) => {
         event.preventDefault()
         const data = new FormData(event.currentTarget)
-        const picked = (prefix: string, options: readonly string[]) => options.filter((item) => data.get(prefix + item) === "on")
+        const record = healthRecord(health)
         setError("")
         setSaved("")
+        if (!record.ok) {
+          setError(record.error)
+          return
+        }
         start(async () => {
           const result = await saveSafetyInfo({
             consent: data.get("consent") === "on",
             emergencyContact: String(data.get("emergencyContact") || ""),
             emergencyRelationship: String(data.get("emergencyRelationship") || ""),
             emergencyPhone: String(data.get("emergencyPhone") || ""),
-            allergies: String(data.get("allergies") || ""),
-            allergyTypes: picked("allergy-", ALLERGY_TYPES),
-            anaphylaxis: String(data.get("anaphylaxis") || ""),
-            epipen: String(data.get("epipen") || ""),
-            medicalConditions: picked("condition-", MEDICAL_CONDITIONS),
-            injury: String(data.get("injury") || ""),
-            tasksAffected: picked("task-", TASKS_AFFECTED),
+            allergies: record.allergies,
+            allergyTypes: record.allergyTypes,
+            anaphylaxis: record.anaphylaxis,
+            epipen: record.epipen,
+            medicalConditions: record.medicalConditions,
+            injury: record.injury,
+            tasksAffected: record.tasksAffected,
+            medicalNotes: record.medicalNotes,
             safetyMedication: String(data.get("safetyMedication") || ""),
             medicalSharing: String(data.get("medicalSharing") || ""),
           })
@@ -134,43 +130,7 @@ export function SafetyForm({ worker }: { worker: Worker }) {
         Emergency phone
         <input id="emergencyPhone" name="emergencyPhone" inputMode="tel" defaultValue={worker.emergencyPhone || ""} className={fieldClass} />
       </label>
-      <SelectField label="Allergies" name="allergies" value={worker.allergies} options={ALLERGY_ANSWERS} />
-      <fieldset>
-        <legend className="text-sm font-semibold">What are you allergic to?</legend>
-        <div className="mt-2 space-y-1">
-          {ALLERGY_TYPES.map((item) => (
-            <label key={item} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-              <input type="checkbox" name={"allergy-" + item} defaultChecked={worker.allergyTypes?.includes(item)} />
-              {item}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <SelectField label="Severe allergic reaction (anaphylaxis)?" name="anaphylaxis" value={worker.anaphylaxis} options={ANAPHYLAXIS_ANSWERS} />
-      <SelectField label="Adrenaline auto-injector (EpiPen or Anapen)?" name="epipen" value={worker.epipen} options={EPIPEN_ANSWERS} />
-      <fieldset>
-        <legend className="text-sm font-semibold">A condition a first aider should know</legend>
-        <div className="mt-2 space-y-1">
-          {MEDICAL_CONDITIONS.map((item) => (
-            <label key={item} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-              <input type="checkbox" name={"condition-" + item} defaultChecked={worker.medicalConditions?.includes(item)} />
-              {item}
-            </label>
-          ))}
-        </div>
-      </fieldset>
-      <SelectField label="Injury that could affect the work" name="injury" value={worker.injury} options={INJURY_ANSWERS} />
-      <fieldset>
-        <legend className="text-sm font-semibold">Tasks it affects</legend>
-        <div className="mt-2 space-y-1">
-          {TASKS_AFFECTED.map((item) => (
-            <label key={item} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-              <input type="checkbox" name={"task-" + item} defaultChecked={worker.tasksAffected?.includes(item)} />
-              {item}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <HealthQuestions value={health} onChange={setHealth} />
       <SelectField label="Medication that could affect safety" name="safetyMedication" value={worker.safetyMedication} options={MEDICATION_ANSWERS} />
       <SelectField label="Who may see this" name="medicalSharing" value={worker.medicalSharing} options={MEDICAL_SHARING} />
       <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
