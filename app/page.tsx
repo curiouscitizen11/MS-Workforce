@@ -176,11 +176,10 @@ export default function HomePage() {
       <section className="flex screen items-center bg-tint text-navy">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-navy/75">Where we work</p>
-          <h2 className="display mt-6">Greater Sydney, based on the Northern Beaches.</h2>
+          <h2 className="display mt-6">Construction labour across Sydney.</h2>
           <p className="lede mt-8 text-navy/75">
-            We supply construction labour to sites across Greater Sydney, from
-            the Northern Beaches and North Shore to the CBD, the Inner West,
-            the Eastern Suburbs and Western Sydney.
+            We supply construction labour to building sites across Sydney,
+            from the CBD and the suburbs to Western Sydney.
           </p>
         </div>
       </section>

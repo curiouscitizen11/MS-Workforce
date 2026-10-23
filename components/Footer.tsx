@@ -34,8 +34,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-white/65">
-              Construction labour hire for builders across Greater Sydney.
-              Based on the Northern Beaches.
+              Construction labour hire for builders across Sydney.
             </p>
           </div>
 

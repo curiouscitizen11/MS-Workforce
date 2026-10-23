@@ -173,8 +173,7 @@ export default function CandidatesPage() {
           <h2 className="display mt-6">Missing a ticket? Here&apos;s where to get it in Sydney.</h2>
           <p className="lede mt-8 text-navy/75">
             More tickets mean more sites you can work on. These registered
-            training providers run the courses on the Northern Beaches and
-            across Sydney. Most take a day or two.
+            training providers run the courses across Sydney. Most take a day or two.
           </p>
           <ul className="mt-14 grid gap-5 md:grid-cols-2">
             {tickets.map((ticket) => (

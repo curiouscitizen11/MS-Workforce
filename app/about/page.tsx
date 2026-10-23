@@ -5,13 +5,13 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "About MS Workforce",
   description:
-    "MS Workforce is a construction labour hire business based on Sydney's Northern Beaches, supplying general labourers, trade assistants and site support to builders across Greater Sydney.",
+    "MS Workforce is a construction labour hire business supplying general labourers, trade assistants and site support to builders across Sydney.",
   alternates: { canonical: "/about" },
   openGraph: {
     ...OG_BASE,
     title: "About MS Workforce",
     description:
-      "A focused construction labour hire business based on Sydney's Northern Beaches, supplying builders across Greater Sydney.",
+      "A focused construction labour hire business supplying builders across Sydney.",
     url: "/about",
   },
 };

@@ -23,8 +23,8 @@ const sections: { title: string; body: React.ReactNode }[] = [
     title: "Who we are",
     body: (
       <p>
-        MS Workforce is a construction labour hire business based in Queenscliff
-        on Sydney&apos;s Northern Beaches, NSW. Questions about this policy:{" "}
+        MS Workforce is a construction labour hire business supplying
+        builders across Sydney, NSW. Questions about this policy:{" "}
         <a href={EMAIL_HREF} className={mail}>{EMAIL}</a>.
       </p>
     ),

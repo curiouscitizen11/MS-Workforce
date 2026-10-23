@@ -62,7 +62,7 @@ const faqs = [
   },
   {
     q: "Which areas do you cover?",
-    a: "Greater Sydney. We are based on the Northern Beaches and supply sites from the Northern Beaches and North Shore through to the CBD, Inner West, Eastern Suburbs and Western Sydney.",
+    a: "All of Sydney. We supply building sites across Sydney, from the CBD and the suburbs out to Western Sydney.",
   },
   {
     q: "What do you need from us to get started?",

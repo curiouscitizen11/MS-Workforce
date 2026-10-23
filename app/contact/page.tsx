@@ -5,7 +5,7 @@ import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BO
 export const metadata: Metadata = {
   title: "Contact MS Workforce",
   description:
-    "Request construction labour or ask a question. Builders email hello@msworkforce.au; workers email jobs@msworkforce.au. Based on Sydney's Northern Beaches, supplying sites across Greater Sydney.",
+    "Request construction labour or ask a question. Builders email hello@msworkforce.au; workers email jobs@msworkforce.au. Supplying construction sites across Sydney.",
   alternates: { canonical: "/contact" },
   openGraph: {
     ...OG_BASE,
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const facts = [
   { label: "Builders", value: EMAIL, href: EMAIL_HREF },
   { label: "Workers", value: JOBS_EMAIL, href: JOBS_EMAIL_HREF },
-  { label: "Based", value: "Northern Beaches, Sydney" },
+  { label: "Area", value: "Across Sydney, NSW" },
   { label: "Service area", value: "Greater Sydney" },
 ];
 
@@ -102,7 +102,7 @@ export default function ContactPage() {
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/65">Details</p>
-          <h2 className="display mt-6">Northern Beaches based. Greater Sydney wide.</h2>
+          <h2 className="display mt-6">Supplying sites across Sydney.</h2>
           <dl className="mt-14 max-w-3xl border-b border-white/10">
             {facts.map((item) => (
               <div key={item.label} className="stack-row border-t border-white/10">

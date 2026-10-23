@@ -1,6 +1,6 @@
 # MS Workforce Website
 
-Simple, professional marketing website for MS Workforce – construction labour hire based on Sydney’s Northern Beaches.
+Simple, professional marketing website for MS Workforce – construction labour hire across Sydney.
 
 ## Stack
 - Next.js 15 (App Router)

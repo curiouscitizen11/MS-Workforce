@@ -9,7 +9,7 @@ import StickyCta from "@/components/StickyCta";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const description =
-  "Construction labour hire across Greater Sydney. MS Workforce supplies general labourers, trade assistants and site support crews to builders, from day labour and short-notice cover to ongoing, project-based supply. Based on the Northern Beaches.";
+  "Construction labour hire across Greater Sydney. MS Workforce supplies general labourers, trade assistants and site support crews to builders, from day labour and short-notice cover to ongoing, project-based supply.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -21,7 +21,6 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   keywords: [
     "construction labour hire Sydney",
-    "labour hire Northern Beaches",
     "general labourers Sydney",
     "trade assistants Sydney",
     "site cleans",
@@ -63,7 +62,6 @@ const organisation = {
   logo: SITE_URL + "/icon",
   image: SITE_URL + "/opengraph-image",
   areaServed: [
-    { "@type": "Place", name: "Northern Beaches, Sydney NSW" },
     { "@type": "City", name: "Sydney" },
   ],
   contactPoint: [
