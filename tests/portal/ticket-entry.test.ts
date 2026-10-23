@@ -2,6 +2,7 @@ import { createElement } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it } from "vitest"
 import { TicketMeta, ticketDraft } from "@/components/portal/TicketMeta"
+import { ticketEntryProblem } from "@/lib/portal/ticket-entry"
 import { complianceFor, flagTicketMismatch, markTicketChecked, saveOtherLicences, saveTicket, saveTicketPhoto, type Ctx } from "@/lib/portal/services"
 import { createNotify } from "@/lib/portal/notify"
 import { createMemoryStore } from "@/lib/portal/store"
@@ -41,7 +42,18 @@ describe("worker ticket number and expiry", () => {
     expect(driver).toContain("Licence number")
     expect(driver).toContain("Card number")
     expect(driver).toContain('id="driverLicence-expiry"')
+    expect(driver).toContain("No expiry date on this card")
+    expect(driver).toContain("portal-check")
     expect(driver).toContain("min-w-0")
+    const hiddenExpiry = renderToStaticMarkup(
+      createElement(TicketMeta, {
+        id: "driverLicence",
+        draft: { ...ticketDraft("driverLicence", { number: "1", expiry: "2028-01-01" }), noExpiry: true },
+        onChange: () => undefined,
+      }),
+    )
+    expect(hiddenExpiry).not.toContain('id="driverLicence-expiry"')
+    expect(hiddenExpiry).toContain("No expiry date on this card")
     const training = renderToStaticMarkup(
       createElement(TicketMeta, { id: "other-Asbestos awareness", draft: ticketDraft("Asbestos awareness"), onChange: () => undefined }),
     )
@@ -53,6 +65,7 @@ describe("worker ticket number and expiry", () => {
     expect(handling).not.toContain("Expiry date")
     expect(handling).not.toContain("This card doesn")
     expect(handling).toContain("Issue date")
+    expect(ticketEntryProblem({ number: "HT-1" }, "2026-10-17", "heights")).toBe("Enter the expiry date, or tick that there is no expiry date on this card.")
   })
 
   it("requires a number when the worker says yes, and lets a white card have no expiry", async () => {

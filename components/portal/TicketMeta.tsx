@@ -68,11 +68,11 @@ export function TicketMeta({
           <input
             type="checkbox"
             name={id + "-no-expiry"}
-            className="h-5 w-5"
+            className="portal-check"
             checked={draft.noExpiry}
             onChange={(event) => onChange({ ...draft, expiry: event.target.checked ? "" : draft.expiry, noExpiry: event.target.checked })}
           />
-          This card doesn&apos;t expire
+          No expiry date on this card
         </label>
       ) : null}
     </div>

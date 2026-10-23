@@ -42,7 +42,7 @@ export function ticketEntryProblem(entry: TicketEntry, today: string, key = ""):
   if (key && !asksForExpiry(key)) return null
   if (entry.noExpiry) return null
   if (!entry.expiry || !/^\d{4}-\d{2}-\d{2}$/.test(entry.expiry)) {
-    return "Enter the expiry date, or tick that this card doesn't expire."
+    return "Enter the expiry date, or tick that there is no expiry date on this card."
   }
   if (entry.expiry < today) return "This ticket has expired. Choose 'Booked in for the course' or call MS Workforce."
   return null

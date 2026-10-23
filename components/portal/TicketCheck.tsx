@@ -96,7 +96,7 @@ function TicketCheckCard({ workerId, item }: { workerId: string; item: TicketChe
         />
       </label>
       <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-        <input type="checkbox" checked={noExpiry} onChange={(event) => setNoExpiry(event.target.checked)} />
+        <input type="checkbox" className="portal-check" checked={noExpiry} onChange={(event) => setNoExpiry(event.target.checked)} />
         No expiry date on this card
       </label>
       {item.checkedBy && item.checkedAtLabel ? (
