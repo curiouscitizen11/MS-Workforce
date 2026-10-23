@@ -48,7 +48,7 @@ import { MS_PHONE, fortnightContaining, olderThanDays, payFortnight, timesheetRe
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
 import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
-import { offerNotionProperties, timesheetNotionProperties, toNotionProperties, workerNotionProperties } from "@/lib/portal/notion/map"
+import { offerNotionProperties, timesheetNotionProperties, toNotionProperties, workerNotionProperties, writeNotionProperties } from "@/lib/portal/notion/map"
 import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
 import { acceptedHeldLabel } from "@/lib/portal/ticket-catalogue"
@@ -1623,18 +1623,22 @@ export async function processOutbox(ctx: Ctx, fetchImpl?: typeof fetch) {
       const formatted = toNotionProperties(properties)
       const match = notionMatch(item.kind, item.payload, properties)
       const existing = match ? await findNotionPage(database, match, fetchImpl) : null
-      const response = existing
-        ? await notionRequest("/pages/" + existing, {
-            method: "PATCH",
-            body: JSON.stringify({ properties: formatted }),
-            fetchImpl,
-          })
-        : await notionRequest("/pages", {
-            method: "POST",
-            body: JSON.stringify({ parent: { database_id: database }, properties: formatted }),
-            fetchImpl,
-          })
-      if (!response.ok) throw new Error("Notion returned " + response.status)
+      const written = await writeNotionProperties(formatted, async (pageProperties) => {
+        const response = existing
+          ? await notionRequest("/pages/" + existing, {
+              method: "PATCH",
+              body: JSON.stringify({ properties: pageProperties }),
+              fetchImpl,
+            })
+          : await notionRequest("/pages", {
+              method: "POST",
+              body: JSON.stringify({ parent: { database_id: database }, properties: pageProperties }),
+              fetchImpl,
+            })
+        if (response.ok) return { ok: true as const }
+        return { ok: false as const, message: await notionErrorMessage(response) }
+      })
+      if (!written.ok) throw new Error(written.message)
       item.status = "sent"
       sent += 1
     } catch (error) {
@@ -1646,6 +1650,24 @@ export async function processOutbox(ctx: Ctx, fetchImpl?: typeof fetch) {
     await ctx.store.outbox.save(item)
   }
   return { ok: true as const, sent }
+}
+
+async function notionErrorMessage(response: Response) {
+  let text = ""
+  try {
+    text = await response.text()
+  } catch {
+    text = ""
+  }
+  const trimmed = text.trim()
+  if (!trimmed) return "Notion returned " + response.status
+  try {
+    const body = JSON.parse(trimmed) as { message?: unknown }
+    if (typeof body.message === "string" && body.message.trim()) return body.message.trim()
+  } catch {
+    return trimmed
+  }
+  return trimmed
 }
 
 function notionMatch(kind: string, payload: Record<string, unknown>, properties: Record<string, unknown>) {

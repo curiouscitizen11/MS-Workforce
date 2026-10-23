@@ -38,10 +38,18 @@ const FREE_TEXT = new Set([
 
 export class NotionPayloadError extends Error {}
 
+function keyIsPrivate(key: string) {
+  const lower = key.toLowerCase()
+  return BANNED.some((word) => {
+    // "Supervisor" is a person on site. "Super" on its own is still a superannuation field.
+    if (word === "super") return /\bsuper\b/.test(lower) || lower.includes("superannuation")
+    return lower.includes(word)
+  })
+}
+
 export function assertNotionPayloadSafe(properties: Record<string, unknown>) {
   for (const key of Object.keys(properties)) {
-    const lower = key.toLowerCase()
-    if (BANNED.some((word) => lower.includes(word))) {
+    if (keyIsPrivate(key)) {
       throw new NotionPayloadError("Refusing to write a private field to Notion: " + key)
     }
     const value = properties[key]
@@ -138,6 +146,14 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "Confined space expiry", worker.tickets.confinedSpace.expiry)
   put(props, "Driver licence expiry", worker.tickets.driverLicence.expiry)
   put(props, "First aid expiry", worker.tickets.firstAid.expiry)
+  put(props, "White card issued", worker.tickets.whiteCard.issued)
+  put(props, "Work at heights issued", worker.tickets.heights.issued)
+  put(props, "Asbestos class A issued", worker.tickets.asbestosA.issued)
+  put(props, "Asbestos class B issued", worker.tickets.asbestosB.issued)
+  put(props, "Confined space issued", worker.tickets.confinedSpace.issued)
+  put(props, "Driver licence issued", worker.tickets.driverLicence.issued)
+  put(props, "First aid issued", worker.tickets.firstAid.issued)
+  put(props, "Driver card number", worker.tickets.driverLicence.cardNumber)
   put(props, "Next ticket expiry", nextTicketExpiry(worker))
   if (extraTickets.known.length) props["Other tickets held"] = extraTickets.known
   put(props, "Transport", worker.transport)
@@ -217,6 +233,7 @@ export function timesheetNotionProperties(sheet: Timesheet): Record<string, unkn
   put(props, "Start (form)", sheet.start)
   put(props, "Finish (form)", sheet.finish)
   put(props, "Break (form)", String(sheet.breakMinutes))
+  put(props, "Break start", sheet.breakStart)
   put(props, "Hours (form)", String(sheet.totalHours))
   props["Total hours"] = sheet.totalHours
   put(props, "Tasks", workDoneText(sheet.tasks, sheet.taskNote))
@@ -225,6 +242,8 @@ export function timesheetNotionProperties(sheet: Timesheet): Record<string, unkn
   put(props, "Query note", sheet.workerNote)
   put(props, "Worker confirmed", sheet.workerConfirmedAt)
   put(props, "Approved by", sheet.supervisorName)
+  put(props, "Supervisor name", sheet.supervisorName)
+  put(props, "Supervisor email", sheet.supervisorEmail)
   put(props, "Approver role", sheet.supervisorRole)
   put(props, "Approved at", sheet.approvedAt)
   put(props, "Pay fortnight", sheet.payFortnight)
@@ -238,7 +257,7 @@ type FieldType = "title" | "text" | "phone" | "email" | "select" | "multi" | "da
 
 const TITLE_FIELDS = new Set(["Name", "Offer", "Entry"])
 const PHONE_FIELDS = new Set(["Mobile", "Emergency phone", "Site phone"])
-const EMAIL_FIELDS = new Set(["Email"])
+const EMAIL_FIELDS = new Set(["Email", "Supervisor email"])
 const SELECT_FIELDS = new Set([
   "Status",
   "RTW evidence",
@@ -267,11 +286,17 @@ const DATE_FIELDS = new Set([
   "White card expiry",
   "White card issued",
   "Work at heights expiry",
+  "Work at heights issued",
   "Asbestos class A expiry",
+  "Asbestos class A issued",
   "Asbestos class B expiry",
+  "Asbestos class B issued",
   "Confined space expiry",
+  "Confined space issued",
   "Driver licence expiry",
+  "Driver licence issued",
   "First aid expiry",
+  "First aid issued",
   "Next ticket expiry",
   "Onboarding submitted",
   "Terms signed",
@@ -308,6 +333,41 @@ export function toNotionProperties(flat: Record<string, unknown>) {
     if (typed !== undefined) out[key] = typed
   }
   return out
+}
+
+/** Notion's message when a database does not have this column yet. */
+export function unknownNotionProperty(message: string): string | null {
+  const match = message.trim().match(/^(.*?) is not a property that exists\b/i)
+  const name = match?.[1]?.trim()
+  return name || null
+}
+
+/** Drop one missing column so the rest of the page can still sync. Returns null for any other error. */
+export function withoutUnknownNotionProperty(
+  properties: Record<string, unknown>,
+  message: string,
+): Record<string, unknown> | null {
+  const name = unknownNotionProperty(message)
+  if (!name || !Object.prototype.hasOwnProperty.call(properties, name)) return null
+  const next = { ...properties }
+  delete next[name]
+  return next
+}
+
+export async function writeNotionProperties(
+  properties: Record<string, unknown>,
+  write: (properties: Record<string, unknown>) => Promise<{ ok: true } | { ok: false; message: string }>,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  let current = properties
+  const limit = Object.keys(properties).length + 1
+  for (let attempt = 0; attempt < limit; attempt += 1) {
+    const result = await write(current)
+    if (result.ok) return { ok: true }
+    const next = withoutUnknownNotionProperty(current, result.message)
+    if (!next) return { ok: false, message: result.message || "Notion write failed" }
+    current = next
+  }
+  return { ok: false, message: "Notion write failed" }
 }
 
 export function toNotionApiValue(type: FieldType, value: unknown) {
