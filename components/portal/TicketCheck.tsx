@@ -134,7 +134,7 @@ function TicketCheckCard({ workerId, item }: { workerId: string; item: TicketChe
             })
           }}
         >
-          Doesn't match
+          Doesn&apos;t match
         </button>
       </div>
       {item.ready ? null : (

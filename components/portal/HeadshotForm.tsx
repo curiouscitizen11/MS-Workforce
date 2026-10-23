@@ -99,7 +99,7 @@ export function HeadshotForm({ onDone }: { onDone?: () => void }) {
       </button>
       {onDone ? (
         <button type="button" className="pill pill-line-dark w-full" onClick={onDone}>
-          I'll add a photo later
+          I&apos;ll add a photo later
         </button>
       ) : null}
     </form>

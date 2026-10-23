@@ -59,7 +59,7 @@ export function TicketMeta({
           checked={draft.noExpiry}
           onChange={(event) => onChange({ ...draft, expiry: event.target.checked ? "" : draft.expiry, noExpiry: event.target.checked })}
         />
-        This card doesn't expire
+        This card doesn&apos;t expire
       </label>
     </div>
   )
