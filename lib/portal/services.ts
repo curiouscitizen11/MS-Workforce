@@ -53,6 +53,7 @@ import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
 import { acceptedHeldLabel } from "@/lib/portal/ticket-catalogue"
 import { asksForExpiry, ticketEntryProblem, ticketNumberProblem, type TicketEntry } from "@/lib/portal/ticket-entry"
+import { workDoneProblem, workDoneText } from "@/lib/portal/work-done"
 import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
 import {
@@ -62,7 +63,6 @@ import {
   WORK_AREAS,
   TICKET_LABELS,
   TICKET_TYPES,
-  TIMESHEET_TASKS,
   VEVO_RESULTS,
   VERIFICATION_METHODS,
   type LicenceCheck,
@@ -935,7 +935,7 @@ export async function submitTimesheet(
     breakMinutes: number
     breakStart?: string
     breakNote?: string
-    tasks?: string[]
+    tasks?: string | string[]
     taskNote?: string
     incident: boolean
     incidentNote?: string
@@ -998,10 +998,11 @@ export async function submitTimesheet(
   if (!input.signaturePng?.startsWith("data:image/") || input.signaturePng.length > 1_500_000) {
     return fail("The supervisor needs to sign on the screen.")
   }
-  const tasks = (input.tasks || []).filter((task) => TIMESHEET_TASKS.includes(task as (typeof TIMESHEET_TASKS)[number]))
-  if ((input.tasks || []).length !== tasks.length) return fail("Choose tasks from the list.")
+  const tasks = workDoneText(input.tasks, input.taskNote)
+  const taskProblem = workDoneProblem(typeof input.tasks === "string" ? input.tasks : tasks)
+  if (taskProblem) return fail(taskProblem)
   const workerNote = input.workerNote?.trim().slice(0, 300)
-  const sensitive = texts([supervisorName, supervisorEmail, input.taskNote, input.incidentNote, workerNote])
+  const sensitive = texts([supervisorName, supervisorEmail, tasks, input.incidentNote, workerNote])
   if (sensitive) return fail(sensitive)
   const existing = (await ctx.store.timesheets.all()).find(
     (sheet) => sheet.workerId === input.workerId && sheet.placementRef === offer.placementRef && sheet.workDate === input.workDate,
@@ -1033,7 +1034,7 @@ export async function submitTimesheet(
     breakStart: breakMinutes === 0 ? undefined : input.breakStart?.trim(),
     totalHours: hours.hours,
     tasks,
-    taskNote: input.taskNote?.trim() || undefined,
+    taskNote: undefined,
     incident: input.incident,
     incidentNote: input.incident ? input.incidentNote?.trim() : undefined,
     workerNote: workerNote || undefined,

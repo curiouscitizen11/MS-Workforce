@@ -302,7 +302,7 @@ export async function lodgeTimesheet(input: {
   finish: string
   breakMinutes: number
   breakStart?: string
-  tasks?: string[]
+  tasks?: string | string[]
   taskNote?: string
   incident: boolean
   incidentNote?: string

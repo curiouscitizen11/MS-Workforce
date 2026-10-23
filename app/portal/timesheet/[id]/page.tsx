@@ -5,6 +5,7 @@ import { isMock } from "@/lib/portal/config"
 import { formatDate } from "@/lib/portal/dates"
 import { formatBreak, formatHours } from "@/lib/portal/hours"
 import { workerCanEditTimesheet } from "@/lib/portal/timesheet-lock"
+import { workDoneText } from "@/lib/portal/work-done"
 import { MS_PHONE, cutoffMessage } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
@@ -61,6 +62,10 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
           <dd className="break-words font-semibold">{formatBreak(sheet.breakMinutes, sheet.breakStart)}</dd>
         </div>
       </dl>
+      <p className="text-sm">
+        <span className="text-navy/70">What did you do today? </span>
+        <span className="font-semibold">{workDoneText(sheet.tasks, sheet.taskNote) || "Not recorded"}</span>
+      </p>
       <p className="text-sm">
         {sheet.siteName || sheet.suburb} · {sheet.status}
         {sheet.signerMismatch ? " · Different signer" : ""}

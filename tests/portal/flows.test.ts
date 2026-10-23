@@ -150,6 +150,7 @@ describe("portal flows", () => {
       start: "07:00",
       finish: "15:30",
       breakMinutes: 0,
+      tasks: "Carrying materials",
       incident: false,
       workerConfirmed: true,
       supervisorName: "Pat Riley",
@@ -166,6 +167,7 @@ describe("portal flows", () => {
       start: "07:00",
       finish: "15:30",
       breakMinutes: 30,
+      tasks: "Carrying materials",
       incident: false,
       workerConfirmed: true,
       supervisorName: "Pat Riley",
@@ -183,6 +185,7 @@ describe("portal flows", () => {
       finish: "15:30",
       breakMinutes: 30,
       breakStart: "12:00",
+      tasks: "Carrying materials",
       incident: false,
       workerConfirmed: true,
       supervisorName: "Pat Riley",
@@ -201,6 +204,7 @@ describe("portal flows", () => {
       breakMinutes: 30,
       breakStart: "12:00",
       breakNote: "took lunch",
+      tasks: "Carrying materials",
       incident: false,
       workerConfirmed: true,
       supervisorName: "Pat Riley",
@@ -226,6 +230,7 @@ describe("portal flows", () => {
       finish: "15:30",
       breakMinutes: 30,
       breakStart: "12:15",
+      tasks: "Carrying materials",
       incident: false,
       workerConfirmed: true,
       supervisorName: "Pat Riley",
@@ -244,6 +249,7 @@ describe("portal flows", () => {
       finish: "15:30",
       breakMinutes: 30,
       breakStart: "12:15",
+      tasks: "Carrying materials",
       incident: false,
       workerConfirmed: true,
       supervisorName: "Alex Stone",
@@ -261,6 +267,8 @@ describe("portal flows", () => {
     expect(props.Entry).toBe("Sam Lee – 2026-10-17")
     expect(props.Source).toBe("Portal")
     expect(props.Status).toBe("Submitted")
+    expect(props.Tasks).toBe("Carrying materials")
+    expect(Array.isArray(props.Tasks)).toBe(false)
     expect(props["Signature"]).toBeUndefined()
     expect(JSON.stringify(props)).not.toContain("alex.stone@example.com")
     expect(JSON.stringify(props).toLowerCase()).not.toMatch(/\btfn\b|tax file|\bbank\b|superannuation|passport|\bgps\b|latitude/)
@@ -275,6 +283,7 @@ describe("portal flows", () => {
       finish: "15:00",
       breakMinutes: 30,
       breakStart: "12:00",
+      tasks: "Carrying materials",
       incident: false,
       workerConfirmed: true,
       supervisorName: "Alex Stone",

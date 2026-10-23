@@ -295,7 +295,7 @@ export function buildSeed(now = new Date()): SeedData {
       breakMinutes: 30,
       breakStart: "12:00",
       totalHours: 8,
-      tasks: ["Carrying materials"],
+      tasks: "Carrying materials",
       incident: false,
       status: "Approved",
       supervisorName: "Pat Riley",

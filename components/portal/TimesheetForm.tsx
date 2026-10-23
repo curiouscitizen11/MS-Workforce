@@ -9,7 +9,8 @@ import { emailError, emailProblem } from "@/lib/portal/email"
 import { formatDate } from "@/lib/portal/dates"
 import { STANDARD_BREAK_MINUTES, breakChoiceProblem, formatBreak, formatHours, hoursWarnings, paidHours, parseTime } from "@/lib/portal/hours"
 import { workerCanEditTimesheet } from "@/lib/portal/timesheet-lock"
-import { SUPERVISOR_ROLES, TIMESHEET_TASKS } from "@/lib/portal/types"
+import { SUPERVISOR_ROLES } from "@/lib/portal/types"
+import { WORK_DONE_MAX, workDoneProblem, workDoneText } from "@/lib/portal/work-done"
 
 export type TimesheetShift = {
   id: string
@@ -30,7 +31,7 @@ export type SavedTimesheet = {
   finish: string
   breakMinutes: number
   breakStart?: string
-  tasks: string[]
+  tasks: string | string[]
   taskNote?: string
   incident: boolean
   incidentNote?: string
@@ -53,8 +54,7 @@ type Payload = {
   finish: string
   breakMinutes: number
   breakStart?: string
-  tasks: string[]
-  taskNote?: string
+  tasks: string
   incident: boolean
   incidentNote?: string
   workerNote?: string
@@ -103,8 +103,7 @@ export function TimesheetForm({
   const [finish, setFinish] = useState(openingSaved?.finish || opening?.finish || "15:30")
   const [breakChoice, setBreakChoice] = useState<0 | 30>(openingSaved?.breakMinutes === 0 ? 0 : STANDARD_BREAK_MINUTES)
   const [breakStart, setBreakStart] = useState(openingSaved?.breakStart || "")
-  const [tasks, setTasks] = useState<string[]>(openingSaved?.tasks || [])
-  const [taskNote, setTaskNote] = useState(openingSaved?.taskNote || "")
+  const [workDone, setWorkDone] = useState(workDoneText(openingSaved?.tasks, openingSaved?.taskNote))
   const [incident, setIncident] = useState<boolean | null>(openingSaved ? openingSaved.incident : null)
   const [incidentNote, setIncidentNote] = useState(openingSaved?.incidentNote || "")
   const [workerNote, setWorkerNote] = useState(openingSaved?.workerNote || "")
@@ -159,7 +158,16 @@ export function TimesheetForm({
     const raw = window.localStorage.getItem(DRAFT_KEY)
     if (!raw) return
     try {
-      const draft = JSON.parse(raw) as { offerId?: string; start?: string; finish?: string; workDate?: string; breakMinutes?: number; breakStart?: string }
+      const draft = JSON.parse(raw) as {
+        offerId?: string
+        start?: string
+        finish?: string
+        workDate?: string
+        breakMinutes?: number
+        breakStart?: string
+        workDone?: string
+        tasks?: string | string[]
+      }
       if (findSaved(savedSheetsRef.current, draft.offerId)) return
       if (draft.workDate) setWorkDate(draft.workDate)
       if (draft.offerId) setOfferId(draft.offerId)
@@ -167,6 +175,8 @@ export function TimesheetForm({
       if (draft.finish) setFinish(draft.finish)
       if (draft.breakMinutes === 0) setBreakChoice(0)
       if (draft.breakStart) setBreakStart(draft.breakStart)
+      if (typeof draft.workDone === "string") setWorkDone(draft.workDone)
+      else if (draft.tasks) setWorkDone(workDoneText(draft.tasks))
     } catch {
       window.localStorage.removeItem(DRAFT_KEY)
     }
@@ -182,8 +192,8 @@ export function TimesheetForm({
   }, [hoursKey])
 
   useEffect(() => {
-    window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ offerId, workDate, start, finish, breakMinutes, breakStart, tasks, incident, workerNote }))
-  }, [offerId, workDate, start, finish, breakMinutes, breakStart, tasks, incident, workerNote])
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ offerId, workDate, start, finish, breakMinutes, breakStart, workDone, incident, workerNote }))
+  }, [offerId, workDate, start, finish, breakMinutes, breakStart, workDone, incident, workerNote])
 
   useEffect(() => {
     const raw = window.localStorage.getItem(QUEUE_KEY)
@@ -226,8 +236,7 @@ export function TimesheetForm({
     setFinish(prior?.finish || next.finish)
     setBreakChoice(prior?.breakMinutes === 0 ? 0 : STANDARD_BREAK_MINUTES)
     setBreakStart(prior?.breakStart || "")
-    setTasks(prior?.tasks || [])
-    setTaskNote(prior?.taskNote || "")
+    setWorkDone(workDoneText(prior?.tasks, prior?.taskNote))
     setIncident(prior ? prior.incident : null)
     setIncidentNote(prior?.incidentNote || "")
     setWorkerNote(prior?.workerNote || "")
@@ -257,8 +266,7 @@ export function TimesheetForm({
       finish,
       breakMinutes,
       breakStart: breakMinutes === 0 ? undefined : breakStart,
-      tasks,
-      taskNote: tasks.includes("Other, please explain") ? taskNote : undefined,
+      tasks: workDone.trim(),
       incident,
       incidentNote: incident ? incidentNote : undefined,
       workerNote,
@@ -305,6 +313,11 @@ export function TimesheetForm({
           }
           if (incident && !incidentNote.trim()) {
             setError("Tell us what happened.")
+            return
+          }
+          const doneProblem = workDoneProblem(workDone)
+          if (doneProblem) {
+            setError(doneProblem)
             return
           }
           if (needsConfirm && !confirmUnusual) {
@@ -456,24 +469,22 @@ export function TimesheetForm({
               I have checked these times.
             </label>
           ) : null}
-          <fieldset>
-            <legend className="text-sm font-semibold">What did you mainly do? (optional)</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {TIMESHEET_TASKS.map((task) => (
-                <button
-                  key={task}
-                  type="button"
-                  className={chip(tasks.includes(task))}
-                  onClick={() => setTasks(tasks.includes(task) ? tasks.filter((item) => item !== task) : [...tasks, task])}
-                >
-                  {task}
-                </button>
-              ))}
-            </div>
-            {tasks.includes("Other, please explain") ? (
-              <input className={fieldClass} aria-label="Other task" value={taskNote} onChange={(event) => setTaskNote(event.target.value)} />
-            ) : null}
-          </fieldset>
+          <label className="block text-sm font-semibold" htmlFor="work-done">
+            What did you do today?
+            <textarea
+              id="work-done"
+              maxLength={WORK_DONE_MAX}
+              rows={3}
+              required
+              placeholder="e.g. Stripped ceiling sheets in unit 4"
+              className={fieldClass}
+              value={workDone}
+              onChange={(event) => setWorkDone(event.target.value)}
+            />
+            <span className="mt-1 block text-xs font-normal text-navy/70">
+              {workDone.length}/{WORK_DONE_MAX}
+            </span>
+          </label>
           <fieldset>
             <legend className="text-sm font-semibold">Were you injured, or was there an incident or near miss today?</legend>
             <div className="mt-2 grid grid-cols-2 gap-2">
@@ -532,8 +543,11 @@ export function TimesheetForm({
               <dt>Total paid hours</dt>
               <dd className="font-semibold">{preview.ok ? formatHours(preview.hours) : "Check the times"}</dd>
             </div>
+            <div className="flex items-start justify-between gap-3">
+              <dt>What did you do today?</dt>
+              <dd className="text-right font-semibold">{workDone.trim()}</dd>
+            </div>
           </dl>
-          {tasks.length ? <p className="text-sm">{tasks.join(", ")}</p> : null}
           <p className="text-sm">Incident reported: {incident ? "Yes" : "No"}</p>
           {hoursDirty && saved?.signaturePng ? (
             <p className="text-sm font-semibold">Changing the hours or the break clears the supervisor signature. They need to sign again.</p>

@@ -31,7 +31,7 @@ function saved(status: string) {
     finish: "15:30",
     breakMinutes: 30,
     breakStart: "12:00",
-    tasks: [] as string[],
+    tasks: "Carrying materials",
     incident: false,
     supervisorName: "Pat Riley",
     supervisorEmail: "pat.riley@example.com",

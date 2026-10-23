@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Heading, StatusChip } from "@/components/portal/ui"
 import { formatDate } from "@/lib/portal/dates"
 import { formatHours } from "@/lib/portal/hours"
+import { workDoneText } from "@/lib/portal/work-done"
 import { payRunFortnight } from "@/lib/portal/pay"
 import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
@@ -48,6 +49,7 @@ export default async function AdminTimesheetsPage() {
                   {formatDate(sheet.workDate)} · {formatHours(sheet.totalHours)} hours
                   {flags.length ? " · " + flags.join(" · ") : ""}
                 </span>
+                <span className="mt-1 block text-sm">{workDoneText(sheet.tasks, sheet.taskNote)}</span>
               </Link>
             </li>
           )

@@ -1,4 +1,5 @@
 import { asTicketInputs, earliestExpiry } from "@/lib/portal/compliance"
+import { workDoneText } from "@/lib/portal/work-done"
 import { notionOtherTickets } from "@/lib/portal/ticket-catalogue"
 import { heldLicenceExpiries } from "@/lib/portal/ticket-photos"
 import { sensitiveFindings } from "@/lib/portal/privacy"
@@ -30,6 +31,7 @@ const FREE_TEXT = new Set([
   "Decline reason",
   "Incident note",
   "Query note",
+  "Tasks",
   "Medical notes",
   "Work history",
 ])
@@ -217,7 +219,7 @@ export function timesheetNotionProperties(sheet: Timesheet): Record<string, unkn
   put(props, "Break (form)", String(sheet.breakMinutes))
   put(props, "Hours (form)", String(sheet.totalHours))
   props["Total hours"] = sheet.totalHours
-  if (sheet.tasks.length) props.Tasks = sheet.tasks
+  put(props, "Tasks", workDoneText(sheet.tasks, sheet.taskNote))
   props["Incident reported"] = sheet.incident
   put(props, "Incident note", sheet.incidentNote)
   put(props, "Query note", sheet.workerNote)
