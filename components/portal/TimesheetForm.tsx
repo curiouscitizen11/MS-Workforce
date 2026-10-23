@@ -8,6 +8,7 @@ import { fieldClass } from "@/components/portal/ui"
 import { emailError, emailProblem } from "@/lib/portal/email"
 import { formatDate } from "@/lib/portal/dates"
 import { STANDARD_BREAK_MINUTES, breakChoiceProblem, formatBreak, formatHours, hoursWarnings, paidHours, parseTime } from "@/lib/portal/hours"
+import { workerCanEditTimesheet } from "@/lib/portal/timesheet-lock"
 import { SUPERVISOR_ROLES, TIMESHEET_TASKS } from "@/lib/portal/types"
 
 export type TimesheetShift = {
@@ -139,7 +140,7 @@ export function TimesheetForm({
     saved.finish !== finish ||
     saved.breakMinutes !== breakMinutes ||
     (saved.breakStart || "") !== recordedBreak
-  const locked = saved?.status === "Approved"
+  const locked = !workerCanEditTimesheet(saved?.status) && Boolean(saved)
   const preview = useMemo(() => paidHours(start, finish, breakMinutes), [start, finish, breakMinutes])
   const breakProblem = breakChoiceProblem({ start, finish, breakMinutes, breakStart })
   const breakSlots = useMemo(() => {
@@ -386,6 +387,12 @@ export function TimesheetForm({
             />
           </label>
           {!shift ? <p className="text-sm font-semibold text-[#B45309]">No accepted shift on that day.</p> : null}
+          {locked ? (
+            <p className="text-sm font-semibold" data-testid="timesheet-locked">
+              These hours are approved for pay. You can&apos;t change them.
+            </p>
+          ) : (
+          <>
           <div className="grid grid-cols-2 gap-2">
             <label className="block text-sm font-semibold" htmlFor="start">
               Start time
@@ -495,9 +502,8 @@ export function TimesheetForm({
               onChange={(event) => setWorkerNote(event.target.value)}
             />
           </label>
-          {locked ? (
-            <p className="text-sm font-semibold">These hours are approved for pay. Call MS Workforce if something is wrong.</p>
-          ) : null}
+          </>
+          )}
         </>
       ) : (
         <>

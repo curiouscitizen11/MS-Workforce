@@ -284,6 +284,12 @@ describe("portal flows", () => {
       signaturePng: "data:image/png;base64,ghi",
     })
     expect(locked.ok).toBe(false)
+    if (!locked.ok) expect(locked.error).toMatch(/approved for pay/i)
+    const afterLock = await ctx.store.timesheets.get(result.id)
+    expect(afterLock?.status).toBe("Approved")
+    expect(afterLock?.finish).toBe("15:30")
+    expect(afterLock?.breakStart).toBe("12:15")
+    expect(afterLock?.totalHours).toBe(8)
     const changed = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 15, breakStart: "12:00" })
     expect(changed.ok).toBe(false)
     expect((await ctx.store.timesheets.get(result.id))?.breakMinutes).toBe(30)

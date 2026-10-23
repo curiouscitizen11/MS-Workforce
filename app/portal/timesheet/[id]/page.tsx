@@ -4,6 +4,7 @@ import { DemoBanner, Heading } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
 import { formatDate } from "@/lib/portal/dates"
 import { formatBreak, formatHours } from "@/lib/portal/hours"
+import { workerCanEditTimesheet } from "@/lib/portal/timesheet-lock"
 import { MS_PHONE, cutoffMessage } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
@@ -77,12 +78,12 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
         </section>
       ) : null}
       {!sheet.signaturePng ? <p className="text-sm font-semibold">No supervisor signature</p> : null}
-      {worker.role !== "admin" && sheet.status !== "Approved" ? (
+      {worker.role !== "admin" && workerCanEditTimesheet(sheet.status) ? (
         <Link href="/portal/timesheet" className="pill pill-line-dark w-full">
           Change these hours
         </Link>
       ) : null}
-      {worker.role !== "admin" && sheet.status === "Approved" ? (
+      {worker.role !== "admin" && !workerCanEditTimesheet(sheet.status) ? (
         <p className="text-sm font-semibold">Approved for pay. These hours are locked.</p>
       ) : null}
       <p className="text-sm leading-relaxed">Something wrong? Call MS Workforce on {MS_PHONE}.</p>
