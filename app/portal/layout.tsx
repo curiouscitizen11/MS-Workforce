@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { cookies } from "next/headers"
 import { PortalNav } from "@/components/portal/Nav"
+import { SideMenu } from "@/components/portal/SideMenu"
 import { readSession } from "@/lib/portal/session"
 import { THEME_COOKIE, themeFromCookie } from "@/lib/portal/theme"
 
@@ -33,25 +34,18 @@ export default async function PortalLayout({ children }: { children: React.React
   const theme = themeFromCookie(cookies().get(THEME_COOKIE)?.value)
   return (
     <div className="portal-root min-h-svh" data-theme={theme}>
-      <header className="bg-navy text-white">
-        <div className="mx-auto flex h-14 max-w-xl items-center justify-between px-4">
-          <Link href={current ? home : "/portal/login"} className="leading-none">
-            <span className="block text-base font-semibold tracking-tight">
-              MS <span className="text-teal-400">|</span> WORKFORCE
-            </span>
-            <span className="mt-0.5 block text-[10px] font-medium tracking-[0.18em] text-white/70">WORKER PORTAL</span>
+      <header className="portal-header">
+        <div className="portal-header-inner">
+          {current ? <SideMenu name={current.worker.name} role={current.worker.role} /> : <span className="portal-header-side" />}
+          <Link href={current ? home : "/portal/login"} className="portal-wordmark">
+            MS <span>WORKFORCE</span>
           </Link>
-          {current ? (
-            <Link href="/portal/me" className="inline-flex min-h-12 items-center text-sm font-semibold text-white">
-              Me
-            </Link>
-          ) : (
-            <Link href="/" className="inline-flex min-h-12 items-center text-sm font-semibold text-white">
+          {current ? <span className="portal-header-side" /> : (
+            <Link href="/" className="portal-header-site">
               Website
             </Link>
           )}
         </div>
-        <div className="h-[3px] bg-[#14B8A6]" aria-hidden="true" />
       </header>
       <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-4">{children}</div>
       {current ? <PortalNav role={current.worker.role} /> : null}
