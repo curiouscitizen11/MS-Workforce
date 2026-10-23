@@ -45,7 +45,6 @@ export default async function TimesheetPage() {
           taskNote: sheet.taskNote,
           incident: sheet.incident,
           incidentNote: sheet.incidentNote,
-          workerNote: sheet.workerNote,
           supervisorName: sheet.supervisorName,
           supervisorEmail: sheet.supervisorEmail,
           supervisorRole: sheet.supervisorRole,

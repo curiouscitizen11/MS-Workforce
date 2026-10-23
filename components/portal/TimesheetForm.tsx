@@ -35,7 +35,6 @@ export type SavedTimesheet = {
   taskNote?: string
   incident: boolean
   incidentNote?: string
-  workerNote?: string
   supervisorName?: string
   supervisorEmail?: string
   supervisorRole?: string
@@ -57,7 +56,6 @@ type Payload = {
   tasks: string
   incident: boolean
   incidentNote?: string
-  workerNote?: string
   workerConfirmed: boolean
   confirmUnusualHours?: boolean
   supervisorName: string
@@ -106,7 +104,6 @@ export function TimesheetForm({
   const [workDone, setWorkDone] = useState(workDoneText(openingSaved?.tasks, openingSaved?.taskNote))
   const [incident, setIncident] = useState<boolean | null>(openingSaved ? openingSaved.incident : null)
   const [incidentNote, setIncidentNote] = useState(openingSaved?.incidentNote || "")
-  const [workerNote, setWorkerNote] = useState(openingSaved?.workerNote || "")
   const [confirmUnusual, setConfirmUnusual] = useState(false)
   const [supervisorName, setSupervisorName] = useState(openingSaved?.supervisorName || opening?.signer || "")
   const [supervisorEmail, setSupervisorEmail] = useState(openingSaved?.supervisorEmail || "")
@@ -192,8 +189,8 @@ export function TimesheetForm({
   }, [hoursKey])
 
   useEffect(() => {
-    window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ offerId, workDate, start, finish, breakMinutes, breakStart, workDone, incident, workerNote }))
-  }, [offerId, workDate, start, finish, breakMinutes, breakStart, workDone, incident, workerNote])
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ offerId, workDate, start, finish, breakMinutes, breakStart, workDone, incident }))
+  }, [offerId, workDate, start, finish, breakMinutes, breakStart, workDone, incident])
 
   useEffect(() => {
     const raw = window.localStorage.getItem(QUEUE_KEY)
@@ -239,7 +236,6 @@ export function TimesheetForm({
     setWorkDone(workDoneText(prior?.tasks, prior?.taskNote))
     setIncident(prior ? prior.incident : null)
     setIncidentNote(prior?.incidentNote || "")
-    setWorkerNote(prior?.workerNote || "")
     setSupervisorName(prior?.supervisorName || next.signer)
     setSupervisorEmail(prior?.supervisorEmail || "")
     setRole(prior?.supervisorRole || next.signerRole || "Site supervisor")
@@ -269,7 +265,6 @@ export function TimesheetForm({
       tasks: workDone.trim(),
       incident,
       incidentNote: incident ? incidentNote : undefined,
-      workerNote,
       workerConfirmed: true,
       supervisorEmail,
       confirmUnusualHours: needsConfirm ? confirmUnusual : undefined,
@@ -502,17 +497,6 @@ export function TimesheetForm({
               </label>
             ) : null}
           </fieldset>
-          <label className="block text-sm font-semibold" htmlFor="worker-note">
-            Anything MS Workforce should know about today? (optional)
-            <textarea
-              id="worker-note"
-              maxLength={300}
-              rows={2}
-              className={fieldClass}
-              value={workerNote}
-              onChange={(event) => setWorkerNote(event.target.value)}
-            />
-          </label>
           </>
           )}
         </>

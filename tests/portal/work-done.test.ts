@@ -49,6 +49,8 @@ describe("what the worker did today", () => {
     expect(html).toContain("e.g. Stripped ceiling sheets in unit 4")
     expect(html).toContain("0/200")
     expect(html).not.toContain("What did you mainly do?")
+    expect(html).not.toContain("Anything MS Workforce should know")
+    expect(html).toContain("Were you injured, or was there an incident or near miss today?")
     expect(html).not.toContain("Carrying materials")
 
     const store = createMemoryStore({ seed: true, now: new Date("2026-10-17T01:00:00.000Z") })

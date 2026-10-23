@@ -939,7 +939,6 @@ export async function submitTimesheet(
     taskNote?: string
     incident: boolean
     incidentNote?: string
-    workerNote?: string
     workerConfirmed: boolean
     confirmUnusualHours?: boolean
     supervisorName: string
@@ -1001,8 +1000,7 @@ export async function submitTimesheet(
   const tasks = workDoneText(input.tasks, input.taskNote)
   const taskProblem = workDoneProblem(typeof input.tasks === "string" ? input.tasks : tasks)
   if (taskProblem) return fail(taskProblem)
-  const workerNote = input.workerNote?.trim().slice(0, 300)
-  const sensitive = texts([supervisorName, supervisorEmail, tasks, input.incidentNote, workerNote])
+  const sensitive = texts([supervisorName, supervisorEmail, tasks, input.incidentNote])
   if (sensitive) return fail(sensitive)
   const existing = (await ctx.store.timesheets.all()).find(
     (sheet) => sheet.workerId === input.workerId && sheet.placementRef === offer.placementRef && sheet.workDate === input.workDate,
@@ -1037,7 +1035,6 @@ export async function submitTimesheet(
     taskNote: undefined,
     incident: input.incident,
     incidentNote: input.incident ? input.incidentNote?.trim() : undefined,
-    workerNote: workerNote || undefined,
     workerConfirmedAt: ctx.now.toISOString(),
     status: "Submitted",
     supervisorName,

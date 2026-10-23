@@ -306,7 +306,6 @@ export async function lodgeTimesheet(input: {
   taskNote?: string
   incident: boolean
   incidentNote?: string
-  workerNote?: string
   workerConfirmed: boolean
   confirmUnusualHours?: boolean
   supervisorName: string
