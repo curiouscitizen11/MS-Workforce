@@ -9,6 +9,7 @@ import {
   createOffers,
   markTicketChecked,
   processOutbox,
+  correctTimesheet,
   purgeDocuments,
   requestMagicLink,
   requestOtp,
@@ -141,6 +142,21 @@ describe("portal flows", () => {
 
   it("signs a timesheet for 8 hours and sends a confirmation, not an approval link", async () => {
     const { ctx } = harness()
+    const refused = await submitTimesheet(ctx, {
+      workerId: "w-sam",
+      offerId: "offer-sam-today",
+      workDate: "2026-10-17",
+      start: "07:00",
+      finish: "15:30",
+      breakMinutes: 0,
+      incident: false,
+      workerConfirmed: true,
+      supervisorName: "Pat Riley",
+      supervisorRole: "Site supervisor",
+      supervisorConfirmed: true,
+      signaturePng: "data:image/png;base64,abc",
+    })
+    expect(refused.ok).toBe(false)
     const result = await submitTimesheet(ctx, {
       workerId: "w-sam",
       offerId: "offer-sam-today",
@@ -159,6 +175,9 @@ describe("portal flows", () => {
     if (!result.ok) return
     expect(result.hours).toBe(8)
     expect(result.status).toBe("Approved")
+    const changed = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 15 })
+    expect(changed.ok).toBe(false)
+    expect((await ctx.store.timesheets.get(result.id))?.breakMinutes).toBe(30)
     const messages = await ctx.store.notifications.all()
     const body = messages.map((item) => item.body).join("\n")
     expect(body).toContain("This signature is the approval")

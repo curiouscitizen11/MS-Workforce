@@ -31,7 +31,6 @@ export default async function TimesheetPage() {
           builder: offer.siteContact || "Site",
           start: offer.startTime,
           finish: offer.usualFinish || "15:30",
-          breakMinutes: offer.usualBreak ?? 30,
           signer: offer.timesheetSigner || offer.siteContact || "",
           signerRole: offer.signerRole || "Site supervisor",
         }))}

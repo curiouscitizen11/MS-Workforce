@@ -43,7 +43,7 @@ import {
   requiredPhotoSlots,
   slotsFromWorker,
 } from "@/lib/portal/ticket-photos"
-import { formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
+import { formatHours, hoursWarnings, onQuarterHour, paidHours, standardBreakProblem } from "@/lib/portal/hours"
 import { MS_PHONE, fortnightContaining, olderThanDays, payFortnight, timesheetReminder } from "@/lib/portal/pay"
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
@@ -949,9 +949,8 @@ export async function submitTimesheet(
     return fail("Start and finish need to be between 5:00 am and 8:00 pm.")
   }
   const breakMinutes = Number(input.breakMinutes)
-  if (!Number.isInteger(breakMinutes) || breakMinutes < 0 || breakMinutes > 120) {
-    return fail("Unpaid break needs to be between 0 and 120 minutes.")
-  }
+  const breakProblem = standardBreakProblem(breakMinutes)
+  if (breakProblem) return fail(breakProblem)
   const hours = paidHours(input.start, input.finish, breakMinutes)
   if (!hours.ok) return hours
   const warnings = hoursWarnings(hours.hours)
@@ -1065,7 +1064,10 @@ export async function correctTimesheet(
   if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
   const sheet = await ctx.store.timesheets.get(sheetId)
   if (!sheet || sheet.status === "Draft") return fail("Only a signed timesheet can be corrected.")
-  const hours = paidHours(patch.start, patch.finish, Number(patch.breakMinutes))
+  const breakMinutes = Number(patch.breakMinutes)
+  const breakProblem = standardBreakProblem(breakMinutes)
+  if (breakProblem) return fail(breakProblem)
+  const hours = paidHours(patch.start, patch.finish, breakMinutes)
   if (!hours.ok) return hours
   const before = JSON.stringify({
     start: sheet.start,
@@ -1076,7 +1078,7 @@ export async function correctTimesheet(
   })
   sheet.start = patch.start
   sheet.finish = patch.finish
-  sheet.breakMinutes = Number(patch.breakMinutes)
+  sheet.breakMinutes = breakMinutes
   sheet.totalHours = hours.hours
   sheet.status = "Approved"
   sheet.corrected = true

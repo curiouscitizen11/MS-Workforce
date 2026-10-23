@@ -3,18 +3,17 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { adjustTimesheet, markTimesheetQueried } from "@/app/portal/actions"
+import { STANDARD_BREAK_MINUTES } from "@/lib/portal/hours"
 import { fieldClass } from "@/components/portal/ui"
 
 export function TimesheetAdmin({
   sheetId,
   start,
   finish,
-  breakMinutes,
 }: {
   sheetId: string
   start: string
   finish: string
-  breakMinutes: number
 }) {
   const router = useRouter()
   const [error, setError] = useState("")
@@ -32,7 +31,7 @@ export function TimesheetAdmin({
               : await adjustTimesheet(sheetId, {
                   start: String(data.get("start") || start),
                   finish: String(data.get("finish") || finish),
-                  breakMinutes: Number(data.get("breakMinutes") || breakMinutes),
+                  breakMinutes: STANDARD_BREAK_MINUTES,
                   note: String(data.get("note") || ""),
                 })
           if (!result.ok) setError(result.error)
@@ -41,11 +40,11 @@ export function TimesheetAdmin({
       }}
     >
       <p className="text-sm font-semibold">Admin correction</p>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <input name="start" aria-label="Corrected start" defaultValue={start} className={fieldClass} />
         <input name="finish" aria-label="Corrected finish" defaultValue={finish} className={fieldClass} />
-        <input name="breakMinutes" aria-label="Corrected break" defaultValue={String(breakMinutes)} className={fieldClass} />
       </div>
+      <p className="text-sm font-semibold">30-minute break</p>
       <input name="note" aria-label="Correction note" placeholder="What changed" className={fieldClass} />
       {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       <button name="mode" value="correct" className="pill pill-teal w-full" disabled={pending}>

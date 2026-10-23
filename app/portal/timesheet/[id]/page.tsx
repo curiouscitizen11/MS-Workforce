@@ -51,7 +51,7 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
         </div>
         <div>
           <dt className="text-navy/70">Break</dt>
-          <dd className="font-semibold">{sheet.breakMinutes} min</dd>
+          <dd className="font-semibold">{sheet.breakMinutes === 30 ? "30-minute break" : sheet.breakMinutes + " min"}</dd>
         </div>
       </dl>
       <p className="text-sm">
@@ -73,7 +73,7 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
       <Link href="/portal" className="pill pill-teal w-full">
         Back to home
       </Link>
-      {worker.role === "admin" ? <TimesheetAdmin sheetId={sheet.id} start={sheet.start} finish={sheet.finish} breakMinutes={sheet.breakMinutes} /> : null}
+      {worker.role === "admin" ? <TimesheetAdmin sheetId={sheet.id} start={sheet.start} finish={sheet.finish} /> : null}
     </div>
   )
 }

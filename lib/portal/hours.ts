@@ -7,6 +7,13 @@ export function parseTime(value: string): number | null {
   return hours * 60 + minutes
 }
 
+export const STANDARD_BREAK_MINUTES = 30
+
+export function standardBreakProblem(minutes: number): string | null {
+  if (minutes === STANDARD_BREAK_MINUTES) return null
+  return "The unpaid break is 30 minutes."
+}
+
 export function paidHours(
   start: string,
   finish: string,
