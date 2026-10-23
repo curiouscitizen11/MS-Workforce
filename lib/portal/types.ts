@@ -362,7 +362,7 @@ export type Offer = {
   createdBy: string
 }
 
-export type TimesheetStatus = "Draft" | "Approved" | "Queried"
+export type TimesheetStatus = "Draft" | "Submitted" | "Approved" | "Queried"
 
 export type Timesheet = {
   id: string
@@ -384,6 +384,7 @@ export type Timesheet = {
   workerConfirmedAt?: string
   status: TimesheetStatus
   supervisorName?: string
+  supervisorEmail?: string
   supervisorRole?: string
   plannedSigner?: string
   signerMismatch?: boolean

@@ -35,6 +35,7 @@ export default async function AdminTimesheetsPage() {
             sheet.signerMismatch ? "Different signer" : "",
             sheet.incident ? "Incident" : "",
             sheet.corrected ? "Corrected by MS Workforce" : "",
+            sheet.signaturePng ? "" : "No supervisor signature",
           ].filter(Boolean)
           return (
             <li key={sheet.id}>

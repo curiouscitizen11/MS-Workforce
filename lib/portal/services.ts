@@ -924,6 +924,7 @@ export async function submitTimesheet(
     workerConfirmed: boolean
     confirmUnusualHours?: boolean
     supervisorName: string
+    supervisorEmail: string
     supervisorRole: string
     supervisorConfirmed: boolean
     signaturePng: string
@@ -963,12 +964,15 @@ export async function submitTimesheet(
   if (warnings.some((warning) => warning.level === "confirm") && !input.confirmUnusualHours) {
     return fail(warnings.find((warning) => warning.level === "confirm")?.message || "Confirm the times.")
   }
-  if (!input.workerConfirmed) return fail("Tick the box to confirm these are the hours you worked.")
+  if (!input.workerConfirmed) return fail("Check the hours before you hand the phone over.")
   if (typeof input.incident !== "boolean") return fail("Say whether there was an incident today.")
   if (input.incident && !input.incidentNote?.trim()) return fail("Tell us what happened.")
   if (!input.supervisorConfirmed) return fail("The supervisor needs to tick the hours as correct.")
   const supervisorName = input.supervisorName.trim()
   if (!supervisorName) return fail("The supervisor needs to type their name.")
+  const supervisorEmail = input.supervisorEmail.trim()
+  const emailIssue = emailProblem(supervisorEmail, supervisorEmail, true)
+  if (emailIssue) return fail(emailError(emailIssue))
   if (!SUPERVISOR_ROLES.includes(input.supervisorRole as (typeof SUPERVISOR_ROLES)[number])) {
     return fail("Choose the supervisor's role.")
   }
@@ -978,15 +982,25 @@ export async function submitTimesheet(
   const tasks = (input.tasks || []).filter((task) => TIMESHEET_TASKS.includes(task as (typeof TIMESHEET_TASKS)[number]))
   if ((input.tasks || []).length !== tasks.length) return fail("Choose tasks from the list.")
   const workerNote = input.workerNote?.trim().slice(0, 300)
-  const sensitive = texts([supervisorName, input.taskNote, input.incidentNote, workerNote])
+  const sensitive = texts([supervisorName, supervisorEmail, input.taskNote, input.incidentNote, workerNote])
   if (sensitive) return fail(sensitive)
   const existing = (await ctx.store.timesheets.all()).find(
     (sheet) => sheet.workerId === input.workerId && sheet.placementRef === offer.placementRef && sheet.workDate === input.workDate,
   )
-  if (existing && existing.status !== "Draft") {
-    return fail("These hours are already signed. Something wrong? Call MS Workforce on " + MS_PHONE + ".")
+  if (existing?.status === "Approved") {
+    return fail("These hours are approved for pay. Call MS Workforce on " + MS_PHONE + ".")
   }
-  const fortnight = payFortnight(ctx.now)
+  const nextBreakStart = breakMinutes === 0 ? "" : input.breakStart?.trim() || ""
+  const hoursChanged =
+    !existing ||
+    existing.start !== input.start ||
+    existing.finish !== input.finish ||
+    existing.breakMinutes !== breakMinutes ||
+    (existing.breakStart || "") !== nextBreakStart
+  if (hoursChanged && existing?.signaturePng && input.signaturePng === existing.signaturePng) {
+    return fail("The supervisor needs to sign these hours again.")
+  }
+  const fortnight = existing?.payFortnight ? { label: existing.payFortnight, payDay: existing.payDay || "", afterCutoff: Boolean(existing.afterCutoff) } : payFortnight(ctx.now)
   const planned = (offer.timesheetSigner || "").trim().toLowerCase()
   const sheet: Timesheet = {
     id: existing?.id || newId("ts"),
@@ -1005,47 +1019,26 @@ export async function submitTimesheet(
     incidentNote: input.incident ? input.incidentNote?.trim() : undefined,
     workerNote: workerNote || undefined,
     workerConfirmedAt: ctx.now.toISOString(),
-    status: "Approved",
+    status: "Submitted",
     supervisorName,
+    supervisorEmail,
     supervisorRole: input.supervisorRole,
     plannedSigner: offer.timesheetSigner,
     signerMismatch: Boolean(planned) && planned !== supervisorName.toLowerCase(),
     signaturePng: input.signaturePng,
     signatureIp: input.ip?.slice(0, 80),
     signatureUserAgent: input.userAgent?.slice(0, 180),
-    approvedAt: ctx.now.toISOString(),
     payFortnight: fortnight.label,
     payDay: fortnight.payDay,
     afterCutoff: fortnight.afterCutoff,
-    corrected: false,
+    corrected: existing?.corrected || false,
     source: "Portal",
     workerName: worker.name,
     siteName: offer.siteName,
     suburb: offer.suburb,
-    confirmationSentAt: ctx.now.toISOString(),
   }
   await ctx.store.timesheets.save(sheet)
   await enqueue(ctx, "timesheets", timesheetNotionProperties(sheet))
-  const body = [
-    "Hours signed",
-    "",
-    worker.name,
-    "Date: " + formatDate(sheet.workDate),
-    "Start: " + sheet.start,
-    "Finish: " + sheet.finish,
-    "Unpaid break: " + (sheet.breakMinutes === 0 ? "none" : sheet.breakMinutes + " minutes" + (sheet.breakStart ? " from " + sheet.breakStart : "")),
-    "Paid hours: " + formatHours(sheet.totalHours),
-    "",
-    "Signed on site by " + sheet.supervisorName + (sheet.supervisorRole ? " (" + sheet.supervisorRole + ")" : "") + ".",
-    "This signature is the approval.",
-    "",
-    "Pay is fortnightly, on Thursday.",
-    "This fortnight: " + fortnight.label + ". Pay day: Thursday " + formatDate(fortnight.payDay) + ".",
-  ].join("\n")
-  if (worker.email) {
-    await ctx.notify.email({ to: worker.email, subject: "Hours signed — " + formatDate(sheet.workDate), body })
-  }
-  await ctx.notify.email({ to: adminEmail(), subject: "Hours signed — " + worker.name, body })
   if (sheet.incident) {
     const alert = worker.name + " reported an incident on " + formatDate(sheet.workDate) + ". " + (sheet.incidentNote || "")
     await ctx.notify.sms(adminMobile(), alert)
@@ -1080,6 +1073,13 @@ export async function correctTimesheet(
     breakStart: patch.breakStart,
   })
   if (breakProblem) return fail(breakProblem)
+  const nextBreakStart = breakMinutes === 0 ? "" : patch.breakStart?.trim() || ""
+  const changed =
+    sheet.start !== patch.start ||
+    sheet.finish !== patch.finish ||
+    sheet.breakMinutes !== breakMinutes ||
+    (sheet.breakStart || "") !== nextBreakStart
+  if (!changed) return { ok: true as const, id: sheet.id }
   const before = JSON.stringify({
     start: sheet.start,
     finish: sheet.finish,
@@ -1093,11 +1093,32 @@ export async function correctTimesheet(
   sheet.breakMinutes = breakMinutes
   sheet.breakStart = breakMinutes === 0 ? undefined : patch.breakStart?.trim()
   sheet.totalHours = hours.hours
-  sheet.status = "Approved"
+  sheet.signaturePng = undefined
+  sheet.supervisorName = undefined
+  sheet.supervisorEmail = undefined
+  sheet.approvedAt = undefined
+  sheet.status = "Submitted"
   sheet.corrected = true
   await ctx.store.timesheets.save(sheet)
   await enqueue(ctx, "timesheets", timesheetNotionProperties(sheet))
   await audit(ctx, adminId, "timesheet-corrected", sheet.id, before + (patch.note ? " " + patch.note : ""))
+  return { ok: true as const, id: sheet.id }
+}
+
+export async function approveTimesheetForPay(ctx: Ctx, adminId: string, sheetId: string) {
+  const admin = await ctx.store.workers.get(adminId)
+  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  const sheet = await ctx.store.timesheets.get(sheetId)
+  if (!sheet) return fail("That timesheet is not signed.")
+  if (sheet.status === "Approved") return fail("These hours are already approved for pay.")
+  if (!sheet.signaturePng || !sheet.supervisorName || !sheet.supervisorEmail) {
+    return fail("This timesheet needs a supervisor signature first.")
+  }
+  sheet.status = "Approved"
+  sheet.approvedAt = ctx.now.toISOString()
+  await ctx.store.timesheets.save(sheet)
+  await enqueue(ctx, "timesheets", timesheetNotionProperties(sheet))
+  await audit(ctx, adminId, "timesheet-approved", sheet.id)
   return { ok: true as const, id: sheet.id }
 }
 

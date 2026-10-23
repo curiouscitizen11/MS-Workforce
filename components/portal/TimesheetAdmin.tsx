@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { adjustTimesheet, markTimesheetQueried } from "@/app/portal/actions"
+import { adjustTimesheet, approveTimesheet, markTimesheetQueried } from "@/app/portal/actions"
 import { fieldClass } from "@/components/portal/ui"
 import { STANDARD_BREAK_MINUTES, parseTime } from "@/lib/portal/hours"
 
@@ -12,12 +12,16 @@ export function TimesheetAdmin({
   finish,
   breakMinutes,
   breakStart,
+  status,
+  signed,
 }: {
   sheetId: string
   start: string
   finish: string
   breakMinutes: number
   breakStart?: string
+  status: string
+  signed: boolean
 }) {
   const router = useRouter()
   const [startValue, setStartValue] = useState(start)
@@ -96,6 +100,24 @@ export function TimesheetAdmin({
       <button name="mode" value="query" className="pill pill-line-dark w-full" disabled={pending}>
         Mark queried
       </button>
+      {status === "Approved" ? (
+        <p className="text-sm font-semibold">Approved for pay. The worker can&apos;t change these hours.</p>
+      ) : (
+        <button
+          type="button"
+          className="pill pill-dark w-full"
+          disabled={pending || !signed}
+          onClick={() => {
+            startTransition(async () => {
+              const result = await approveTimesheet(sheetId)
+              if (!result.ok) setError(result.error)
+              else router.refresh()
+            })
+          }}
+        >
+          {signed ? "Approve for pay" : "Needs a supervisor signature"}
+        </button>
+      )}
     </form>
   )
 }

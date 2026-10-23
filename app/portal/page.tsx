@@ -14,7 +14,7 @@ import {
 import { isMock } from "@/lib/portal/config"
 import { complianceFor } from "@/lib/portal/services"
 import { formatDate, formatTime, sydneyParts, sydneyToday } from "@/lib/portal/dates"
-import { inductionTodoCount, offersWaiting, ticketActionCount, unsignedFortnightDays } from "@/lib/portal/home"
+import { inductionTodoCount, offersWaiting, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays } from "@/lib/portal/home"
 import { formatHours } from "@/lib/portal/hours"
 import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
@@ -53,6 +53,7 @@ export default async function DashboardPage() {
   const docs = await store.documents.all()
   const waiting = offersWaiting(offers, worker.id)
   const unsigned = unsignedFortnightDays(offers, sheets, worker.id, today)
+  const missingSign = shiftsMissingSupervisorSign(offers, sheets, worker.id, today)
   const todos = inductionTodoCount(Boolean(worker.inductionPassed), offers, worker.id, today)
   const photoLabels = slotsFromWorker(worker)
     .filter((slot) => {
@@ -104,6 +105,20 @@ export default async function DashboardPage() {
         <Link href="/portal/timesheet" className="pill pill-teal w-full">
           Log today&apos;s hours
         </Link>
+      ) : null}
+      {missingSign.length ? (
+        <section className="rounded-2xl border border-[#B45309] bg-[#FEF3C7] p-3">
+          <h2 className="text-sm font-semibold">Needs a supervisor signature</h2>
+          <ul className="mt-2 space-y-2">
+            {missingSign.map((offer) => (
+              <li key={offer.id}>
+                <Link href="/portal/timesheet" className="block min-h-12 text-sm font-semibold">
+                  {formatDate(offer.shiftDate)} · {offer.siteName || offer.suburb} · No supervisor signature
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : null}
       <div className="portal-grid">
         <Tile href="/portal/offers" label="Shifts" count={waiting} countLabel={waiting + " offers waiting"} icon={<ShiftsIcon />} />

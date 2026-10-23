@@ -25,6 +25,7 @@ import {
   saveTicketPhoto,
   submitApplication,
   submitInduction,
+  approveTimesheetForPay,
   correctTimesheet,
   queryTimesheet,
   submitTimesheet,
@@ -309,6 +310,7 @@ export async function lodgeTimesheet(input: {
   workerConfirmed: boolean
   confirmUnusualHours?: boolean
   supervisorName: string
+  supervisorEmail: string
   supervisorRole: string
   supervisorConfirmed: boolean
   signaturePng: string
@@ -329,6 +331,14 @@ export async function adjustTimesheet(sheetId: string, patch: { start: string; f
   const current = await readSession()
   if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
   const result = await correctTimesheet(await ctx(), current.worker.id, sheetId, patch)
+  if (result.ok) refresh()
+  return result
+}
+
+export async function approveTimesheet(sheetId: string) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  const result = await approveTimesheetForPay(await ctx(), current.worker.id, sheetId)
   if (result.ok) refresh()
   return result
 }

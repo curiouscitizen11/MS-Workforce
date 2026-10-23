@@ -6,7 +6,7 @@ export function offersWaiting(offers: { workerId: string; status: string }[], wo
 
 export function unsignedFortnightDays(
   offers: { workerId: string; status: string; shiftDate: string }[],
-  sheets: { workerId: string; workDate: string; status: string }[],
+  sheets: { workerId: string; workDate: string; status: string; signaturePng?: string }[],
   workerId: string,
   today: string,
 ) {
@@ -14,8 +14,31 @@ export function unsignedFortnightDays(
     if (day > today) return false
     const worked = offers.some((offer) => offer.workerId === workerId && offer.status === "Accepted" && offer.shiftDate === day)
     if (!worked) return false
-    return !sheets.some((sheet) => sheet.workerId === workerId && sheet.workDate === day && sheet.status === "Approved")
+    return !sheets.some(
+      (sheet) =>
+        sheet.workerId === workerId &&
+        sheet.workDate === day &&
+        (sheet.status === "Approved" || Boolean(sheet.signaturePng)),
+    )
   }).length
+}
+
+export function shiftsMissingSupervisorSign<T extends { id: string; workerId: string; status: string; shiftDate: string }>(
+  offers: T[],
+  sheets: { workerId: string; offerId?: string; workDate: string; signaturePng?: string }[],
+  workerId: string,
+  today: string,
+) {
+  return offers.filter((offer) => {
+    if (offer.workerId !== workerId || offer.status !== "Accepted" || offer.shiftDate >= today) return false
+    const signed = sheets.some(
+      (sheet) =>
+        sheet.workerId === workerId &&
+        (sheet.offerId === offer.id || (!sheet.offerId && sheet.workDate === offer.shiftDate)) &&
+        Boolean(sheet.signaturePng),
+    )
+    return !signed
+  })
 }
 
 export function inductionTodoCount(

@@ -34,6 +34,24 @@ export default async function TimesheetPage() {
           signer: offer.timesheetSigner || offer.siteContact || "",
           signerRole: offer.signerRole || "Site supervisor",
         }))}
+        savedSheets={sheets.map((sheet) => ({
+          offerId: sheet.offerId,
+          workDate: sheet.workDate,
+          start: sheet.start,
+          finish: sheet.finish,
+          breakMinutes: sheet.breakMinutes,
+          breakStart: sheet.breakStart,
+          tasks: sheet.tasks,
+          taskNote: sheet.taskNote,
+          incident: sheet.incident,
+          incidentNote: sheet.incidentNote,
+          workerNote: sheet.workerNote,
+          supervisorName: sheet.supervisorName,
+          supervisorEmail: sheet.supervisorEmail,
+          supervisorRole: sheet.supervisorRole,
+          signaturePng: sheet.signaturePng,
+          status: sheet.status,
+        }))}
       />
       <section className="rounded-2xl border border-navy/10 bg-white p-3">
         <h2 className="text-sm font-semibold">This fortnight</h2>

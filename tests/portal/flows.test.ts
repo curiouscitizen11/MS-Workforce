@@ -9,6 +9,7 @@ import {
   createOffers,
   markTicketChecked,
   processOutbox,
+  approveTimesheetForPay,
   correctTimesheet,
   purgeDocuments,
   requestMagicLink,
@@ -152,6 +153,7 @@ describe("portal flows", () => {
       incident: false,
       workerConfirmed: true,
       supervisorName: "Pat Riley",
+      supervisorEmail: "pat.riley@example.com",
       supervisorRole: "Site supervisor",
       supervisorConfirmed: true,
       signaturePng: "data:image/png;base64,abc",
@@ -167,11 +169,29 @@ describe("portal flows", () => {
       incident: false,
       workerConfirmed: true,
       supervisorName: "Pat Riley",
+      supervisorEmail: "pat.riley@example.com",
       supervisorRole: "Site supervisor",
       supervisorConfirmed: true,
       signaturePng: "data:image/png;base64,abc",
     })
     expect(missingStart.ok).toBe(false)
+    const noEmail = await submitTimesheet(ctx, {
+      workerId: "w-sam",
+      offerId: "offer-sam-today",
+      workDate: "2026-10-17",
+      start: "07:00",
+      finish: "15:30",
+      breakMinutes: 30,
+      breakStart: "12:00",
+      incident: false,
+      workerConfirmed: true,
+      supervisorName: "Pat Riley",
+      supervisorEmail: "",
+      supervisorRole: "Site supervisor",
+      supervisorConfirmed: true,
+      signaturePng: "data:image/png;base64,abc",
+    })
+    expect(noEmail.ok).toBe(false)
     const result = await submitTimesheet(ctx, {
       workerId: "w-sam",
       offerId: "offer-sam-today",
@@ -184,6 +204,7 @@ describe("portal flows", () => {
       incident: false,
       workerConfirmed: true,
       supervisorName: "Pat Riley",
+      supervisorEmail: "pat.riley@example.com",
       supervisorRole: "Site supervisor",
       supervisorConfirmed: true,
       signaturePng: "data:image/png;base64,abc",
@@ -191,34 +212,96 @@ describe("portal flows", () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.hours).toBe(8)
-    expect(result.status).toBe("Approved")
+    expect(result.status).toBe("Submitted")
     expect((await ctx.store.timesheets.get(result.id))?.breakStart).toBe("12:00")
     expect((await ctx.store.timesheets.get(result.id))?.breakNote).toBeUndefined()
-    const changed = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 15, breakStart: "12:00" })
-    expect(changed.ok).toBe(false)
-    expect((await ctx.store.timesheets.get(result.id))?.breakMinutes).toBe(30)
-    const short = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "10:00", breakMinutes: 0 })
-    expect(short.ok).toBe(true)
-    expect((await ctx.store.timesheets.get(result.id))?.breakMinutes).toBe(0)
-    expect((await ctx.store.timesheets.get(result.id))?.breakStart).toBeUndefined()
-    expect((await ctx.store.timesheets.get(result.id))?.totalHours).toBe(3)
-    const longAgain = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 0 })
-    expect(longAgain.ok).toBe(false)
-    const restored = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "12:00" })
-    expect(restored.ok).toBe(true)
+    expect((await ctx.store.timesheets.get(result.id))?.supervisorEmail).toBe("pat.riley@example.com")
     const messages = await ctx.store.notifications.all()
-    const body = messages.map((item) => item.body).join("\n")
-    expect(body).toContain("This signature is the approval")
-    expect(body.toLowerCase()).not.toContain("tally")
-    expect(body.toLowerCase()).not.toContain("approval link")
+    expect(messages.some((item) => item.subject?.includes("Hours signed"))).toBe(false)
+    const sameSignature = await submitTimesheet(ctx, {
+      workerId: "w-sam",
+      offerId: "offer-sam-today",
+      workDate: "2026-10-17",
+      start: "07:00",
+      finish: "15:30",
+      breakMinutes: 30,
+      breakStart: "12:15",
+      incident: false,
+      workerConfirmed: true,
+      supervisorName: "Pat Riley",
+      supervisorEmail: "pat.riley@example.com",
+      supervisorRole: "Site supervisor",
+      supervisorConfirmed: true,
+      signaturePng: "data:image/png;base64,abc",
+    })
+    expect(sameSignature.ok).toBe(false)
+    expect((await ctx.store.timesheets.get(result.id))?.breakStart).toBe("12:00")
+    const resigned = await submitTimesheet(ctx, {
+      workerId: "w-sam",
+      offerId: "offer-sam-today",
+      workDate: "2026-10-17",
+      start: "07:00",
+      finish: "15:30",
+      breakMinutes: 30,
+      breakStart: "12:15",
+      incident: false,
+      workerConfirmed: true,
+      supervisorName: "Alex Stone",
+      supervisorEmail: "alex.stone@example.com",
+      supervisorRole: "Site supervisor",
+      supervisorConfirmed: true,
+      signaturePng: "data:image/png;base64,def",
+    })
+    expect(resigned.ok).toBe(true)
+    expect((await ctx.store.timesheets.get(result.id))?.supervisorName).toBe("Alex Stone")
+    expect((await ctx.store.timesheets.get(result.id))?.supervisorEmail).toBe("alex.stone@example.com")
     const sheet = await ctx.store.timesheets.get(result.id)
     if (!sheet) throw new Error("missing timesheet")
     const props = timesheetNotionProperties(sheet)
     expect(props.Entry).toBe("Sam Lee – 2026-10-17")
     expect(props.Source).toBe("Portal")
-    expect(props.Status).toBe("Approved")
+    expect(props.Status).toBe("Submitted")
     expect(props["Signature"]).toBeUndefined()
+    expect(JSON.stringify(props)).not.toContain("alex.stone@example.com")
     expect(JSON.stringify(props).toLowerCase()).not.toMatch(/\btfn\b|tax file|\bbank\b|superannuation|passport|\bgps\b|latitude/)
+    const approved = await approveTimesheetForPay(ctx, "w-mav", result.id)
+    expect(approved.ok).toBe(true)
+    expect((await ctx.store.timesheets.get(result.id))?.status).toBe("Approved")
+    const locked = await submitTimesheet(ctx, {
+      workerId: "w-sam",
+      offerId: "offer-sam-today",
+      workDate: "2026-10-17",
+      start: "07:00",
+      finish: "15:00",
+      breakMinutes: 30,
+      breakStart: "12:00",
+      incident: false,
+      workerConfirmed: true,
+      supervisorName: "Alex Stone",
+      supervisorEmail: "alex.stone@example.com",
+      supervisorRole: "Site supervisor",
+      supervisorConfirmed: true,
+      signaturePng: "data:image/png;base64,ghi",
+    })
+    expect(locked.ok).toBe(false)
+    const changed = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 15, breakStart: "12:00" })
+    expect(changed.ok).toBe(false)
+    expect((await ctx.store.timesheets.get(result.id))?.breakMinutes).toBe(30)
+    const short = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "10:00", breakMinutes: 0 })
+    expect(short.ok).toBe(true)
+    const afterShort = await ctx.store.timesheets.get(result.id)
+    expect(afterShort?.breakMinutes).toBe(0)
+    expect(afterShort?.breakStart).toBeUndefined()
+    expect(afterShort?.totalHours).toBe(3)
+    expect(afterShort?.signaturePng).toBeUndefined()
+    expect(afterShort?.supervisorName).toBeUndefined()
+    expect(afterShort?.supervisorEmail).toBeUndefined()
+    expect(afterShort?.status).toBe("Submitted")
+    const longAgain = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 0 })
+    expect(longAgain.ok).toBe(false)
+    const restored = await correctTimesheet(ctx, "w-mav", result.id, { start: "07:00", finish: "15:30", breakMinutes: 30, breakStart: "12:00" })
+    expect(restored.ok).toBe(true)
+    expect((await ctx.store.timesheets.get(result.id))?.signaturePng).toBeUndefined()
   })
 
   it("clears ticket verification when a card changes", async () => {

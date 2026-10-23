@@ -33,7 +33,13 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
       <DemoBanner mock={isMock()} />
       <Heading
         kicker="Timesheet"
-        title={"Signed and sent. " + formatHours(sheet.totalHours) + " hours on " + formatDate(sheet.workDate) + "."}
+        title={
+          sheet.status === "Approved"
+            ? "Approved for pay. " + formatHours(sheet.totalHours) + " hours on " + formatDate(sheet.workDate) + "."
+            : sheet.signaturePng
+              ? "Waiting for MS Workforce to approve. " + formatHours(sheet.totalHours) + " hours on " + formatDate(sheet.workDate) + "."
+              : "Needs a supervisor signature. " + formatHours(sheet.totalHours) + " hours on " + formatDate(sheet.workDate) + "."
+        }
         text={sheet.workerName + " · MS Workforce"}
       />
       <p className="text-sm font-semibold" data-testid="fortnight-total">
@@ -64,17 +70,35 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
         <section className="rounded-2xl border border-navy/10 bg-white p-3">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Supervisor signature</p>
           <p className="mt-1 font-semibold">{sheet.supervisorName}</p>
+          {sheet.supervisorEmail ? <p className="text-sm text-navy/70">{sheet.supervisorEmail}</p> : null}
           <p className="text-sm text-navy/70">{sheet.supervisorRole}</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={sheet.signaturePng} alt={"Signature of " + (sheet.supervisorName || "the supervisor")} className="mt-2 h-16 w-full rounded-md bg-[#0b1a2e] object-contain" />
         </section>
+      ) : null}
+      {!sheet.signaturePng ? <p className="text-sm font-semibold">No supervisor signature</p> : null}
+      {worker.role !== "admin" && sheet.status !== "Approved" ? (
+        <Link href="/portal/timesheet" className="pill pill-line-dark w-full">
+          Change these hours
+        </Link>
+      ) : null}
+      {worker.role !== "admin" && sheet.status === "Approved" ? (
+        <p className="text-sm font-semibold">Approved for pay. These hours are locked.</p>
       ) : null}
       <p className="text-sm leading-relaxed">Something wrong? Call MS Workforce on {MS_PHONE}.</p>
       <Link href="/portal" className="pill pill-teal w-full">
         Back to home
       </Link>
       {worker.role === "admin" ? (
-        <TimesheetAdmin sheetId={sheet.id} start={sheet.start} finish={sheet.finish} breakMinutes={sheet.breakMinutes} breakStart={sheet.breakStart} />
+        <TimesheetAdmin
+          sheetId={sheet.id}
+          start={sheet.start}
+          finish={sheet.finish}
+          breakMinutes={sheet.breakMinutes}
+          breakStart={sheet.breakStart}
+          status={sheet.status}
+          signed={Boolean(sheet.signaturePng && sheet.supervisorName && sheet.supervisorEmail)}
+        />
       ) : null}
     </div>
   )
