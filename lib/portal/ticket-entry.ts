@@ -2,7 +2,7 @@ import { sensitiveMessage } from "@/lib/portal/privacy"
 
 export type TicketEntry = { number?: string; cardNumber?: string; expiry?: string; issued?: string; noExpiry?: boolean }
 
-export const TRAINING_ITEMS = ["Asbestos awareness", "Silica awareness"] as const
+export const TRAINING_ITEMS = ["Asbestos awareness", "Silica awareness", "Manual handling"] as const
 
 export function isTrainingItem(key: string) {
   return (TRAINING_ITEMS as readonly string[]).includes(key)

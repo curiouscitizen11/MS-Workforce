@@ -64,6 +64,13 @@ describe("tickets and training picker", () => {
     expect(labels.join(" ")).not.toContain("Work at heights")
     expect(labels.join(" ")).not.toContain("None of these")
     expect(labels.join(" ")).not.toContain("Manual handling")
+    const handling = ticketRows({
+      today: "2026-10-17",
+      tickets: { whiteCard: { status: "No" } },
+      otherHeld: ["Manual handling"],
+      otherDetails: { "Manual handling": { expiry: "2020-01-01" } },
+    })
+    expect(handling.find((row) => row.label === "Manual handling")?.status).toBe("Valid")
 
     const soon = ticketRows({
       today: "2026-10-17",
@@ -110,10 +117,11 @@ describe("tickets and training picker", () => {
     const groups = ticketCatalogue()
     expect(groups.map((group) => group.name)).toEqual(["Licences", "Training"])
     const training = groups[1].items.map((item) => item.label)
-    expect(training).toEqual(["Asbestos awareness", "Silica awareness"])
+    expect(training).toEqual(["Asbestos awareness", "Silica awareness", "Manual handling"])
     expect(groups[0].items.some((item) => item.label === "White card")).toBe(true)
     expect(groups[0].items.some((item) => item.label === "Forklift (LF)")).toBe(true)
     expect(groups[0].items.some((item) => item.label === "Asbestos awareness")).toBe(false)
+    expect(groups[0].items.some((item) => item.label === "Manual handling")).toBe(false)
     expect(groups[0].items.some((item) => item.label === "None of these")).toBe(false)
     expect(matchesSearch("Forklift (LF)", "fork")).toBe(true)
     expect(matchesSearch("White card", "silica")).toBe(false)

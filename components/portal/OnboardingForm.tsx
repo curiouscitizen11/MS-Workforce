@@ -261,7 +261,7 @@ function TicketStep({ worker, photos, today, onDone }: { worker: Worker; photos:
   return (
     <div className="space-y-4">
       <p className="text-sm leading-relaxed text-navy/80">
-        Add the licences and training certificates you hold. A White card is already on the list. Each one saves when you tap Save. Asbestos awareness and silica awareness do not ask for an expiry. You need a photo of the front and the back before a card can be saved. You will not be able to open the photos again.
+        Add the licences and training certificates you hold. A White card is already on the list. Each one saves when you tap Save. Asbestos awareness, silica awareness and manual handling do not ask for an expiry. You need a photo of the front and the back before a card can be saved. You will not be able to open the photos again.
       </p>
       <TicketBook
         today={today}

@@ -47,6 +47,12 @@ describe("worker ticket number and expiry", () => {
     )
     expect(training).not.toContain("Expiry date")
     expect(training).toContain("Issue date")
+    const handling = renderToStaticMarkup(
+      createElement(TicketMeta, { id: "other-Manual handling", draft: ticketDraft("Manual handling"), onChange: () => undefined }),
+    )
+    expect(handling).not.toContain("Expiry date")
+    expect(handling).not.toContain("This card doesn")
+    expect(handling).toContain("Issue date")
   })
 
   it("requires a number when the worker says yes, and lets a white card have no expiry", async () => {
@@ -186,6 +192,12 @@ describe("worker ticket number and expiry", () => {
       "Silica awareness": { number: "SA-20" },
     })
     expect(silica.ok).toBe(true)
+    await pair(ctx, "Manual handling")
+    const handling = await saveOtherLicences(ctx, "w-sam", ["Manual handling"], {
+      "Manual handling": { number: "MH-1", expiry: "2027-01-01" },
+    })
+    expect(handling.ok).toBe(true)
+    expect((await ctx.store.workers.get("w-sam"))?.licenceChecks?.["Manual handling"]?.expiry).toBeNull()
     await pair(ctx, "Forklift (LF)")
     const licence = await saveOtherLicences(ctx, "w-sam", ["Forklift (LF)"], { "Forklift (LF)": { number: "LF-1" } })
     expect(licence.ok).toBe(false)

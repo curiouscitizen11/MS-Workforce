@@ -1,7 +1,7 @@
 import { assessTicket, warningWindowDays } from "@/lib/portal/compliance"
 import { daysBetween } from "@/lib/portal/dates"
 import { sensitiveMessage } from "@/lib/portal/privacy"
-import { asksForExpiry, isTrainingItem } from "@/lib/portal/ticket-entry"
+import { TRAINING_ITEMS, asksForExpiry, isTrainingItem } from "@/lib/portal/ticket-entry"
 import { OTHER_TICKETS, TICKET_LABELS, TICKET_TYPES, type TicketType } from "@/lib/portal/types"
 
 export type PickerItem = { id: string; label: string; status?: string }
@@ -57,7 +57,7 @@ export function ticketCatalogue(): PickerGroup[] {
       label: item,
     })),
   ]
-  const training = (["Asbestos awareness", "Silica awareness"] as const).map((item) => ({ id: "other:" + item, label: item }))
+  const training = TRAINING_ITEMS.map((item) => ({ id: "other:" + item, label: item }))
   return [
     { name: "Licences", items: licences },
     { name: "Training", items: training },
