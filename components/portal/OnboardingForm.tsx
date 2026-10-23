@@ -2,12 +2,10 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { saveProfile, saveTicketStep } from "@/app/portal/actions"
+import { saveProfile } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { HeadshotForm } from "@/components/portal/HeadshotForm"
-import { TicketChoices } from "@/components/portal/TicketChoices"
-import { TicketMeta, ticketDraft, type TicketDraft } from "@/components/portal/TicketMeta"
-import { TicketPhotoPair } from "@/components/portal/TicketPhotos"
+import { TicketBook } from "@/components/portal/TicketBook"
 import { fieldClass } from "@/components/portal/ui"
 import { FITNESS_DECLARATION } from "@/lib/portal/fitness"
 import {
@@ -22,23 +20,17 @@ import {
   MEDICAL_CONDITIONS,
   MEDICAL_SHARING,
   MEDICATION_ANSWERS,
-  OTHER_TICKETS,
   RTW_OPTIONS,
   TASKS_AFFECTED,
-  TICKET_ANSWERS,
-  TICKET_LABELS,
-  TICKET_TYPES,
   TRANSPORT_OPTIONS,
   VEVO_METHODS,
   WEEKDAYS,
   WORK_AREAS,
-  type PhotoSide,
-  type TicketType,
   type Worker,
 } from "@/lib/portal/types"
 import type { PhotoRef } from "@/lib/portal/ticket-photos"
 
-export function OnboardingForm({ worker, photos }: { worker: Worker; photos: PhotoRef[] }) {
+export function OnboardingForm({ worker, photos, today }: { worker: Worker; photos: PhotoRef[]; today: string }) {
   const router = useRouter()
   const [step, setStep] = useState(worker.onboardingSubmitted ? 6 : 0)
   const [error, setError] = useState("")
@@ -103,7 +95,7 @@ export function OnboardingForm({ worker, photos }: { worker: Worker; photos: Pho
           }
         />
       ) : null}
-      {step === 2 ? <TicketStep worker={worker} photos={photos} onDone={() => setStep(3)} /> : null}
+      {step === 2 ? <TicketStep worker={worker} photos={photos} today={today} onDone={() => setStep(3)} /> : null}
       {step === 3 ? (
         <Form
           pending={pending}
@@ -266,141 +258,21 @@ export function OnboardingForm({ worker, photos }: { worker: Worker; photos: Pho
   )
 }
 
-function knownAnswer(status: string | undefined) {
-  return TICKET_ANSWERS.includes(status as (typeof TICKET_ANSWERS)[number]) ? status || "No" : "No"
-}
-
-function TicketStep({ worker, photos, onDone }: { worker: Worker; photos: PhotoRef[]; onDone: () => void }) {
-  const [pending, start] = useTransition()
-  const [error, setError] = useState("")
-  const [savedPhotos, setSavedPhotos] = useState<PhotoRef[]>(photos)
-  const [answers, setAnswers] = useState<Record<TicketType, string>>(() => {
-    const next = {} as Record<TicketType, string>
-    for (const type of TICKET_TYPES) next[type] = knownAnswer(worker.tickets[type]?.status)
-    return next
-  })
-  const [held, setHeld] = useState<string[]>(worker.otherTicketsHeld || [])
-  const [entries, setEntries] = useState<Record<string, TicketDraft>>(() => {
-    const next: Record<string, TicketDraft> = {}
-    for (const type of TICKET_TYPES) next[type] = ticketDraft(type, worker.tickets[type])
-    for (const [label, check] of Object.entries(worker.licenceChecks || {})) next[label] = ticketDraft(label, check)
-    return next
-  })
-  const needed = [
-    ...TICKET_TYPES.filter((type) => answers[type] === "Yes, I have it").map((type) => ({ key: type, label: TICKET_LABELS[type] })),
-    ...held.filter((item) => item !== "None of these").map((item) => ({ key: item, label: item })),
-  ]
-  const ready = needed.every(
-    (item) => savedPhotos.some((photo) => photo.key === item.key && photo.side === "front") && savedPhotos.some((photo) => photo.key === item.key && photo.side === "back"),
-  )
-
-  function onSaved(key: string, side: PhotoSide) {
-    setSavedPhotos((current) => (current.some((photo) => photo.key === key && photo.side === side) ? current : [...current, { key, side }]))
-  }
-
+function TicketStep({ worker, photos, today, onDone }: { worker: Worker; photos: PhotoRef[]; today: string; onDone: () => void }) {
   return (
-    <form
-      className="space-y-4"
-      onSubmit={(event) => {
-        event.preventDefault()
-        if (!ready) {
-          setError("Add a photo of the front and the back of each card you hold before you continue.")
-          return
-        }
-        start(async () => {
-          const tickets = {} as Record<TicketType, TicketDraft & { status: string }>
-          for (const type of TICKET_TYPES) {
-            tickets[type] = { status: answers[type], ...(entries[type] || ticketDraft(type, worker.tickets[type])) }
-          }
-          const otherDetails: Record<string, TicketDraft> = {}
-          for (const label of held) {
-            if (label === "None of these") continue
-            otherDetails[label] = entries[label] || ticketDraft(label, worker.licenceChecks?.[label])
-          }
-          const result = await saveTicketStep({ tickets, otherTicketsHeld: held, otherDetails })
-          if (!result.ok) {
-            setError(result.error)
-            return
-          }
-          onDone()
-        })
-      }}
-    >
+    <div className="space-y-4">
       <p className="text-sm leading-relaxed text-navy/80">
-        If you have a licence or a training certificate, type the number on it. Add an expiry only when the card has one. Asbestos awareness and silica awareness do not expire. Then add a photo of the front and the back. You need both photos before you can continue. MS Workforce checks them against the photos. You will not be able to open the photos again.
+        Add the licences and training certificates you hold. A White card is already on the list. Each one saves when you tap Save. Asbestos awareness and silica awareness do not ask for an expiry. You need a photo of the front and the back before a card can be saved. You will not be able to open the photos again.
       </p>
-      {TICKET_TYPES.map((type) => (
-        <div key={type} className="space-y-2">
-          <TicketChoices
-            name={type}
-            label={TICKET_LABELS[type]}
-            value={answers[type]}
-            course={type === "whiteCard"}
-            onChange={(choice) => setAnswers({ ...answers, [type]: choice })}
-          />
-          {answers[type] === "Yes, I have it" ? (
-            <>
-              <TicketMeta
-                id={type}
-                draft={entries[type] || ticketDraft(type, worker.tickets[type])}
-                onChange={(draft) => setEntries({ ...entries, [type]: draft })}
-              />
-              <TicketPhotoPair
-                licenceKey={type}
-                label={TICKET_LABELS[type]}
-                front={savedPhotos.some((photo) => photo.key === type && photo.side === "front")}
-                back={savedPhotos.some((photo) => photo.key === type && photo.side === "back")}
-                onSaved={(side) => onSaved(type, side)}
-              />
-            </>
-          ) : null}
-        </div>
-      ))}
-      <fieldset>
-        <legend className="text-sm font-semibold">Other licences and training</legend>
-        <div className="mt-2 space-y-1">
-          {OTHER_TICKETS.map((item) => {
-            const on = held.includes(item)
-            return (
-              <label key={item} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-                <input
-                  type="checkbox"
-                  checked={on}
-                  onChange={(event) => setHeld(event.target.checked ? [...held, item] : held.filter((value) => value !== item))}
-                />
-                {item}
-              </label>
-            )
-          })}
-        </div>
-      </fieldset>
-      {held
-        .filter((item) => item !== "None of these")
-        .map((item) => (
-          <div key={item} className="space-y-3">
-            <TicketMeta
-              id={"other-" + item}
-              draft={entries[item] || ticketDraft(item, worker.licenceChecks?.[item])}
-              onChange={(draft) => setEntries({ ...entries, [item]: draft })}
-            />
-            <TicketPhotoPair
-              licenceKey={item}
-              label={item}
-              front={savedPhotos.some((photo) => photo.key === item && photo.side === "front")}
-              back={savedPhotos.some((photo) => photo.key === item && photo.side === "back")}
-              onSaved={(side) => onSaved(item, side)}
-            />
-          </div>
-        ))}
-      {error ? (
-        <p role="alert" className="text-sm font-semibold text-[#B91C1C]">
-          {error}
-        </p>
-      ) : null}
-      <button className="pill pill-teal w-full" disabled={pending || !ready}>
-        Save tickets and training
-      </button>
-    </form>
+      <TicketBook
+        today={today}
+        tickets={worker.tickets}
+        otherHeld={worker.otherTicketsHeld || []}
+        otherDetails={worker.licenceChecks || {}}
+        photos={photos}
+        onContinue={onDone}
+      />
+    </div>
   )
 }
 

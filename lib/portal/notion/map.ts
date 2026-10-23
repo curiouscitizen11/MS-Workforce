@@ -1,4 +1,5 @@
 import { asTicketInputs, earliestExpiry } from "@/lib/portal/compliance"
+import { notionOtherTickets } from "@/lib/portal/ticket-catalogue"
 import { heldLicenceExpiries } from "@/lib/portal/ticket-photos"
 import { sensitiveFindings } from "@/lib/portal/privacy"
 import {
@@ -125,7 +126,9 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "Confined space", ticketChoice(worker.tickets.confinedSpace.status))
   put(props, "Driver licence", ticketChoice(worker.tickets.driverLicence.status))
   put(props, "First aid", ticketChoice(worker.tickets.firstAid.status))
-  put(props, "Other tickets", worker.tickets.other.note || (worker.tickets.other.status === "No" ? undefined : worker.tickets.other.status))
+  const extraTickets = notionOtherTickets(worker.otherTicketsHeld)
+  const otherText = [worker.tickets.other.note, extraTickets.custom.join(", ")].filter(Boolean).join(". ")
+  put(props, "Other tickets", otherText || (worker.tickets.other.status === "No" ? undefined : worker.tickets.other.status))
   put(props, "White card expiry", worker.tickets.whiteCard.expiry)
   put(props, "Work at heights expiry", worker.tickets.heights.expiry)
   put(props, "Asbestos class A expiry", worker.tickets.asbestosA.expiry)
@@ -134,7 +137,7 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "Driver licence expiry", worker.tickets.driverLicence.expiry)
   put(props, "First aid expiry", worker.tickets.firstAid.expiry)
   put(props, "Next ticket expiry", nextTicketExpiry(worker))
-  if (worker.otherTicketsHeld?.length) props["Other tickets held"] = worker.otherTicketsHeld
+  if (extraTickets.known.length) props["Other tickets held"] = extraTickets.known
   put(props, "Transport", worker.transport)
   put(props, "Fitness declaration", fitnessChoice(worker.fitness))
   put(props, "Construction work in last 2 years", worker.constructionRecent)

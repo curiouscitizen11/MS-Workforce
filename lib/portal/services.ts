@@ -51,11 +51,11 @@ import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
 import { offerNotionProperties, timesheetNotionProperties, toNotionProperties, workerNotionProperties } from "@/lib/portal/notion/map"
 import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
+import { acceptedHeldLabel } from "@/lib/portal/ticket-catalogue"
 import { asksForExpiry, ticketEntryProblem, ticketNumberProblem, type TicketEntry } from "@/lib/portal/ticket-entry"
 import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
 import {
-  OTHER_TICKETS,
   ROLES,
   SUPERVISOR_ROLES,
   TICKET_ANSWERS,
@@ -609,7 +609,7 @@ export async function saveTicketAnswers(
     answers[type] = answer
   }
   const held = input.otherTicketsHeld.map(String)
-  if (held.some((item) => !(OTHER_TICKETS as readonly string[]).includes(item))) return fail("Choose tickets from the list.")
+  if (held.some((item) => !acceptedHeldLabel(item))) return fail("Choose a ticket from the list, or type its name.")
   const statusMap = {} as Record<TicketType, string>
   for (const type of TICKET_TYPES) statusMap[type] = answers[type].status
   const docs = await workerDocs(ctx, workerId)
@@ -665,27 +665,28 @@ export async function saveTicketAnswers(
 export async function saveOtherLicences(ctx: Ctx, workerId: string, held: string[], details: Record<string, TicketEntry> = {}) {
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Log in again.")
-  const next = held.map(String)
-  if (next.some((item) => !(OTHER_TICKETS as readonly string[]).includes(item))) return fail("Choose tickets from the list.")
+  const next = Array.from(new Set(held.map(String)))
+  if (next.some((item) => !acceptedHeldLabel(item))) return fail("Choose a ticket from the list, or type its name.")
   const today = sydneyToday(ctx.now)
   const docs = await workerDocs(ctx, workerId)
+  const previousHeld = worker.otherTicketsHeld || []
+  const touched = next.filter((label) => isOtherLicence(label) && (label in details || !previousHeld.includes(label)))
   const missing = missingPhotoMessage(
-    next.filter(isOtherLicence).map((label) => ({ key: label, label })),
+    touched.map((label) => ({ key: label, label })),
     docs,
     workerId,
   )
   if (missing) return fail(missing)
-  for (const label of next.filter(isOtherLicence)) {
+  for (const label of touched) {
     const problem = ticketEntryProblem(details[label] || {}, today, label)
     if (problem) return fail(label + ": " + problem)
   }
-  const previousHeld = worker.otherTicketsHeld || []
   let changed =
     previousHeld.length !== next.length ||
     previousHeld.some((item) => !next.includes(item)) ||
     next.some((item) => !previousHeld.includes(item))
   await syncOtherLicences(ctx, worker, next)
-  for (const label of next.filter(isOtherLicence)) {
+  for (const label of touched) {
     const entry = details[label] || {}
     const previous = worker.licenceChecks?.[label]
     const number = (entry.number || "").trim()

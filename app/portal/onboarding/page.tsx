@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { OnboardingForm } from "@/components/portal/OnboardingForm"
 import { Heading } from "@/components/portal/ui"
+import { sydneyToday } from "@/lib/portal/dates"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { redirect } from "next/navigation"
@@ -17,7 +18,7 @@ export default async function OnboardingPage() {
   return (
     <div className="space-y-4">
       <Heading kicker="Onboarding" title="Your details" text="You can stop and come back. We save each step." />
-      <OnboardingForm worker={worker} photos={photos} />
+      <OnboardingForm worker={worker} photos={photos} today={sydneyToday()} />
     </div>
   )
 }

@@ -1,4 +1,5 @@
-import { OTHER_TICKETS, TICKET_LABELS, TICKET_TYPES, type PhotoSide, type PortalDocument, type TicketType, type Worker } from "@/lib/portal/types"
+import { acceptedHeldLabel } from "@/lib/portal/ticket-catalogue"
+import { TICKET_LABELS, TICKET_TYPES, type PhotoSide, type PortalDocument, type TicketType, type Worker } from "@/lib/portal/types"
 
 export const TICKET_PHOTO_MAX_BYTES = 8 * 1024 * 1024
 
@@ -9,7 +10,7 @@ export function isTicketType(value: string): value is TicketType {
 }
 
 export function isOtherLicence(value: string): boolean {
-  return value !== "None of these" && (OTHER_TICKETS as readonly string[]).includes(value)
+  return value !== "None of these" && acceptedHeldLabel(value)
 }
 
 export function isPhotoLicenceKey(value: string): boolean {
