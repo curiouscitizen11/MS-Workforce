@@ -261,6 +261,13 @@ main .page-enter > section.bg-navy:first-of-type::before { display: none; }
   background: var(--p-accent);
   color: var(--p-button-text);
 }
+.portal-root input[type="date"] {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
 .portal-root .portal-nav {
   background: var(--p-card);
   border-top: 1px solid var(--p-border);

@@ -227,6 +227,7 @@ export type Ticket = {
   state?: string
   expiry?: string | null
   issued?: string | null
+  cardNumber?: string
   note?: string
   pendingCheck?: boolean
   checkedBy?: string
@@ -236,7 +237,9 @@ export type Ticket = {
 
 export type LicenceCheck = {
   number?: string
+  cardNumber?: string
   expiry?: string | null
+  issued?: string | null
   checkedBy?: string
   checkedAt?: string
   photosDeletedAt?: string

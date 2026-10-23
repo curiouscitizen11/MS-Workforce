@@ -3,17 +3,19 @@
 import { fieldClass } from "@/components/portal/ui"
 import { asksForExpiry } from "@/lib/portal/ticket-entry"
 
-export type TicketDraft = { number: string; expiry: string; noExpiry: boolean }
+export type TicketDraft = { number: string; cardNumber: string; expiry: string; issued: string; noExpiry: boolean }
 
 export function ticketDraft(
   key: string,
-  source?: { number?: string | null; expiry?: string | null } | null,
+  source?: { number?: string | null; cardNumber?: string | null; expiry?: string | null; issued?: string | null } | null,
 ): TicketDraft {
   const expiry = source?.expiry || ""
   return {
     number: source?.number || "",
+    cardNumber: source?.cardNumber || "",
+    issued: source?.issued || "",
     expiry,
-    noExpiry: !expiry && (key === "whiteCard" || Boolean(source?.number)),
+    noExpiry: !asksForExpiry(key) || (!expiry && (key === "whiteCard" || Boolean(source?.number))),
   }
 }
 
@@ -26,11 +28,13 @@ export function TicketMeta({
   draft: TicketDraft
   onChange: (next: TicketDraft) => void
 }) {
-  const showExpiry = asksForExpiry(id.replace(/^other-/, ""))
+  const key = id.replace(/^other-/, "")
+  const driver = key === "driverLicence"
+  const showExpiry = asksForExpiry(key)
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 max-w-full space-y-2">
       <label className="block text-sm font-semibold" htmlFor={id + "-number"}>
-        Number on the card
+        {driver ? "Licence number" : "Licence or card number"}
         <input
           id={id + "-number"}
           name={id + "-number"}
@@ -41,32 +45,54 @@ export function TicketMeta({
           onChange={(event) => onChange({ ...draft, number: event.target.value })}
         />
       </label>
+      {driver ? (
+        <label className="block text-sm font-semibold" htmlFor={id + "-card"}>
+          Card number
+          <input
+            id={id + "-card"}
+            name={id + "-card"}
+            value={draft.cardNumber}
+            autoComplete="off"
+            maxLength={30}
+            className={fieldClass}
+            onChange={(event) => onChange({ ...draft, cardNumber: event.target.value })}
+          />
+        </label>
+      ) : null}
+      <DateField id={id + "-issued"} label="Issue date" value={draft.issued} onChange={(issued) => onChange({ ...draft, issued })} />
+      {showExpiry && !draft.noExpiry ? (
+        <DateField id={id + "-expiry"} label="Expiry date" value={draft.expiry} onChange={(expiry) => onChange({ ...draft, expiry })} />
+      ) : null}
       {showExpiry ? (
-        <>
-          <label className="block min-w-0 text-sm font-semibold" htmlFor={id + "-expiry"}>
-            Expiry date
-            <input
-              id={id + "-expiry"}
-              name={id + "-expiry"}
-              type="date"
-              value={draft.noExpiry ? "" : draft.expiry}
-              disabled={draft.noExpiry}
-              className={fieldClass + " box-border max-w-full min-w-0"}
-              onChange={(event) => onChange({ ...draft, expiry: event.target.value })}
-            />
-          </label>
-          <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-            <input
-              type="checkbox"
-              name={id + "-no-expiry"}
-              className="h-5 w-5"
-              checked={draft.noExpiry}
-              onChange={(event) => onChange({ ...draft, expiry: event.target.checked ? "" : draft.expiry, noExpiry: event.target.checked })}
-            />
-            This card doesn&apos;t expire
-          </label>
-        </>
+        <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
+          <input
+            type="checkbox"
+            name={id + "-no-expiry"}
+            className="h-5 w-5"
+            checked={draft.noExpiry}
+            onChange={(event) => onChange({ ...draft, expiry: event.target.checked ? "" : draft.expiry, noExpiry: event.target.checked })}
+          />
+          This card doesn&apos;t expire
+        </label>
       ) : null}
     </div>
+  )
+}
+
+function DateField({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (value: string) => void }) {
+  return (
+    <label className="block min-w-0 max-w-full text-sm font-semibold" htmlFor={id}>
+      {label}
+      <span className="mt-1 block min-w-0 max-w-full overflow-hidden">
+        <input
+          id={id}
+          name={id}
+          type="date"
+          value={value}
+          className={fieldClass + " box-border block w-full min-w-0 max-w-full"}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      </span>
+    </label>
   )
 }

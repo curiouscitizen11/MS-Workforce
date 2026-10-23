@@ -54,7 +54,9 @@ export function TicketEditor({
             const result = await updateTicket(type, {
               status,
               number: draft.number,
+              cardNumber: draft.cardNumber,
               expiry: draft.expiry,
+              issued: draft.issued,
               noExpiry: draft.noExpiry,
             })
             if (!result.ok) setError(result.error)

@@ -1,4 +1,7 @@
+import { createElement } from "react"
+import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it } from "vitest"
+import { TicketMeta, ticketDraft } from "@/components/portal/TicketMeta"
 import { complianceFor, flagTicketMismatch, markTicketChecked, saveOtherLicences, saveTicket, saveTicketPhoto, type Ctx } from "@/lib/portal/services"
 import { createNotify } from "@/lib/portal/notify"
 import { createMemoryStore } from "@/lib/portal/store"
@@ -22,6 +25,30 @@ async function pair(ctx: Ctx, key: string) {
 }
 
 describe("worker ticket number and expiry", () => {
+  it("labels card fields and hides an expiry that does not apply", () => {
+    const white = renderToStaticMarkup(createElement(TicketMeta, { id: "whiteCard", draft: ticketDraft("whiteCard"), onChange: () => undefined }))
+    expect(white).toContain("Licence or card number")
+    expect(white).toContain("Issue date")
+    expect(white).not.toContain('id="whiteCard-expiry"')
+    expect(ticketDraft("whiteCard").noExpiry).toBe(true)
+    const driver = renderToStaticMarkup(
+      createElement(TicketMeta, {
+        id: "driverLicence",
+        draft: ticketDraft("driverLicence", { number: "1", expiry: "2028-01-01" }),
+        onChange: () => undefined,
+      }),
+    )
+    expect(driver).toContain("Licence number")
+    expect(driver).toContain("Card number")
+    expect(driver).toContain('id="driverLicence-expiry"')
+    expect(driver).toContain("min-w-0")
+    const training = renderToStaticMarkup(
+      createElement(TicketMeta, { id: "other-Asbestos awareness", draft: ticketDraft("Asbestos awareness"), onChange: () => undefined }),
+    )
+    expect(training).not.toContain("Expiry date")
+    expect(training).toContain("Issue date")
+  })
+
   it("requires a number when the worker says yes, and lets a white card have no expiry", async () => {
     const ctx = harness()
     const missing = await saveTicket(ctx, "w-sam", "whiteCard", { status: "Yes, I have it", number: "  ", noExpiry: true })
@@ -112,6 +139,39 @@ describe("worker ticket number and expiry", () => {
     const replaced = await ctx.store.workers.get("w-sam")
     expect(replaced?.tickets.heights.checkedAt).toBeUndefined()
     expect(replaced?.tickets.heights.number).toBeUndefined()
+  })
+
+  it("stores a driver licence number and card number, and an issue date", async () => {
+    const ctx = harness()
+    await pair(ctx, "driverLicence")
+    const missingCard = await saveTicket(ctx, "w-sam", "driverLicence", {
+      status: "Yes, I have it",
+      number: "12345678",
+      expiry: "2028-01-01",
+      issued: "2020-02-02",
+    })
+    expect(missingCard.ok).toBe(false)
+    if (!missingCard.ok) expect(missingCard.error).toMatch(/card number/i)
+    const future = await saveTicket(ctx, "w-sam", "driverLicence", {
+      status: "Yes, I have it",
+      number: "12345678",
+      cardNumber: "998877",
+      expiry: "2028-01-01",
+      issued: "2027-01-01",
+    })
+    expect(future.ok).toBe(false)
+    const saved = await saveTicket(ctx, "w-sam", "driverLicence", {
+      status: "Yes, I have it",
+      number: "12345678",
+      cardNumber: "998877",
+      expiry: "2028-01-01",
+      issued: "2020-02-02",
+    })
+    expect(saved.ok).toBe(true)
+    const sam = await ctx.store.workers.get("w-sam")
+    expect(sam?.tickets.driverLicence.number).toBe("12345678")
+    expect(sam?.tickets.driverLicence.cardNumber).toBe("998877")
+    expect(sam?.tickets.driverLicence.issued).toBe("2020-02-02")
   })
 
   it("stores a training certificate without an expiry, and still requires one on a licence", async () => {

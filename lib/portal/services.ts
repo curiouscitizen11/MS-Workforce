@@ -51,7 +51,7 @@ import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
 import { offerNotionProperties, timesheetNotionProperties, toNotionProperties, workerNotionProperties } from "@/lib/portal/notion/map"
 import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
-import { ticketEntryProblem, ticketNumberProblem, type TicketEntry } from "@/lib/portal/ticket-entry"
+import { asksForExpiry, ticketEntryProblem, ticketNumberProblem, type TicketEntry } from "@/lib/portal/ticket-entry"
 import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
 import {
@@ -531,15 +531,25 @@ function withWorkerEntry(previous: Ticket | undefined, status: string, entry: Ti
   const problem = ticketEntryProblem(entry, today, key)
   if (problem) return { ok: false, error: problem }
   const number = (entry.number || "").trim()
-  const expiry = entry.noExpiry ? null : entry.expiry || null
-  const changed = !previous?.checkedAt || previous.number !== number || (previous.expiry || null) !== expiry || previous.status !== status
+  const expiry = entry.noExpiry || !asksForExpiry(key) ? null : entry.expiry || null
+  const issued = (entry.issued || "").trim() || null
+  const cardNumber = key === "driverLicence" ? (entry.cardNumber || "").trim() : undefined
+  const changed =
+    !previous?.checkedAt ||
+    previous.number !== number ||
+    (previous.expiry || null) !== expiry ||
+    (previous.issued || null) !== issued ||
+    (previous.cardNumber || "") !== (cardNumber || "") ||
+    previous.status !== status
   return {
     ok: true,
     changed,
     ticket: {
       status,
       number,
+      cardNumber,
       expiry,
+      issued,
       pendingCheck: changed,
       checkedBy: changed ? undefined : previous?.checkedBy,
       checkedAt: changed ? undefined : previous?.checkedAt,
@@ -591,7 +601,10 @@ export async function saveTicketAnswers(
   const answers = {} as Record<TicketType, TicketEntry & { status: string }>
   for (const type of TICKET_TYPES) {
     const raw = input.tickets[type]
-    const answer = typeof raw === "string" || !raw ? { status: raw || "No" } : { status: raw.status || "No", number: raw.number, expiry: raw.expiry, noExpiry: raw.noExpiry }
+    const answer =
+      typeof raw === "string" || !raw
+        ? { status: raw || "No" }
+        : { status: raw.status || "No", number: raw.number, cardNumber: raw.cardNumber, expiry: raw.expiry, issued: raw.issued, noExpiry: raw.noExpiry }
     if (!TICKET_ANSWERS.includes(answer.status as (typeof TICKET_ANSWERS)[number])) return fail("Choose one of the listed options.")
     answers[type] = answer
   }
@@ -628,13 +641,14 @@ export async function saveTicketAnswers(
     const entry = input.otherDetails?.[label] || {}
     const previous = worker.licenceChecks?.[label]
     const number = (entry.number || "").trim()
-    const expiry = entry.noExpiry ? null : entry.expiry || null
-    const same = previous?.checkedAt && previous.number === number && (previous.expiry || null) === expiry
+    const expiry = entry.noExpiry || !asksForExpiry(label) ? null : entry.expiry || null
+    const issued = (entry.issued || "").trim() || null
+    const same = previous?.checkedAt && previous.number === number && (previous.expiry || null) === expiry && (previous.issued || null) === issued
     worker.licenceChecks = {
       ...worker.licenceChecks,
       [label]: same
         ? previous
-        : { number, expiry },
+        : { number, expiry, issued },
     }
     if (!same) changed = true
   }
@@ -675,9 +689,10 @@ export async function saveOtherLicences(ctx: Ctx, workerId: string, held: string
     const entry = details[label] || {}
     const previous = worker.licenceChecks?.[label]
     const number = (entry.number || "").trim()
-    const expiry = entry.noExpiry ? null : entry.expiry || null
-    const same = Boolean(previous?.checkedAt) && previous?.number === number && (previous?.expiry || null) === expiry
-    worker.licenceChecks = { ...worker.licenceChecks, [label]: same && previous ? previous : { number, expiry } }
+    const expiry = entry.noExpiry || !asksForExpiry(label) ? null : entry.expiry || null
+    const issued = (entry.issued || "").trim() || null
+    const same = Boolean(previous?.checkedAt) && previous?.number === number && (previous?.expiry || null) === expiry && (previous?.issued || null) === issued
+    worker.licenceChecks = { ...worker.licenceChecks, [label]: same && previous ? previous : { number, expiry, issued } }
     if (!same) changed = true
   }
   if (changed) worker.ticketsVerified = allHeldChecked(worker)
