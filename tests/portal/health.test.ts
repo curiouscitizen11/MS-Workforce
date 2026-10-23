@@ -2,7 +2,7 @@ import { createElement } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it } from "vitest"
 import { HealthQuestions } from "@/components/portal/HealthQuestions"
-import { healthFromWorker, healthRecord, healthSummary, type HealthDraft } from "@/lib/portal/health"
+import { answerSummary, healthFromWorker, healthRecord, healthSummary, sheetFrame, type HealthDraft } from "@/lib/portal/health"
 import { workerNotionProperties } from "@/lib/portal/notion/map"
 import { createMemoryStore } from "@/lib/portal/store"
 
@@ -47,6 +47,15 @@ describe("health questions", () => {
     expect(cleared.conditions).toEqual(["Asthma"])
     expect(cleared.tasks).toEqual([])
     expect(healthSummary(["Bee or wasp stings", "Latex"], "")).toBe("Bee or wasp stings, Latex")
+    expect(answerSummary("Allergies", "Yes", ["Bee or wasp stings", "Latex"], "Swelling")).toBe(
+      "Allergies: Bee or wasp stings, Latex. Describe: Swelling",
+    )
+    expect(answerSummary("Injury", "Yes", ["Lifting or carrying", "Ladders or heights"], "Left knee", "past injury")).toBe(
+      "Injury: past injury, Lifting or carrying, Ladders or heights. Describe: Left knee",
+    )
+    expect(answerSummary("Injury", "Yes", [], "Left knee", "past injury")).toBe("Injury: past injury. Describe: Left knee")
+    expect(sheetFrame(844, 844, 0)).toEqual({ bottom: 0, maxHeight: 633 })
+    expect(sheetFrame(844, 380, 0)).toEqual({ bottom: 464, maxHeight: 285 })
   })
 
   it("hides the option list until yes, and shows one summary row", () => {
@@ -78,7 +87,25 @@ describe("health questions", () => {
     expect(sheet).toContain("Describe")
     expect(sheet).toContain("anaphylaxis")
     expect(sheet).toContain('role="dialog"')
+    expect(sheet).toContain("portal-sheet-bar")
+    expect(sheet).toContain("portal-sheet-foot")
+    expect(sheet).toContain("portal-opt-grid")
+    expect(sheet.indexOf("portal-sheet-foot")).toBeGreaterThan(sheet.indexOf("portal-sheet-body"))
     expect(sheet).not.toContain("Tasks it affects")
+
+    const injury = renderToStaticMarkup(
+      createElement(HealthQuestions, {
+        value: {
+          ...empty,
+          injury: "Yes",
+          injuryKind: "Yes, a past injury that still affects me",
+          tasks: ["Lifting or carrying", "Ladders or heights"],
+          injuryNote: "Left knee",
+        },
+        onChange: () => undefined,
+      }),
+    )
+    expect(injury).toContain("Injury: past injury, Lifting or carrying, Ladders or heights. Describe: Left knee")
   })
 
   it("still sends the same Notion health properties", async () => {

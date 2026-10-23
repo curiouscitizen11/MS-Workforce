@@ -53,6 +53,30 @@ export function healthSummary(options: string[], note: string) {
   return options.includes(OTHER_OPTION) ? OTHER_OPTION : ""
 }
 
+export function injuryKindWord(kind: string) {
+  return kind === PAST_INJURY ? "past injury" : "current injury"
+}
+
+/** Summary row: the choices first, then a separate Describe clause. */
+export function answerSummary(label: string, choice: HealthChoice, options: string[], note: string, lead = "") {
+  if (choice !== "Yes") return ""
+  const names = [lead.trim(), ...options.filter((item) => item && item !== OTHER_OPTION)].filter(Boolean)
+  const list = names.join(", ")
+  const described = note.trim()
+  if (list && described) return label + ": " + list + ". Describe: " + described
+  if (list) return label + ": " + list
+  if (described) return label + ": Describe: " + described
+  if (options.includes(OTHER_OPTION)) return label + ": " + OTHER_OPTION
+  return ""
+}
+
+/** Lift the sheet above the keyboard and keep it to about three quarters of the visible screen. */
+export function sheetFrame(windowHeight: number, viewportHeight: number, offsetTop = 0) {
+  const bottom = Math.max(0, Math.round(windowHeight - viewportHeight - offsetTop))
+  const visible = Math.max(1, Math.round(viewportHeight))
+  return { bottom, maxHeight: Math.min(visible, Math.round(visible * 0.75)) }
+}
+
 function choiceFrom(value: string | undefined, yesValues: readonly string[]): HealthChoice {
   if (value === "No") return "No"
   if (value === TELL_BY_PHONE) return TELL_BY_PHONE
