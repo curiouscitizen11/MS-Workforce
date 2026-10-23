@@ -61,7 +61,6 @@ export function OnboardingForm({ worker, photos, today }: { worker: Worker; phot
           onSubmit={(data) => start(() => save(data, 1))}
           fields={
             <>
-              <Text label="Preferred name" name="preferredName" defaultValue={worker.preferredName} />
               <Text label="Date of birth" name="dob" type="date" defaultValue={worker.dob} />
               <Text label="Address" name="address" defaultValue={worker.address} />
               <Text label="Postcode" name="postcode" defaultValue={worker.postcode} />

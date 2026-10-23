@@ -451,17 +451,16 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
 export async function saveMyDetails(
   ctx: Ctx,
   workerId: string,
-  input: { preferredName: string; suburb: string; postcode: string },
+  input: { suburb: string; postcode: string },
 ) {
   const worker = await ctx.store.workers.get(workerId)
   if (!worker || worker.role !== "worker") return fail("Log in again.")
-  const sensitive = texts([input.preferredName, input.suburb, input.postcode])
+  const sensitive = texts([input.suburb, input.postcode])
   if (sensitive) return fail(SENSITIVE_MESSAGE)
-  worker.preferredName = input.preferredName.trim()
   worker.suburb = input.suburb.trim()
   worker.postcode = input.postcode.trim()
   await persistWorker(ctx, worker)
-  await audit(ctx, workerId, "update-details", workerId, "Updated preferred name, suburb or postcode.")
+  await audit(ctx, workerId, "update-details", workerId, "Updated suburb or postcode.")
   return { ok: true as const }
 }
 

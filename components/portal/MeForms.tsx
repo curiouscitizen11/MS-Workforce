@@ -21,7 +21,6 @@ export function DetailsForm({ worker }: { worker: Worker }) {
         setSaved("")
         start(async () => {
           const result = await saveDetails({
-            preferredName: String(data.get("preferredName") || ""),
             suburb: String(data.get("suburb") || ""),
             postcode: String(data.get("postcode") || ""),
           })
@@ -33,10 +32,6 @@ export function DetailsForm({ worker }: { worker: Worker }) {
         })
       }}
     >
-      <label className="block text-sm font-semibold" htmlFor="preferredName">
-        Preferred name
-        <input id="preferredName" name="preferredName" defaultValue={worker.preferredName || ""} className={fieldClass} />
-      </label>
       <label className="block text-sm font-semibold" htmlFor="suburb">
         Suburb
         <input id="suburb" name="suburb" defaultValue={worker.suburb || ""} className={fieldClass} />

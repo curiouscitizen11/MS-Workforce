@@ -152,7 +152,7 @@ export async function applyForWork(input: unknown) {
   return result
 }
 
-export async function saveDetails(input: { preferredName: string; suburb: string; postcode: string }) {
+export async function saveDetails(input: { suburb: string; postcode: string }) {
   const current = await readSession()
   if (!current || current.worker.role !== "worker") return { ok: false as const, error: "Log in again." }
   const result = await saveMyDetails(await ctx(), current.worker.id, input)

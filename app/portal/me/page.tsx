@@ -17,7 +17,7 @@ export default async function MePage() {
   const shown = { ...worker, mobile: formatAuMobile(worker.mobile) }
   return (
     <div className="space-y-4">
-      <Heading kicker="Me" title={worker.preferredName || worker.name.split(" ")[0]} text="Your photo, details and private safety info." />
+      <Heading kicker="Me" title={worker.name.split(" ")[0]} text="Your photo, details and private safety info." />
       {worker.role === "worker" ? (
         <>
           <section className="space-y-2 rounded-2xl border border-navy/10 bg-white p-4">
