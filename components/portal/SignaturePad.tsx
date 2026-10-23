@@ -10,13 +10,16 @@ export function SignaturePad({ onChange }: { onChange: (value: string | null) =>
     const canvas = ref.current
     if (!canvas) return
     const rect = canvas.getBoundingClientRect()
-    canvas.width = rect.width
-    canvas.height = rect.height
+    const ratio = window.devicePixelRatio || 1
+    canvas.width = Math.max(1, Math.round(rect.width * ratio))
+    canvas.height = Math.max(1, Math.round(rect.height * ratio))
     const context = canvas.getContext("2d")
     if (!context) return
-    context.lineWidth = 2.4
+    context.scale(ratio, ratio)
+    context.lineWidth = 3
     context.lineCap = "round"
-    context.strokeStyle = "#0A2540"
+    context.lineJoin = "round"
+    context.strokeStyle = "#ffffff"
   }, [])
 
   function point(event: React.PointerEvent<HTMLCanvasElement>) {
@@ -31,7 +34,7 @@ export function SignaturePad({ onChange }: { onChange: (value: string | null) =>
       <canvas
         ref={ref}
         aria-label="Signature"
-        className="h-28 w-full touch-none rounded-xl border border-navy/20 bg-white"
+        className="h-28 w-full touch-none rounded-xl border border-[#5d728c] bg-[#0b1a2e]"
         onPointerDown={(event) => {
           const canvas = ref.current
           const context = canvas?.getContext("2d")
@@ -62,7 +65,8 @@ export function SignaturePad({ onChange }: { onChange: (value: string | null) =>
           const canvas = ref.current
           const context = canvas?.getContext("2d")
           if (!canvas || !context) return
-          context.clearRect(0, 0, canvas.width, canvas.height)
+          const ratio = window.devicePixelRatio || 1
+          context.clearRect(0, 0, canvas.width / ratio, canvas.height / ratio)
           onChange(null)
         }}
       >

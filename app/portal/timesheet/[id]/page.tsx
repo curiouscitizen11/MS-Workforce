@@ -66,7 +66,7 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
           <p className="mt-1 font-semibold">{sheet.supervisorName}</p>
           <p className="text-sm text-navy/70">{sheet.supervisorRole}</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={sheet.signaturePng} alt={"Signature of " + (sheet.supervisorName || "the supervisor")} className="mt-2 h-16 w-full object-contain" />
+          <img src={sheet.signaturePng} alt={"Signature of " + (sheet.supervisorName || "the supervisor")} className="mt-2 h-16 w-full rounded-md bg-[#0b1a2e] object-contain" />
         </section>
       ) : null}
       <p className="text-sm leading-relaxed">Something wrong? Call MS Workforce on {MS_PHONE}.</p>
