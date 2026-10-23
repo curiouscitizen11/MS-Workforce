@@ -4,7 +4,9 @@ import { sensitiveMessage } from "@/lib/portal/privacy"
 import { asksForExpiry, isTrainingItem } from "@/lib/portal/ticket-entry"
 import { OTHER_TICKETS, TICKET_LABELS, TICKET_TYPES, type TicketType } from "@/lib/portal/types"
 
-export type PickerGroup = { name: string; items: { id: string; label: string }[] }
+export type PickerItem = { id: string; label: string; status?: string }
+
+export type PickerGroup = { name: string; items: PickerItem[] }
 
 export type TicketRow = {
   id: string

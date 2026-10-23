@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { removeImages, saveVerification, sendShiftOffers, showPassport, signOutWorker } from "@/app/portal/actions"
+import { ChosenList } from "@/components/portal/AddPicker"
 import { fieldClass } from "@/components/portal/ui"
 import { TICKET_LABELS, TICKET_TYPES, VEVO_RESULTS, VERIFICATION_METHODS, WORKER_STATUSES } from "@/lib/portal/types"
 
@@ -80,23 +81,14 @@ export function OfferComposer({
         Offer to every ready worker
       </label>
       {all ? null : (
-        <div className="space-y-1">
-          {workers.map((worker) => (
-            <label key={worker.id} className="flex min-h-12 items-center gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={picked.includes(worker.id)}
-                onChange={(event) =>
-                  setPicked(event.target.checked ? [...picked, worker.id] : picked.filter((id) => id !== worker.id))
-                }
-              />
-              <span>
-                <span className="font-semibold">{worker.name}</span>
-                <span className="block text-xs text-navy/70">{worker.label}</span>
-              </span>
-            </label>
-          ))}
-        </div>
+        <ChosenList
+          legend="Workers to offer"
+          addLabel="+ Add worker"
+          groups={[{ name: "Ready workers", items: workers.map((worker) => ({ id: worker.id, label: worker.name, status: worker.label })) }]}
+          selected={picked}
+          onChange={setPicked}
+          empty="No workers added yet."
+        />
       )}
       {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       {note ? <p className="text-sm font-semibold text-[#15803D]">{note}</p> : null}

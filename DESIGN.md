@@ -142,4 +142,13 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 | Test at 360, 390 and 430px and on Mac | Hover-only actions or tiny tap targets |
 | Use demo data ("Jordan Example") | Real names, numbers or photos |
 
+## 16. Long lists: chosen rows and an add picker
+When a screen offers a long catalogue, show only the items the person has chosen. Each chosen item is a list row from section 9: the name, a status word when there is one, and ›. Tapping the row opens that item.
+
+Under the rows, one button reads "+ Add …". It opens a scrollable picker with a search box at the top. Options are grouped, for example Licences and Training. An item already chosen is greyed out and cannot be added twice. If the catalogue can grow, an Other row at the bottom lets the person type a name. Choosing an item opens its form.
+
+Use this for catalogues, not for a short fixed set. Days of the week, a yes or no, and a safety checklist (allergies, medical conditions, and tasks an injury affects) stay fully visible so nothing is missed. A single-choice select of a few options stays a select.
+
+This section does not change the home tiles or the bottom bar. Those stay until the batch that owns the home and menu.
+
 Note: the 2x2 tile home and bottom bar already on the branch (Phase 1 item 2.2) are replaced by this layout. Do that only in the batch that owns the home and menu screens (Batch 2), not as a side change.

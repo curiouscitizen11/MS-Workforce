@@ -61,7 +61,12 @@ export function AddPicker({
                       onClick={() => onChoose(item.id)}
                     >
                       <span className="portal-list-label">{item.label}</span>
-                      {added ? <span className="portal-list-status">Already added</span> : <span className="portal-list-chev" aria-hidden="true">›</span>}
+                      {added ? <span className="portal-list-status">Already added</span> : (
+                        <>
+                          {item.status ? <span className="portal-list-status">{item.status}</span> : null}
+                          <span className="portal-list-chev" aria-hidden="true">›</span>
+                        </>
+                      )}
                     </button>
                   )
                 })}
@@ -104,6 +109,87 @@ export function AddPicker({
           </form>
         ) : null}
       </div>
+    </div>
+  )
+}
+
+export function ChosenList({
+  legend,
+  addLabel,
+  groups,
+  selected,
+  onChange,
+  empty = "None added yet.",
+}: {
+  legend: string
+  addLabel: string
+  groups: PickerGroup[]
+  selected: string[]
+  onChange: (next: string[]) => void
+  empty?: string
+}) {
+  const [open, setOpen] = useState(false)
+  const [editing, setEditing] = useState<string | null>(null)
+  const items = groups.flatMap((group) => group.items)
+  const current = items.find((item) => item.id === editing)
+  if (editing) {
+    return (
+      <div className="space-y-3">
+        <button type="button" className="min-h-11 text-sm font-semibold" onClick={() => setEditing(null)}>
+          Back to the list
+        </button>
+        <h2 className="text-base font-semibold">{current?.label || editing}</h2>
+        {current?.status ? <p className="text-sm font-semibold">{current.status}</p> : null}
+        <button
+          type="button"
+          className="min-h-12 w-full text-sm font-semibold"
+          onClick={() => {
+            onChange(selected.filter((id) => id !== editing))
+            setEditing(null)
+          }}
+        >
+          Remove
+        </button>
+      </div>
+    )
+  }
+  return (
+    <div className="space-y-3">
+      <h2 className="text-sm font-semibold">{legend}</h2>
+      {selected.length ? (
+        <div className="portal-list">
+          {selected.map((id) => {
+            const item = items.find((row) => row.id === id)
+            return (
+              <button key={id} type="button" className="portal-list-row" onClick={() => setEditing(id)}>
+                <span className="portal-list-label">{item?.label || id}</span>
+                {item?.status ? <span className="portal-list-status">{item.status}</span> : null}
+                <span className="portal-list-chev" aria-hidden="true">
+                  ›
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      ) : (
+        <p className="text-sm">{empty}</p>
+      )}
+      {open ? (
+        <AddPicker
+          title={addLabel.replace(/^\+\s*/, "")}
+          groups={groups}
+          addedIds={selected}
+          onChoose={(id) => {
+            if (!selected.includes(id)) onChange([...selected, id])
+            setOpen(false)
+          }}
+          onClose={() => setOpen(false)}
+        />
+      ) : (
+        <button type="button" className="pill pill-line-dark w-full" onClick={() => setOpen(true)}>
+          {addLabel}
+        </button>
+      )}
     </div>
   )
 }

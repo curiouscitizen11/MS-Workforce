@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { saveProfile } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { HeadshotForm } from "@/components/portal/HeadshotForm"
+import { ChosenList } from "@/components/portal/AddPicker"
 import { TicketBook } from "@/components/portal/TicketBook"
 import { fieldClass } from "@/components/portal/ui"
 import { FITNESS_DECLARATION } from "@/lib/portal/fitness"
@@ -37,6 +38,7 @@ export function OnboardingForm({ worker, photos, today }: { worker: Worker; phot
   const [pending, start] = useTransition()
   const [signature, setSignature] = useState<string | null>(worker.signaturePng || null)
   const [typedName, setTypedName] = useState(worker.name)
+  const [workAreas, setWorkAreas] = useState<string[]>(worker.workAreas || [])
 
   async function save(patch: Record<string, unknown>, next: number) {
     setError("")
@@ -101,7 +103,7 @@ export function OnboardingForm({ worker, photos, today }: { worker: Worker; phot
           pending={pending}
           onSubmit={(data) => {
             const workDays = WEEKDAYS.filter((item) => data["day-" + item] === "on")
-            const workAreas = WORK_AREAS.filter((item) => data["area-" + item] === "on")
+            const areas = workAreas.filter((area) => (WORK_AREAS as readonly string[]).includes(area))
             start(() =>
               save(
                 {
@@ -110,7 +112,7 @@ export function OnboardingForm({ worker, photos, today }: { worker: Worker; phot
                   availableFrom: data.availableFrom,
                   transport: data.transport,
                   workDays,
-                  workAreas,
+                  workAreas: areas,
                 },
                 4,
               ),
@@ -133,17 +135,14 @@ export function OnboardingForm({ worker, photos, today }: { worker: Worker; phot
                   ))}
                 </div>
               </fieldset>
-              <fieldset>
-                <legend className="text-sm font-semibold">Work areas</legend>
-                <div className="mt-2 space-y-1">
-                  {WORK_AREAS.map((area) => (
-                    <label key={area} className="flex min-h-12 items-center gap-3 text-sm font-semibold">
-                      <input type="checkbox" name={"area-" + area} defaultChecked={worker.workAreas?.includes(area)} />
-                      {area}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
+              <ChosenList
+                legend="Work areas"
+                addLabel="+ Add area"
+                groups={[{ name: "Areas", items: WORK_AREAS.map((area) => ({ id: area, label: area })) }]}
+                selected={workAreas}
+                onChange={setWorkAreas}
+                empty="No areas added yet."
+              />
             </>
           }
         />

@@ -59,6 +59,7 @@ import {
   ROLES,
   SUPERVISOR_ROLES,
   TICKET_ANSWERS,
+  WORK_AREAS,
   TICKET_LABELS,
   TICKET_TYPES,
   TIMESHEET_TASKS,
@@ -382,7 +383,9 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
   if (typeof patch.visaSubclass === "string") worker.visaSubclass = patch.visaSubclass
   if (typeof patch.visaExpiry === "string") worker.visaExpiry = patch.visaExpiry
   worker.visaConditions = undefined
-  if (Array.isArray(patch.workAreas)) worker.workAreas = patch.workAreas.map(String)
+  if (Array.isArray(patch.workAreas)) {
+    worker.workAreas = patch.workAreas.map(String).filter((area) => (WORK_AREAS as readonly string[]).includes(area))
+  }
   if (Array.isArray(patch.workDays)) worker.workDays = patch.workDays.map(String)
   if (typeof patch.experienceLevel === "string") worker.experienceLevel = patch.experienceLevel
   if (typeof patch.workHistory === "string") worker.workHistory = patch.workHistory
