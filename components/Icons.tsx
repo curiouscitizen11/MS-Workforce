@@ -81,19 +81,20 @@ const paths: Record<string, React.ReactNode> = {
 
 export type IconName = keyof typeof paths;
 
-export default function Icon({ name, className = "" }: { name: IconName; className?: string }) {
+export default function Icon({ name, className = "", small = false }: { name: IconName; className?: string; small?: boolean }) {
   return (
     <span
       aria-hidden="true"
       className={
-        "inline-flex h-11 w-11 flex-none items-center justify-center rounded-xl border border-navy-line bg-navy text-teal " +
+        "inline-flex flex-none items-center justify-center border border-navy-line bg-navy text-teal " +
+        (small ? "h-9 w-9 rounded-lg " : "h-11 w-11 rounded-xl ") +
         className
       }
     >
       <svg
         viewBox="0 0 24 24"
-        width="24"
-        height="24"
+        width={small ? 20 : 24}
+        height={small ? 20 : 24}
         fill="none"
         stroke="currentColor"
         strokeWidth="1.75"

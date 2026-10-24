@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/Icons";
 
 const pageDescription =
   "MS Workforce is a construction labour hire business supplying general labourers, trade assistants and site support to builders across Sydney.";
@@ -12,16 +13,19 @@ export const metadata: Metadata = {
   ...socialMeta("/about", "About MS Workforce | Sydney Construction Labour Hire", pageDescription),
 };
 
-const values = [
+const values: { icon: IconName; title: string; body: string }[] = [
   {
+    icon: "hardhat",
     title: "Safety",
     body: "We confirm site requirements before every start and act on concerns straight away.",
   },
   {
+    icon: "clock",
     title: "Reliability",
     body: "On site, on time, ready to work. If we can't fill a request properly, we say so.",
   },
   {
+    icon: "crew",
     title: "Respect",
     body: "Fair treatment and correct pay for workers, and honest dealings with builders.",
   },
@@ -56,13 +60,12 @@ export default function AboutPage() {
           <h2 className="display mt-6">Safety, reliability, respect.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {values.map((item) => (
-              <li key={item.title} className="stack-row">
-                <h3 className="text-2xl font-bold tracking-tight sm:col-span-4 sm:text-3xl">
-                  {item.title}
-                </h3>
-                <p className="text-base leading-relaxed text-body sm:col-span-8 sm:text-lg">
-                  {item.body}
-                </p>
+              <li key={item.title} className="num-card">
+                <Icon name={item.icon} />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                </div>
               </li>
             ))}
           </ul>

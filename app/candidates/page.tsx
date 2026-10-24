@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/Icons";
 import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, socialMeta } from "@/components/site";
 import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/tickets";
 
@@ -13,22 +14,25 @@ export const metadata: Metadata = {
   ...socialMeta("/candidates", "Construction Jobs in Sydney | MS Workforce", pageDescription),
 };
 
-const work = [
-  { title: "General labouring", body: "Site preparation, clean-up, loading and the everyday work on a build." },
-  { title: "Trade assistant work", body: "Working alongside carpenters, concreters, bricklayers and other trades." },
-  { title: "Site cleans and materials handling", body: "Cleans, rubbish removal, deliveries and moving materials around site." },
+const work: { icon: IconName; title: string; body: string }[] = [
+  { icon: "hardhat", title: "General labouring", body: "Site preparation, clean-up, loading and the everyday work on a build." },
+  { icon: "wrench", title: "Trade assistant work", body: "Working alongside carpenters, concreters, bricklayers and other trades." },
+  { icon: "sparkle", title: "Site cleans and materials handling", body: "Cleans, rubbish removal, deliveries and moving materials around site." },
 ];
 
-const lookFor = [
+const lookFor: { icon: IconName; title: string; body: string }[] = [
   {
+    icon: "clock",
     title: "Reliability",
     body: "You turn up on time, every time, and let us know early if something changes.",
   },
   {
+    icon: "check",
     title: "Attitude",
     body: "You take the work seriously, look after the site and get on well with the crew.",
   },
   {
+    icon: "hardhat",
     title: "Experience helps",
     body: "Construction experience is a plus. Willingness to learn and work hard matters just as much.",
   },
@@ -127,9 +131,9 @@ export default function CandidatesPage() {
           <p className="kicker text-teal">The work</p>
           <h2 className="display mt-6">Labouring, trade assistant and site support work.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
-            {work.map((item, index) => (
+            {work.map((item) => (
               <li key={item.title} className="num-card">
-                <span className="num-badge">{index + 1}</span>
+                <Icon name={item.icon} />
                 <div className="min-w-0 flex-1">
                   <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">{item.title}</h3>
                   <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
@@ -148,9 +152,12 @@ export default function CandidatesPage() {
           <h2 className="display mt-6">Reliable people who take the work seriously.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {lookFor.map((item) => (
-              <li key={item.title} className="stack-row">
-                <h3 className="text-2xl font-bold tracking-tight sm:col-span-4 sm:text-3xl">{item.title}</h3>
-                <p className="text-base leading-relaxed text-body sm:col-span-8 sm:text-lg">{item.body}</p>
+              <li key={item.title} className="num-card">
+                <Icon name={item.icon} />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                </div>
               </li>
             ))}
           </ul>
@@ -164,7 +171,7 @@ export default function CandidatesPage() {
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {expect.map((item) => (
               <li key={item} className="flex gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-5 sm:p-7">
-                <span aria-hidden="true" className="mt-3 h-2 w-2 flex-none rounded-full bg-teal" />
+                <Icon name="check" small className="mt-0.5" />
                 <p className="text-xl font-semibold leading-snug tracking-tight sm:text-2xl">{item}</p>
               </li>
             ))}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/Icons";
 import { BOOK_LABOUR_URL, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageTitle = "Labourers in Sydney for Builders | MS Workforce";
@@ -26,11 +27,11 @@ const assistantWork = [
   "Support for carpenters, concreters, bricklayers, renderers and tilers",
 ];
 
-const lengths = [
-  { title: "Day labour", body: "A single day, booked when you need it." },
-  { title: "Short-notice cover", body: "For no-shows, pours, deliveries and stages that run long." },
-  { title: "Ongoing supply", body: "Regular labour, with the same workers returning wherever possible." },
-  { title: "Project-based crews", body: "A crew sized to the stage and adjusted as the program moves." },
+const lengths: { icon: IconName; title: string; body: string }[] = [
+  { icon: "calendar", title: "Day labour", body: "A single day, booked when you need it." },
+  { icon: "clock", title: "Short-notice cover", body: "For no-shows, pours, deliveries and stages that run long." },
+  { icon: "repeat", title: "Ongoing supply", body: "Regular labour, with the same workers returning wherever possible." },
+  { icon: "layers", title: "Project-based crews", body: "A crew sized to the stage and adjusted as the program moves." },
 ];
 
 const steps = [
@@ -109,7 +110,8 @@ export default function LabourersSydneyPage() {
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">
             {lengths.map((item) => (
               <li key={item.title} className="rounded-2xl border border-navy-line bg-navy-card p-5">
-                <h3 className="text-xl font-bold tracking-tight">{item.title}</h3>
+                <Icon name={item.icon} />
+                <h3 className="mt-4 text-xl font-bold tracking-tight">{item.title}</h3>
                 <p className="mt-2 text-base leading-relaxed text-body">{item.body}</p>
               </li>
             ))}

@@ -1,6 +1,7 @@
 import ContactButtons from "@/components/ContactButtons";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/Icons";
 import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, socialMeta } from "@/components/site";
 
 const pageDescription =
@@ -13,11 +14,11 @@ export const metadata: Metadata = {
   ...socialMeta("/contact", "Contact MS Workforce | Request Construction Labour", pageDescription),
 };
 
-const facts = [
-  { label: "Builders", value: EMAIL, href: EMAIL_HREF },
-  { label: "Workers", value: JOBS_EMAIL, href: JOBS_EMAIL_HREF },
-  { label: "Area", value: "Across Sydney, NSW" },
-  { label: "Service area", value: "Greater Sydney" },
+const facts: { icon: IconName; label: string; value: string; href?: string }[] = [
+  { icon: "mail", label: "Builders", value: EMAIL, href: EMAIL_HREF },
+  { icon: "mail", label: "Workers", value: JOBS_EMAIL, href: JOBS_EMAIL_HREF },
+  { icon: "pin", label: "Area", value: "Across Sydney, NSW" },
+  { icon: "pin", label: "Service area", value: "Greater Sydney" },
 ];
 
 const include = [
@@ -104,9 +105,11 @@ export default function ContactPage() {
           <h2 className="display mt-6">Supplying sites across Sydney.</h2>
           <dl className="mt-8 max-w-3xl grid gap-3 sm:mt-10">
             {facts.map((item) => (
-              <div key={item.label} className="stack-row">
-                <dt className="kicker text-teal sm:col-span-4">{item.label}</dt>
-                <dd className="break-words text-xl font-medium tracking-tight sm:col-span-8 sm:text-2xl">
+              <div key={item.label} className="num-card items-center">
+                <Icon name={item.icon} />
+                <div className="min-w-0 flex-1">
+                <dt className="kicker text-teal">{item.label}</dt>
+                <dd className="mt-1 break-words text-lg font-semibold tracking-tight sm:text-2xl">
                   {item.href ? (
                     <a href={item.href} className="text-teal-300">
                       {item.value}
@@ -115,6 +118,7 @@ export default function ContactPage() {
                     item.value
                   )}
                 </dd>
+                </div>
               </div>
             ))}
           </dl>

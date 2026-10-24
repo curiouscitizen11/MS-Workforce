@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/Icons";
 import { BOOK_LABOUR_URL, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageTitle = "Construction Labour Hire in Greater Sydney | MS Workforce";
@@ -13,11 +14,11 @@ export const metadata: Metadata = {
   ...socialMeta("/labour-hire-greater-sydney", pageTitle, pageDescription),
 };
 
-const supply = [
-  { title: "General labourers", body: "Site preparation, clean-up, loading and unloading, and the day-to-day work that keeps a build moving." },
-  { title: "Trade assistants", body: "Hands-on support for carpenters, concreters, bricklayers and other trades." },
-  { title: "Site cleans and site support", body: "Progressive cleans, builders cleans, rubbish removal and skip loading." },
-  { title: "Materials handling", body: "Receiving deliveries and stacking, protecting and distributing materials around the site." },
+const supply: { icon: IconName; title: string; body: string }[] = [
+  { icon: "hardhat", title: "General labourers", body: "Site preparation, clean-up, loading and unloading, and the day-to-day work that keeps a build moving." },
+  { icon: "wrench", title: "Trade assistants", body: "Hands-on support for carpenters, concreters, bricklayers and other trades." },
+  { icon: "sparkle", title: "Site cleans and site support", body: "Progressive cleans, builders cleans, rubbish removal and skip loading." },
+  { icon: "package", title: "Materials handling", body: "Receiving deliveries and stacking, protecting and distributing materials around the site." },
 ];
 
 // These questions and answers use wording already on the Builders page. The FAQ structured
@@ -85,9 +86,12 @@ export default function GreaterSydneyPage() {
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">What we supply on site</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {supply.map((item) => (
-              <li key={item.title} className="stack-row">
-                <h3 className="text-xl font-bold tracking-tight sm:col-span-5 sm:text-2xl">{item.title}</h3>
-                <p className="text-base leading-relaxed text-body sm:col-span-7 sm:text-lg">{item.body}</p>
+              <li key={item.title} className="num-card">
+                <Icon name={item.icon} />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                </div>
               </li>
             ))}
           </ul>
