@@ -94,7 +94,7 @@ export default function SiteCleansPage() {
             ))}
           </ul>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
-            This is labour support only. We do not supply licensed asbestos removal.
+            MS Workforce does not carry out asbestos removal itself, but can connect builders with a licensed asbestos removal contractor when a job needs it. Ask us through Book labour or Email the brief.
           </p>
         </div>
       </section>
@@ -138,6 +138,9 @@ export default function SiteCleansPage() {
             >
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>
+            </a>
+            <a href={REQUEST_LABOUR_HREF} className="link-quiet w-full sm:w-auto">
+              Email the brief
             </a>
             <Link href="/services" className="link-quiet w-full sm:w-auto">
               See all services
