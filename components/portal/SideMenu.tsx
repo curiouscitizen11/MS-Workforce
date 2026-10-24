@@ -104,6 +104,7 @@ export function SideMenu({ name, role, initialOpen = false }: { name: string; ro
   const panelRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!open) return
+    const menuButton = buttonRef.current
     const panel = panelRef.current
     const previous = document.activeElement
     const focusable = () =>
@@ -133,8 +134,8 @@ export function SideMenu({ name, role, initialOpen = false }: { name: string; ro
     return () => {
       document.body.style.overflow = previousOverflow
       window.removeEventListener("keydown", onKey)
-      if (previous instanceof HTMLElement && previous !== buttonRef.current) previous.focus()
-      else buttonRef.current?.focus()
+      if (previous instanceof HTMLElement && previous !== menuButton) previous.focus()
+      else menuButton?.focus()
     }
   }, [open])
 
