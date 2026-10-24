@@ -33,20 +33,12 @@ const steps = [
 
 const faqs = [
   {
-    q: "What kind of work can you cover?",
-    a: "General labouring, trade assistance, site cleans, rubbish removal and materials handling on residential, renovation and commercial sites across Greater Sydney. Labourers with asbestos awareness and Class B tickets are available on request.",
-  },
-  {
     q: "How much notice do you need?",
     a: "As much as you can give, but short-notice requests are welcome. We will tell you straight away whether we can fill it. We would rather say no than send the wrong person.",
   },
   {
     q: "Can I book someone for a single day?",
     a: "Yes. We supply day labour, short-notice cover, ongoing supply and project-based crews, so you can book a single day, a few weeks or a full stage of the build.",
-  },
-  {
-    q: "Who directs the workers on site?",
-    a: "Your site team directs the work day to day. MS Workforce stays the employer: we run the payroll and super, and we stay in contact with you and the worker for the length of the booking.",
   },
   {
     q: "What happens if a worker is not the right fit?",
