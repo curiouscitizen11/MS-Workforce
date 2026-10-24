@@ -85,9 +85,9 @@ export default function ContactPage() {
           </h2>
           <ul className="mt-8 max-w-3xl grid gap-3 sm:mt-10">
             {include.map((item, index) => (
-              <li key={item} className="stack-row">
-                <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
-                <span className="text-xl font-medium tracking-tight sm:col-span-10 sm:text-2xl">{item}</span>
+              <li key={item} className="num-card items-center">
+                <span className="num-badge">{index + 1}</span>
+                <span className="min-w-0 flex-1 text-lg font-semibold tracking-tight sm:text-2xl">{item}</span>
               </li>
             ))}
           </ul>

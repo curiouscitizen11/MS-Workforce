@@ -114,9 +114,9 @@ export default function SiteCleansPage() {
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">How booking works</h2>
           <ol className="mt-8 grid gap-3 sm:mt-10">
             {steps.map((step, index) => (
-              <li key={step.title} className="stack-row">
-                <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
-                <div className="sm:col-span-10">
+              <li key={step.title} className="num-card">
+                <span className="num-badge">{index + 1}</span>
+                <div className="min-w-0 flex-1">
                   <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{step.title}</h3>
                   <p className="mt-2 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
                     {step.body}

@@ -128,9 +128,9 @@ export default function CandidatesPage() {
           <h2 className="display mt-6">Labouring, trade assistant and site support work.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {work.map((item, index) => (
-              <li key={item.title} className="stack-row">
-                <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
-                <div className="sm:col-span-10">
+              <li key={item.title} className="num-card">
+                <span className="num-badge">{index + 1}</span>
+                <div className="min-w-0 flex-1">
                   <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">{item.title}</h3>
                   <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
                     {item.body}

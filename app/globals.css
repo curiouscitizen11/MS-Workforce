@@ -80,6 +80,13 @@ body {
   .link-quiet-light {
     @apply text-teal-400 decoration-teal-400/40 hover:text-teal-300;
   }
+  /* Numbered card: teal number badge on the left, content on the right */
+  .num-card {
+    @apply flex items-start gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-6 sm:p-7;
+  }
+  .num-badge {
+    @apply inline-flex h-10 w-10 flex-none items-center justify-center rounded-full bg-teal text-base font-bold leading-none text-navy;
+  }
   .stack-row {
     @apply grid gap-3 rounded-2xl border border-navy-line bg-navy-card p-5 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:p-7;
   }

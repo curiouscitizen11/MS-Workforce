@@ -90,10 +90,10 @@ export default function HomePage() {
           <h2 className="display mt-6">Labour for every stage of the build.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {roles.map((item, index) => (
-              <li key={item.title} className="stack-row">
-                <span className="kicker text-teal sm:col-span-3">0{index + 1}</span>
-                <div className="sm:col-span-9">
-                  <h3 className="text-2xl font-bold tracking-tight sm:text-4xl">
+              <li key={item.title} className="num-card">
+                <span className="num-badge">{index + 1}</span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xl font-bold tracking-tight sm:text-3xl">
                     {item.title}
                   </h3>
                   <p className="mt-3 max-w-xl text-base leading-relaxed text-body sm:text-lg">
