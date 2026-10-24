@@ -19,7 +19,7 @@ export default function Footer() {
           <div className="md:col-span-4">
             <div className="leading-none">
               <div className="text-lg font-semibold tracking-tight">
-                MS <span className="text-teal">|</span> WORKFORCE
+                MS <span className="text-teal-400">|</span> WORKFORCE
               </div>
               <div className="mt-1 text-[10px] font-medium tracking-[0.2em] text-white/60">
                 LABOUR HIRE
