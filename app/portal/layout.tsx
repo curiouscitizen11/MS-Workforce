@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   },
   description: "MS Workforce worker portal.",
   applicationName: "MS Workforce",
+  manifest: "/portal/manifest",
   appleWebApp: {
     capable: true,
     title: "MS Workforce",
