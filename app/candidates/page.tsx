@@ -45,7 +45,7 @@ const formUrl = WORKER_FORM_URL;
 
 function TicketCard({ ticket }: { ticket: Ticket }) {
   return (
-    <li className="flex flex-col rounded-2xl border border-navy/10 bg-white p-6 sm:p-8">
+    <li className="flex flex-col rounded-md border border-navy/10 bg-white p-6 sm:p-8">
       <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{ticket.title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-navy/75">{ticket.code}</p>
       {ticket.note ? <p className="mt-3 text-sm leading-relaxed text-navy/75">{ticket.note}</p> : null}

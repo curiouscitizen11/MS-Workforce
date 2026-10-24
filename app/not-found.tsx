@@ -24,7 +24,7 @@ export default function NotFound() {
             For builders
           </Link>
           <Link href="/candidates" className="pill pill-line w-full sm:w-auto">
-            Find work
+            Apply for work
           </Link>
         </div>
       </div>

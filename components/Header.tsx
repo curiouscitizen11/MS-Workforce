@@ -9,7 +9,7 @@ const navigation = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/services" },
   { name: "Builders", href: "/clients" },
-  { name: "Find work", href: "/candidates" },
+  { name: "Apply for work", href: "/candidates" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
@@ -40,12 +40,12 @@ export default function Header() {
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 h-[var(--site-header-height)] bg-navy text-white shadow-[inset_0_-1px_0_rgba(51,191,175,0.22)]">
+    <header className="fixed inset-x-0 top-0 z-50 h-[var(--site-header-height)] bg-navy text-white border-b border-[#22354f]">
       <div className="wrap flex h-full items-center justify-between">
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="-ml-3 inline-flex h-11 w-11 flex-none items-center justify-center rounded-full text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal md:hidden"
+            className="-ml-3 inline-flex h-11 w-11 flex-none items-center justify-center rounded text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal md:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((value) => !value)}
@@ -102,7 +102,7 @@ export default function Header() {
             href={BOOK_LABOUR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden min-h-11 items-center rounded-full bg-teal-400 px-5 text-sm font-semibold text-navy transition hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
+            className="hidden min-h-11 items-center rounded bg-teal-400 px-5 text-sm font-semibold text-navy transition hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
           >
             Book labour
           </a>
@@ -123,7 +123,7 @@ export default function Header() {
         <nav
           id="mobile-nav"
           aria-label="Mobile"
-          className="fixed bottom-0 left-0 top-[var(--site-header-height)] z-40 w-[88%] max-w-sm overflow-y-auto border-r border-white/10 bg-navy px-6 py-8 text-left shadow-2xl md:hidden"
+          className="fixed bottom-0 left-0 top-[var(--site-header-height)] z-40 w-[88%] max-w-sm overflow-y-auto border-r border-teal-400 bg-[#0e2240] px-6 py-8 text-left md:hidden"
         >
           <ul className="space-y-1">
             {navigation.map((item) => {
@@ -134,7 +134,7 @@ export default function Header() {
                     href={item.href}
                     aria-current={current ? "page" : undefined}
                     className={
-                      "block rounded-2xl border-l-4 px-3 py-3 text-3xl font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
+                      "block rounded-none border-l-[3px] px-3 py-3 text-3xl font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
                       (current
                         ? "border-teal text-white"
                         : "border-transparent text-white/70")
