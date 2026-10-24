@@ -73,6 +73,13 @@ body {
   .pill-line-dark {
     @apply border-navy bg-transparent text-navy hover:bg-navy hover:text-white;
   }
+  /* Quiet secondary action: underlined text link with a 44px tap area */
+  .link-quiet {
+    @apply inline-flex min-h-11 items-center justify-center px-2 text-[15px] font-medium underline underline-offset-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300;
+  }
+  .link-quiet-light {
+    @apply text-white/85 decoration-white/40 hover:text-white;
+  }
   .stack-row {
     @apply grid gap-3 py-8 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:py-10;
   }

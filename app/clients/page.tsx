@@ -88,7 +88,7 @@ export default function ClientsPage() {
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>
             </a>
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-line w-full sm:w-auto">
+            <a href={REQUEST_LABOUR_HREF} className="link-quiet link-quiet-light w-full sm:w-auto">
               Email the brief
             </a>
           </div>

@@ -104,16 +104,17 @@ export default function CandidatesPage() {
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a href={formUrl} className="pill pill-teal w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
-              Employee portal
+              Apply for work
+              <span className="sr-only"> (employee portal opens in a new tab)</span>
             </a>
-            <a href={WORK_ENQUIRY_HREF} className="pill pill-line w-full sm:w-auto">
+            <a href={WORK_ENQUIRY_HREF} className="link-quiet link-quiet-light w-full sm:w-auto">
               Email us
             </a>
           </div>
-          <p className="mt-6">
+          <p className="mt-2">
             <a
               href="#tickets"
-              className="text-base font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white"
+              className="inline-flex min-h-11 items-center text-base font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white"
             >
               Get your tickets
             </a>

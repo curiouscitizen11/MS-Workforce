@@ -71,13 +71,15 @@ export default function HomePage() {
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>
             </a>
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-line w-full sm:w-auto">
-              Email the brief
-            </a>
-            <Link href="/candidates" className="pill pill-line w-full sm:w-auto">
-              Find work
+            <Link href="/candidates#register" className="pill pill-line w-full sm:w-auto">
+              Apply for work
             </Link>
           </div>
+          <p className="mt-4">
+            <a href={REQUEST_LABOUR_HREF} className="link-quiet link-quiet-light -ml-2">
+              Prefer email? Email the brief
+            </a>
+          </p>
         </div>
       </section>
 
