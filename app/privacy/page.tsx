@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   ...socialMeta("/privacy", "Privacy Policy | MS Workforce", pageDescription),
 };
 
-const mail = "text-teal-700 underline decoration-teal-700/40 underline-offset-4 break-all";
-const ext = "text-teal-700 underline decoration-teal-700/40 underline-offset-4";
+const mail = "text-teal-300 underline decoration-teal-300/40 underline-offset-4 break-all";
+const ext = "text-teal-300 underline decoration-teal-300/40 underline-offset-4";
 
 const sections: { title: string; body: React.ReactNode }[] = [
   {
@@ -175,25 +175,25 @@ export default function PrivacyPage() {
     <>
       <section className="bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/65">Privacy</p>
+          <p className="kicker text-teal">Privacy</p>
           <h1 className="display mt-6">Privacy Policy</h1>
-          <p className="lede mt-8 text-white/75">
+          <p className="lede mt-8 text-body">
             How we handle your information. Last updated 13 October 2026.
           </p>
         </div>
       </section>
 
-      <section className="bg-tint text-navy">
+      <section className="bg-navy-alt text-white">
         <div className="wrap py-20 sm:py-24">
-          <div className="max-w-3xl border-b border-navy/10">
+          <div className="max-w-3xl border-b border-navy-line">
             {sections.map((s) => (
-              <div key={s.title} className="border-t border-navy/10 py-8">
+              <div key={s.title} className="border-t border-navy-line py-8">
                 <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{s.title}</h2>
-                <div className="mt-4 space-y-4 text-lg leading-relaxed text-navy/75">{s.body}</div>
+                <div className="mt-4 space-y-4 text-lg leading-relaxed text-body">{s.body}</div>
               </div>
             ))}
           </div>
-          <p className="mt-10 text-sm text-navy/75">
+          <p className="mt-10 text-sm text-body">
             <Link href="/" className="underline underline-offset-4">Back to home</Link>
           </p>
         </div>

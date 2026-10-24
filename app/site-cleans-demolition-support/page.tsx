@@ -49,9 +49,9 @@ export default function SiteCleansPage() {
     <>
       <section className="bg-navy text-white">
         <div className="wrap py-20 sm:py-28">
-          <p className="kicker text-white/65">Site cleans and demolition support</p>
+          <p className="kicker text-teal">Site cleans and demolition support</p>
           <h1 className="display mt-6">Site cleans and demolition support for Sydney builders.</h1>
-          <p className="lede mt-8 text-white/75">
+          <p className="lede mt-8 text-body">
             MS Workforce supplies labourers for site cleans and demolition
             support across Greater Sydney. Labour only, supervised by your
             builder. Book a single day or a crew for the whole stage.
@@ -73,35 +73,35 @@ export default function SiteCleansPage() {
         </div>
       </section>
 
-      <section className="bg-tint text-navy">
+      <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Site cleans</h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             A clean site is safer and keeps the trades moving. We supply
             labourers to keep it that way from the first week to handover.
           </p>
-          <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-base text-navy/80 sm:text-lg">
+          <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-base text-body sm:text-lg">
             {cleans.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
 
           <h2 className="mt-14 text-3xl font-semibold tracking-tight sm:text-4xl">Demolition support</h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             Extra hands for the manual side of demolition and strip-out, so
             your crew can stay on the main task. Your builder or site
             supervisor directs the work and the workers follow your site rules.
           </p>
-          <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-base text-navy/80 sm:text-lg">
+          <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-base text-body sm:text-lg">
             {demolition.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             This is labour only. We do not supply plant or run demolition
             jobs ourselves.
           </p>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             MS Workforce does not carry out asbestos removal itself, but can
             connect builders with a licensed asbestos removal contractor when
             a job needs it. Ask us through Book labour or Email the brief.
@@ -112,20 +112,20 @@ export default function SiteCleansPage() {
       <section className="bg-navy text-white">
         <div className="wrap py-16 sm:py-24">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">How booking works</h2>
-          <ol className="mt-8 border-b border-white/10">
+          <ol className="mt-8 border-b border-navy-line">
             {steps.map((step, index) => (
-              <li key={step.title} className="stack-row border-t border-white/10">
-                <span className="kicker text-white/65 sm:col-span-2">0{index + 1}</span>
+              <li key={step.title} className="stack-row border-t border-navy-line">
+                <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
                   <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{step.title}</h3>
-                  <p className="mt-2 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+                  <p className="mt-2 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
                     {step.body}
                   </p>
                 </div>
               </li>
             ))}
           </ol>
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+          <p className="mt-8 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             Book one day, short-notice cover, ongoing supply or a
             project-based crew. If we can&apos;t fill a request properly, we
             say so rather than send the wrong person.
@@ -133,10 +133,10 @@ export default function SiteCleansPage() {
         </div>
       </section>
 
-      <section className="bg-tint text-navy">
+      <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Need a hand on site?</h2>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-navy/75 sm:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
             Send us the brief and we will tell you straight away whether we can fill it.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">

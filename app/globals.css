@@ -7,19 +7,19 @@
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
   scroll-behavior: smooth;
   background: #0b1a2e;
 }
 
 body {
-  @apply text-navy antialiased;
-  background-color: #eef3f7;
+  @apply text-white antialiased;
+  background-color: #0b1a2e;
 }
 
 ::selection {
-  background: #0b1a2e;
-  color: #ffffff;
+  background: #2ec4b6;
+  color: #0b1a2e;
 }
 
 @media (max-width: 767px) {
@@ -133,27 +133,21 @@ main .page-enter > section:first-of-type img {
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
 
-/* ---- Brand backgrounds (soft tint + navy bands) ---- */
-.bg-tint {
-  background-color: #eef3f7;
-}
-main section.bg-navy {
+/* ---- Brand backgrounds: deep navy family (option A) ----
+   base #0b1a2e (bg-navy), alternate #0e2240 (bg-navy-alt), cards #152d4a (bg-navy-card),
+   lines #22354f (border-navy-line), body text #c9d4e0 (text-body), accent #2ec4b6. */
+main section {
   position: relative;
   isolation: isolate;
 }
-/* thin 1px line at the top of each navy band */
-main section.bg-navy::before {
+/* thin teal rule at the top of every section after the first on a page */
+main section::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
   height: 1px;
-  background: #22354f;
+  background: rgba(46, 196, 182, 0.28);
   pointer-events: none;
   z-index: -1;
 }
-main .page-enter > section.bg-navy:first-of-type::before { display: none; }
-/* Cards lift off the tint */
-main section.bg-tint .rounded-2xl.bg-white,
-main section.bg-tint li.bg-white {
-  border-color: rgba(11, 26, 46, 0.12);
-}
+main .page-enter > section:first-of-type::before { display: none; }

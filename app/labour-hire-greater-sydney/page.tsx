@@ -56,9 +56,9 @@ export default function GreaterSydneyPage() {
       />
       <section className="bg-navy text-white">
         <div className="wrap py-20 sm:py-28">
-          <p className="kicker text-white/65">Greater Sydney</p>
+          <p className="kicker text-teal">Greater Sydney</p>
           <h1 className="display mt-6">Construction labour across Greater Sydney.</h1>
-          <p className="lede mt-8 text-white/75">
+          <p className="lede mt-8 text-body">
             We supply construction labour to building sites across Greater
             Sydney, from the CBD and the suburbs to Western Sydney. Book one
             worker for a day or a crew for the whole project.
@@ -80,18 +80,18 @@ export default function GreaterSydneyPage() {
         </div>
       </section>
 
-      <section className="bg-tint text-navy">
+      <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">What we supply on site</h2>
-          <ul className="mt-8 border-b border-navy/10">
+          <ul className="mt-8 border-b border-navy-line">
             {supply.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy/10">
+              <li key={item.title} className="stack-row border-t border-navy-line">
                 <h3 className="text-xl font-semibold tracking-tight sm:col-span-5 sm:text-2xl">{item.title}</h3>
-                <p className="text-base leading-relaxed text-navy/75 sm:col-span-7 sm:text-lg">{item.body}</p>
+                <p className="text-base leading-relaxed text-body sm:col-span-7 sm:text-lg">{item.body}</p>
               </li>
             ))}
           </ul>
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
+          <p className="mt-8 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             Labour is booked by the day, as short-notice cover, or on an
             ongoing, project-based basis. We match workers we have screened
             ourselves to the job.
@@ -104,21 +104,21 @@ export default function GreaterSydneyPage() {
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Questions about Greater Sydney coverage
           </h2>
-          <ul className="mt-8 border-b border-white/10">
+          <ul className="mt-8 border-b border-navy-line">
             {faqs.map((item) => (
-              <li key={item.q} className="border-t border-white/10 py-6 sm:py-8">
+              <li key={item.q} className="border-t border-navy-line py-6 sm:py-8">
                 <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{item.q}</h3>
-                <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">{item.a}</p>
+                <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">{item.a}</p>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      <section className="bg-tint text-navy">
+      <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Need labour on site?</h2>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-navy/75 sm:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
             Send us the brief and we will tell you straight away whether we can fill it.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">

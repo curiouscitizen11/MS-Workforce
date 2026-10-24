@@ -7,12 +7,12 @@ export default function PhotoSection() {
   if (items.length === 0) return null;
 
   return (
-    <section className="bg-tint text-navy">
+    <section className="bg-navy-alt text-white">
       <div className="wrap py-16 sm:py-24">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">On site</h2>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((photo) => (
-            <li key={photo.src} className="overflow-hidden rounded-2xl border border-navy/10 bg-white">
+            <li key={photo.src} className="overflow-hidden rounded-2xl border border-navy-line bg-navy-card">
               <div className="relative aspect-[4/3]">
                 <Image
                   src={photo.src}
@@ -23,7 +23,7 @@ export default function PhotoSection() {
                 />
               </div>
               {photo.caption ? (
-                <p className="p-4 text-sm leading-relaxed text-navy/75">{photo.caption}</p>
+                <p className="p-4 text-sm leading-relaxed text-body">{photo.caption}</p>
               ) : null}
             </li>
           ))}

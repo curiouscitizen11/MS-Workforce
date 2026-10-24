@@ -86,7 +86,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-AU">
-      <body className={inter.className + " bg-tint text-navy antialiased"}>
+      <body className={inter.className + " bg-navy text-white antialiased"}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}

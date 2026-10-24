@@ -58,9 +58,9 @@ export default function ServicesPage() {
     <>
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/65">Services</p>
+          <p className="kicker text-teal">Services</p>
           <h1 className="display mt-6">Construction labour hire across Greater Sydney.</h1>
-          <p className="lede mt-8 text-white/75">
+          <p className="lede mt-8 text-body">
             General labourers, trade assistants and site support crews for
             builders and trades. Booked by the day, for short-notice cover, or
             supplied on an ongoing, project-based basis.
@@ -81,32 +81,32 @@ export default function ServicesPage() {
           key={item.title}
           className={
             "flex screen items-center " +
-            (item.dark ? "bg-navy text-white" : "bg-tint text-navy")
+            (item.dark ? "bg-navy text-white" : "bg-navy-alt text-white")
           }
         >
           <div className="wrap py-24 sm:py-28">
-            <p className={"kicker " + (item.dark ? "text-white/70" : "text-navy/75")}>
+            <p className={"kicker " + (item.dark ? "text-body" : "text-body")}>
               {item.kicker}
             </p>
             <h2 className="display mt-6">{item.title}</h2>
-            <p className={"lede mt-8 " + (item.dark ? "text-white/75" : "text-navy/75")}>
+            <p className={"lede mt-8 " + (item.dark ? "text-body" : "text-body")}>
               {item.body}
             </p>
           </div>
         </section>
       ))}
 
-      <section className="flex screen items-center bg-tint text-navy">
+      <section className="flex screen items-center bg-navy-alt text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/75">Ways to book</p>
+          <p className="kicker text-teal">Ways to book</p>
           <h2 className="display mt-6">Short-notice and ongoing supply.</h2>
-          <ul className="mt-14 border-b border-navy/10">
+          <ul className="mt-14 border-b border-navy-line">
             {supply.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy/10">
+              <li key={item.title} className="stack-row border-t border-navy-line">
                 <h3 className="text-2xl font-semibold tracking-tight sm:col-span-5 sm:text-3xl">
                   {item.title}
                 </h3>
-                <p className="text-base leading-relaxed text-navy/75 sm:col-span-7 sm:text-lg">
+                <p className="text-base leading-relaxed text-body sm:col-span-7 sm:text-lg">
                   {item.body}
                 </p>
               </li>
@@ -117,7 +117,7 @@ export default function ServicesPage() {
 
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/65">Who we work with</p>
+          <p className="kicker text-teal">Who we work with</p>
           <h2 className="display mt-6">Built for builders and trades.</h2>
           <ul className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2">
             {sectors.map((item) => (

@@ -32,9 +32,9 @@ export default function AboutPage() {
     <>
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/65">About</p>
+          <p className="kicker text-teal">About</p>
           <h1 className="display mt-6">Why MS Workforce</h1>
-          <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-white/75 sm:text-xl">
+          <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-body sm:text-xl">
             <p>
               I&apos;ve spent over five years on Sydney construction sites.
               I&apos;ve seen what a good labourer means to a
@@ -50,27 +50,27 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-tint text-navy">
+      <section className="flex screen items-center bg-navy-alt text-white">
         <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/75">How we work</p>
+          <p className="kicker text-teal">How we work</p>
           <h2 className="display mt-6">Safety, reliability, respect.</h2>
-          <ul className="mt-14 border-b border-navy/10">
+          <ul className="mt-14 border-b border-navy-line">
             {values.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy/10">
+              <li key={item.title} className="stack-row border-t border-navy-line">
                 <h3 className="text-2xl font-semibold tracking-tight sm:col-span-4 sm:text-3xl">
                   {item.title}
                 </h3>
-                <p className="text-base leading-relaxed text-navy/75 sm:col-span-8 sm:text-lg">
+                <p className="text-base leading-relaxed text-body sm:col-span-8 sm:text-lg">
                   {item.body}
                 </p>
               </li>
             ))}
           </ul>
           <div className="mt-12 flex flex-col gap-3 sm:flex-row">
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-dark w-full sm:w-auto">
+            <a href={REQUEST_LABOUR_HREF} className="pill pill-teal w-full sm:w-auto">
               Request labour
             </a>
-            <Link href="/contact" className="pill pill-line-dark w-full sm:w-auto">
+            <Link href="/contact" className="pill pill-line w-full sm:w-auto">
               Contact
             </Link>
           </div>
