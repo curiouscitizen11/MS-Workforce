@@ -71,6 +71,64 @@ export const tickets: Ticket[] = [
     ],
   },
   {
+    title: "Asbestos removal: Class B (non-friable)",
+    code: "CPCCDE3028 Remove non-friable asbestos (formerly CPCCDE3014)",
+    note: "For asbestos removal workers. The removal licence is held by the business you work for, not by you.",
+    providers: [
+      {
+        name: "Pinnacle Safety and Training",
+        rto: "40496",
+        location: "Silverwater",
+        price: "$395",
+        href: "https://www.pinnaclesafety.com.au/courses/asbestos-safety/remove-non-friable-asbestos-training/greater-sydney",
+      },
+      {
+        name: "DLI Training",
+        rto: "21714",
+        location: "Auburn",
+        price: "$380 per person",
+        href: "https://www.dlitraining.edu.au/remove-non-friable-asbestos-training-course/",
+      },
+    ],
+    official: [
+      { label: "SafeWork NSW: Class B asbestos removal licence", href: "https://www.safework.nsw.gov.au/licences-and-registrations/licences/class-b-asbestos-removal-licence" },
+      { label: "SafeWork NSW: approved asbestos training providers", href: "https://www.safework.nsw.gov.au/hazards-a-z/asbestos/training2/safework-approved-rtos" },
+    ],
+  },
+  {
+    title: "Asbestos removal: Class A (friable)",
+    code: "CPCCDE3029 Remove friable asbestos (formerly CPCCDE3015). Supervisors: CPCCDE4009 Supervise asbestos removal",
+    note: "For asbestos removal workers. You need the non-friable unit first. The Class A licence is held by the business, not the worker.",
+    providers: [
+      {
+        name: "DLI Training",
+        rto: "21714",
+        location: "Auburn",
+        price: "$580 per person",
+        href: "https://www.dlitraining.edu.au/remove-friable-asbestos/",
+      },
+      {
+        name: "Pinnacle Safety and Training",
+        rto: "40496",
+        location: "Silverwater",
+        price: "Price on enquiry",
+        href: "https://www.pinnaclesafety.com.au/courses/asbestos-safety/remove-non-friable-and-friable-asbestos-class-a-and-b/greater-sydney",
+        label: "Class A and B combined course",
+      },
+      {
+        name: "DLI Training",
+        rto: "21714",
+        location: "Auburn",
+        price: "$330 per person",
+        href: "https://www.dlitraining.edu.au/supervise-asbestos-removal-training/",
+        label: "Supervise asbestos removal",
+      },
+    ],
+    official: [
+      { label: "SafeWork NSW: Class A asbestos removal licence", href: "https://www.safework.nsw.gov.au/licences-and-registrations/licences/class-a-asbestos-removal-licence" },
+    ],
+  },
+  {
     title: "Enter and work in confined spaces",
     code: "RIIWHS202 Enter and work in confined spaces (formerly RIIWHS202E)",
     providers: [
