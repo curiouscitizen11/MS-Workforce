@@ -1,0 +1,34 @@
+import Image from "next/image";
+import { photos } from "@/data/photos";
+
+// Renders nothing while data/photos.ts is empty. Photos without alt text are skipped.
+export default function PhotoSection() {
+  const items = photos.filter((photo) => photo.src && photo.alt.trim() !== "");
+  if (items.length === 0) return null;
+
+  return (
+    <section className="bg-tint text-navy">
+      <div className="wrap py-16 sm:py-24">
+        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">On site</h2>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((photo) => (
+            <li key={photo.src} className="overflow-hidden rounded-md border border-navy/10 bg-white">
+              <div className="relative aspect-[4/3]">
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
+              {photo.caption ? (
+                <p className="p-4 text-sm leading-relaxed text-navy/75">{photo.caption}</p>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}

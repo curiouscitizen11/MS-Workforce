@@ -1,3 +1,4 @@
+import ContactButtons from "@/components/ContactButtons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, socialMeta } from "@/components/site";
@@ -66,6 +67,7 @@ export default function ContactPage() {
               Email the brief
             </a>
           </div>
+          <ContactButtons className="mt-3" />
           <Link
             href="/privacy"
             className="mt-6 inline-block text-sm text-white/65 underline decoration-white/30 underline-offset-4 hover:text-white"

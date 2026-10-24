@@ -1,3 +1,4 @@
+import PhotoSection from "@/components/PhotoSection";
 import Link from "next/link";
 import { REQUEST_LABOUR_HREF, BOOK_LABOUR_URL } from "@/components/site";
 
@@ -185,6 +186,8 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      <PhotoSection />
 
       <section className="grid screen grid-rows-2 bg-navy text-white md:grid-cols-2 md:grid-rows-1">
         <a
