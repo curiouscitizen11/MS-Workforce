@@ -1,5 +1,6 @@
 import PhotoSection from "@/components/PhotoSection";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/Icons";
 import { REQUEST_LABOUR_HREF, BOOK_LABOUR_URL } from "@/components/site";
 
 const roles = [
@@ -28,17 +29,20 @@ const supply = [
   { title: "Project-based crews", body: "A crew sized to the stage, scaled up or down as the program changes." },
 ];
 
-const steps = [
+const steps: { icon: IconName; title: string; body: string }[] = [
   {
-    title: "Book labour",
+    icon: "request",
+    title: "Send your request",
     body: "Fill in the Book labour form or email the brief: site, start time, roles, numbers and how long you need them.",
   },
   {
-    title: "We match and confirm",
+    icon: "crew",
+    title: "We match your crew",
     body: "We match workers we have screened ourselves to the job and confirm PPE, access and site requirements with you before the start.",
   },
   {
-    title: "Crew on site",
+    icon: "hardhat",
+    title: "They start on site",
     body: "Workers arrive briefed on the site, the start time and who to report to. Your site team directs the work, and you get one weekly invoice on approved hours.",
   },
 ];
@@ -54,27 +58,34 @@ export default function HomePage() {
   return (
     <>
       <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-20 sm:py-28 lg:py-32">
-          <p className="kicker text-teal">Construction labour hire · Greater Sydney</p>
-          <h1 className="display mt-6">Construction labour, on site when you need them.</h1>
-          <p className="lede mt-8 text-body">
+        <div className="wrap py-14 sm:py-24 lg:py-28">
+          <span aria-hidden="true" className="block h-1 w-12 rounded-full bg-teal" />
+          <p className="kicker mt-6 text-teal">Construction labour hire · Greater Sydney</p>
+          <h1 className="display mt-4">Construction labour, on site when you need them.</h1>
+          <p className="lede mt-6 text-body">
             MS Workforce supplies general labourers, trade assistants and site
             support crews to builders across Greater Sydney. From a single day
             of labour to a crew for the whole stage.
           </p>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={BOOK_LABOUR_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pill pill-teal w-full sm:w-auto"
-            >
-              Book labour
-              <span className="sr-only"> (form opens in a new tab)</span>
-            </a>
-            <Link href="/candidates#register" className="pill pill-line w-full sm:w-auto">
-              Apply for work
-            </Link>
+          <div className="mt-8 grid gap-6 sm:max-w-xl sm:grid-cols-2 sm:gap-4">
+            <div>
+              <p className="mb-2 text-sm font-semibold text-white">Builders and site managers</p>
+              <a
+                href={BOOK_LABOUR_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pill pill-teal w-full"
+              >
+                Book labour
+                <span className="sr-only"> (form opens in a new tab)</span>
+              </a>
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-semibold text-white">Looking for work</p>
+              <Link href="/candidates#register" className="pill pill-line w-full">
+                Apply for work
+              </Link>
+            </div>
           </div>
           <p className="mt-4">
             <a href={REQUEST_LABOUR_HREF} className="link-quiet link-quiet-light -ml-2">
@@ -130,17 +141,18 @@ export default function HomePage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">How it works</p>
           <h2 className="display mt-6">Three steps. Brief in, crew on site.</h2>
-          <ol className="mt-14 grid gap-5 md:grid-cols-3">
+          <ol className="mt-8 grid gap-3 sm:mt-10 md:grid-cols-3 md:gap-5">
             {steps.map((step, index) => (
               <li
                 key={step.title}
-                className="group rounded-2xl border border-navy-line bg-navy-card p-6 transition-colors duration-200 hover:border-teal-400/50 sm:p-8"
+                className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal text-sm font-semibold text-navy">
-                  {index + 1}
-                </span>
-                <h3 className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">{step.title}</h3>
-                <p className="mt-3 text-base leading-relaxed text-body sm:text-lg">{step.body}</p>
+                <div className="flex items-center gap-3">
+                  <Icon name={step.icon} />
+                  <span className="kicker text-teal">Step {index + 1}</span>
+                </div>
+                <h3 className="mt-5 text-xl font-bold tracking-tight sm:text-2xl">{step.title}</h3>
+                <p className="mt-2 text-base leading-relaxed text-body">{step.body}</p>
               </li>
             ))}
           </ol>
