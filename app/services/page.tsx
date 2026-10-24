@@ -126,10 +126,13 @@ export default function ServicesPage() {
               </li>
             ))}
           </ul>
-          <div className="mt-12">
+          <div className="mt-12 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
             <a href={REQUEST_LABOUR_HREF} className="pill pill-teal">
               Request labour
             </a>
+            <Link href="/labourers-sydney" className="link-quiet link-quiet-light">
+              More on labourers in Sydney
+            </Link>
           </div>
         </div>
       </section>

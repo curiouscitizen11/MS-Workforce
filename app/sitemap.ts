@@ -7,7 +7,8 @@ import { SITE_URL } from "@/components/site";
 // for every page would tell search engines everything changed on every deploy.
 const pages: { route: string; lastModified: string }[] = [
   { route: "", lastModified: "2026-10-25" },
-  { route: "/services", lastModified: "2026-10-13" },
+  { route: "/services", lastModified: "2026-10-25" },
+  { route: "/labourers-sydney", lastModified: "2026-10-25" },
   { route: "/clients", lastModified: "2026-10-25" },
   { route: "/candidates", lastModified: "2026-10-25" },
   { route: "/about", lastModified: "2026-10-23" },
