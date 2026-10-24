@@ -4,7 +4,8 @@ import { DemoBanner, Heading } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
 import { complianceFor } from "@/lib/portal/services"
 import { formatDate, formatTime, sydneyParts, sydneyToday } from "@/lib/portal/dates"
-import { greetingFor, inductionTodoCount, nextBookedShift, offersWaiting, shiftsMissingSupervisorSign, workerHomeRows } from "@/lib/portal/home"
+import { greetingFor, nextBookedShift, offersWaiting, shiftsMissingSupervisorSign, workerHomeRows } from "@/lib/portal/home"
+import { inductionRows } from "@/lib/portal/inductions"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { sidesPresent, slotsFromWorker } from "@/lib/portal/ticket-photos"
@@ -51,7 +52,11 @@ export default async function DashboardPage() {
     timesheetUnsigned: missingSign.length > 0 || Boolean(booked?.when === "today" && !todaySheet?.signaturePng),
     sheetStatus: todaySheet?.status,
     ticketState,
-    inductionTodos: inductionTodoCount(Boolean(worker.inductionPassed), offers, worker.id, today),
+    inductionTodos: inductionRows({
+      inductionPassed: worker.inductionPassed,
+      siteInductions: worker.siteInductions,
+      offers,
+    }).filter((row) => !row.done).length,
     safetySaved: Boolean(worker.emergencyContact || worker.healthConsent || worker.allergies),
   })
   const shift = booked?.shift
