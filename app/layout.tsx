@@ -61,12 +61,21 @@ const organisation = {
   description,
   logo: SITE_URL + "/icon",
   image: SITE_URL + "/opengraph-image",
-  areaServed: [
-    { "@type": "City", name: "Sydney" },
-  ],
+  areaServed: [{ "@type": "AdministrativeArea", name: "Greater Sydney, New South Wales, Australia" }],
+  knowsAbout: ["Construction labour hire"],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Construction labour hire",
+    itemListElement: [
+      "General labourers",
+      "Trade assistants",
+      "Site cleans and site support",
+      "Materials handling",
+    ].map((name) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name } })),
+  },
   contactPoint: [
-    { "@type": "ContactPoint", contactType: "sales", email: EMAIL, areaServed: "AU", availableLanguage: "en-AU" },
-    { "@type": "ContactPoint", contactType: "recruitment", email: JOBS_EMAIL, areaServed: "AU", availableLanguage: "en-AU" },
+    { "@type": "ContactPoint", contactType: "sales", email: EMAIL, areaServed: "Greater Sydney", availableLanguage: "en-AU" },
+    { "@type": "ContactPoint", contactType: "recruitment", email: JOBS_EMAIL, areaServed: "Greater Sydney", availableLanguage: "en-AU" },
   ],
 };
 

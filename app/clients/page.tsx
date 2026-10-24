@@ -66,9 +66,24 @@ const faqs = [
   },
 ];
 
+// FAQ structured data: built from the same visible questions and answers above, nothing extra.
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: { "@type": "Answer", text: item.a },
+  })),
+};
+
 export default function ClientsPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <section className="flex screen items-center bg-navy text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/65">For builders</p>
