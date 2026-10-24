@@ -42,17 +42,42 @@ export default function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-[var(--site-header-height)] bg-navy text-white shadow-[inset_0_-1px_0_rgba(51,191,175,0.22)]">
       <div className="wrap flex h-full items-center justify-between">
-        <Link
-          href="/"
-          className="block leading-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
-        >
-          <span className="block text-[19px] font-semibold tracking-tight">
-            MS <span className="text-teal">|</span> WORKFORCE
-          </span>
-          <span className="mt-1 block text-[11px] font-medium tracking-[0.2em] text-white/70">
-            LABOUR HIRE
-          </span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="-ml-3 inline-flex h-11 w-11 flex-none items-center justify-center rounded-full text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal md:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
+            <svg
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            >
+              {open ? (
+                <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+              ) : (
+                <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+              )}
+            </svg>
+          </button>
+          <Link
+            href="/"
+            className="block leading-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
+          >
+            <span className="block text-[19px] font-semibold tracking-tight">
+              MS <span className="text-teal">|</span> WORKFORCE
+            </span>
+            <span className="mt-1 block text-[11px] font-medium tracking-[0.2em] text-white/70">
+              LABOUR HIRE
+            </span>
+          </Link>
+        </div>
 
         <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
           {navigation.map((item) => {
@@ -82,37 +107,23 @@ export default function Header() {
             Book labour
           </a>
         </nav>
+      </div>
 
+      {open ? (
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
-          <svg
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          >
-            {open ? (
-              <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
-            ) : (
-              <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-            )}
-          </svg>
-        </button>
-      </div>
+          tabIndex={-1}
+          aria-hidden="true"
+          className="fixed bottom-0 right-0 top-[var(--site-header-height)] z-30 w-full bg-black/50 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      ) : null}
 
       {open ? (
         <nav
           id="mobile-nav"
           aria-label="Mobile"
-          className="fixed inset-x-0 bottom-0 top-[var(--site-header-height)] z-40 overflow-y-auto bg-navy px-6 py-8 md:hidden"
+          className="fixed bottom-0 left-0 top-[var(--site-header-height)] z-40 w-[88%] max-w-sm overflow-y-auto border-r border-white/10 bg-navy px-6 py-8 text-left shadow-2xl md:hidden"
         >
           <ul className="space-y-1">
             {navigation.map((item) => {
