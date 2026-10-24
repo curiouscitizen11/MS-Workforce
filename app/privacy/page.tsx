@@ -188,7 +188,7 @@ export default function PrivacyPage() {
           <div className="grid max-w-3xl gap-4">
             {sections.map((s) => (
               <div key={s.title} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">
-                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{s.title}</h2>
+                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{s.title}</h2>
                 <div className="mt-4 space-y-4 text-lg leading-relaxed text-body">{s.body}</div>
               </div>
             ))}

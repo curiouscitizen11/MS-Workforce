@@ -125,7 +125,7 @@ export default function ClientsPage() {
               <li key={step.title} className="stack-row">
                 <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
-                  <h3 className="text-2xl font-semibold tracking-tight sm:text-4xl">{step.title}</h3>
+                  <h3 className="text-2xl font-bold tracking-tight sm:text-4xl">{step.title}</h3>
                   <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
                     {step.body}
                   </p>
@@ -143,7 +143,7 @@ export default function ClientsPage() {
           <div className="mt-8 grid gap-3 sm:mt-10">
             {faqs.map((item) => (
               <details key={item.q} className="group rounded-2xl border border-navy-line bg-navy-card px-5 sm:px-7">
-                <summary className="flex min-h-11 cursor-pointer list-none items-start justify-between gap-6 py-6 text-xl font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal sm:text-2xl [&::-webkit-details-marker]:hidden">
+                <summary className="flex min-h-11 cursor-pointer list-none items-start justify-between gap-6 py-6 text-xl font-bold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal sm:text-2xl [&::-webkit-details-marker]:hidden">
                   <span>{item.q}</span>
                   <span
                     aria-hidden="true"

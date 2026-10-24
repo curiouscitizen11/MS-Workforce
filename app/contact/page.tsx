@@ -80,7 +80,7 @@ export default function ContactPage() {
       <section className="flex screen items-center bg-navy-alt text-white">
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">Labour requests</p>
-          <h2 className="mt-6 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
+          <h2 className="mt-6 max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
             What to include in a labour request.
           </h2>
           <ul className="mt-8 max-w-3xl grid gap-3 sm:mt-10">

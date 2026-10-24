@@ -45,10 +45,10 @@ body {
     @apply text-[11px] font-medium uppercase tracking-[0.22em];
   }
   .display {
-    @apply max-w-5xl text-balance text-[2.1rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl xl:text-[4.75rem];
+    @apply max-w-5xl text-balance text-[2.25rem] font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-[4.75rem];
   }
   .lede {
-    @apply max-w-xl text-lg leading-relaxed sm:text-xl;
+    @apply max-w-xl text-lg leading-relaxed text-body sm:text-xl;
   }
   /* Buttons: fully round pills, 48px tall, 16px/600, flat, no lift or shadow (colours from the worker portal) */
   .pill {

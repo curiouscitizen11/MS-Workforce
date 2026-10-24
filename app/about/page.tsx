@@ -57,7 +57,7 @@ export default function AboutPage() {
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {values.map((item) => (
               <li key={item.title} className="stack-row">
-                <h3 className="text-2xl font-semibold tracking-tight sm:col-span-4 sm:text-3xl">
+                <h3 className="text-2xl font-bold tracking-tight sm:col-span-4 sm:text-3xl">
                   {item.title}
                 </h3>
                 <p className="text-base leading-relaxed text-body sm:col-span-8 sm:text-lg">

@@ -75,7 +75,7 @@ export default function SiteCleansPage() {
 
       <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Site cleans</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Site cleans</h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             A clean site is safer and keeps the trades moving. We supply
             labourers to keep it that way from the first week to handover.
@@ -86,7 +86,7 @@ export default function SiteCleansPage() {
             ))}
           </ul>
 
-          <h2 className="mt-14 text-3xl font-semibold tracking-tight sm:text-4xl">Demolition support</h2>
+          <h2 className="mt-14 text-3xl font-bold tracking-tight sm:text-4xl">Demolition support</h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             Extra hands for the manual side of demolition and strip-out, so
             your crew can stay on the main task. Your builder or site
@@ -111,13 +111,13 @@ export default function SiteCleansPage() {
 
       <section className="bg-navy text-white">
         <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">How booking works</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">How booking works</h2>
           <ol className="mt-8 grid gap-3 sm:mt-10">
             {steps.map((step, index) => (
               <li key={step.title} className="stack-row">
                 <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
-                  <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{step.title}</h3>
+                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{step.title}</h3>
                   <p className="mt-2 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
                     {step.body}
                   </p>
@@ -135,7 +135,7 @@ export default function SiteCleansPage() {
 
       <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Need a hand on site?</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Need a hand on site?</h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
             Send us the brief and we will tell you straight away whether we can fill it.
           </p>

@@ -79,7 +79,7 @@ export default function LabourersSydneyPage() {
 
       <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">General labourers</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">General labourers</h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             Reliable labour for the jobs that need extra hands on site.
           </p>
@@ -89,7 +89,7 @@ export default function LabourersSydneyPage() {
             ))}
           </ul>
 
-          <h2 className="mt-14 text-3xl font-semibold tracking-tight sm:text-4xl">Trade assistants</h2>
+          <h2 className="mt-14 text-3xl font-bold tracking-tight sm:text-4xl">Trade assistants</h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             Practical support so your trades stay productive.
           </p>
@@ -103,13 +103,13 @@ export default function LabourersSydneyPage() {
 
       <section className="bg-navy text-white">
         <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             From one day to a whole project
           </h2>
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">
             {lengths.map((item) => (
               <li key={item.title} className="rounded-2xl border border-navy-line bg-navy-card p-5">
-                <h3 className="text-xl font-semibold tracking-tight">{item.title}</h3>
+                <h3 className="text-xl font-bold tracking-tight">{item.title}</h3>
                 <p className="mt-2 text-base leading-relaxed text-body">{item.body}</p>
               </li>
             ))}
@@ -119,13 +119,13 @@ export default function LabourersSydneyPage() {
 
       <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">How booking works</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">How booking works</h2>
           <ol className="mt-8 grid gap-3 sm:mt-10">
             {steps.map((step, index) => (
               <li key={step.title} className="stack-row">
                 <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
-                  <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{step.title}</h3>
+                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{step.title}</h3>
                   <p className="mt-2 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
                     {step.body}
                   </p>
@@ -142,7 +142,7 @@ export default function LabourersSydneyPage() {
 
       <section className="bg-navy text-white">
         <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Need labour on site?</h2>
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Need labour on site?</h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
             Send us the brief and we will tell you straight away whether we can fill it.
           </p>

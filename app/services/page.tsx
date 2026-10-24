@@ -103,7 +103,7 @@ export default function ServicesPage() {
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {supply.map((item) => (
               <li key={item.title} className="stack-row">
-                <h3 className="text-2xl font-semibold tracking-tight sm:col-span-5 sm:text-3xl">
+                <h3 className="text-2xl font-bold tracking-tight sm:col-span-5 sm:text-3xl">
                   {item.title}
                 </h3>
                 <p className="text-base leading-relaxed text-body sm:col-span-7 sm:text-lg">
@@ -121,7 +121,7 @@ export default function ServicesPage() {
           <h2 className="display mt-6">Built for builders and trades.</h2>
           <ul className="mt-14 grid gap-3 sm:grid-cols-2">
             {sectors.map((item) => (
-              <li key={item} className="rounded-2xl border border-navy-line bg-navy-card p-5 text-xl font-semibold tracking-tight sm:p-7 sm:text-2xl">
+              <li key={item} className="rounded-2xl border border-navy-line bg-navy-card p-5 text-xl font-bold tracking-tight sm:p-7 sm:text-2xl">
                 {item}
               </li>
             ))}
