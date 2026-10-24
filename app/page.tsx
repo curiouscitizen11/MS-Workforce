@@ -99,10 +99,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">What we supply</p>
-          <h2 className="display mt-6">Labour for every stage of the build.</h2>
+          <h2 className="display mt-4">Labour for every stage of the build.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {roles.map((item) => (
               <li key={item.title} className="num-card">
@@ -126,11 +126,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Ways to book</p>
-          <h2 className="display mt-6">From one day to the whole job.</h2>
-          <ul className="mt-14 grid gap-3 sm:grid-cols-2">
+          <h2 className="display mt-4">From one day to the whole job.</h2>
+          <ul className="mt-8 grid sm:mt-10 gap-3 sm:grid-cols-2">
             {supply.map((item) => (
               <li key={item.title} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">
                 <Icon name={item.icon} />
@@ -142,10 +142,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">How it works</p>
-          <h2 className="display mt-6">Three steps. Brief in, crew on site.</h2>
+          <h2 className="display mt-4">Three steps. Brief in, crew on site.</h2>
           <ol className="mt-8 grid gap-3 sm:mt-10 md:grid-cols-3 md:gap-5">
             {steps.map((step, index) => (
               <li
@@ -178,10 +178,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Our standard</p>
-          <h2 className="display mt-6">The same standard on every start.</h2>
+          <h2 className="display mt-4">The same standard on every start.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {standards.map((item) => (
               <li key={item} className="flex gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-5 sm:p-7">
@@ -193,11 +193,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Where we work</p>
-          <h2 className="display mt-6">Construction labour across Sydney.</h2>
-          <p className="lede mt-8 text-body">
+          <h2 className="display mt-4">Construction labour across Sydney.</h2>
+          <p className="lede mt-5 text-body">
             We supply construction labour to building sites across Sydney,
             from the CBD and the suburbs to Western Sydney.
           </p>
@@ -206,12 +206,12 @@ export default function HomePage() {
 
       <PhotoSection />
 
-      <section className="grid screen grid-rows-2 bg-navy text-white md:grid-cols-2 md:grid-rows-1">
+      <section className="grid grid-rows-2 bg-navy text-white md:grid-cols-2 md:grid-rows-1">
         <a
           href={BOOK_LABOUR_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex flex-col items-center justify-center text-center border-b transition-colors hover:bg-white/[0.03] border-navy-line px-5 py-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10 md:border-b-0 md:border-r"
+          className="group flex flex-col items-center justify-center text-center border-b transition-colors hover:bg-white/[0.03] border-navy-line px-5 py-14 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10 md:border-b-0 md:border-r"
         >
           <p className="kicker text-teal">For builders</p>
           <h2 className="mx-auto mt-4 max-w-lg text-balance text-3xl font-bold tracking-tight sm:text-[2.5rem] sm:leading-[1.1]">
@@ -221,7 +221,7 @@ export default function HomePage() {
         </a>
         <Link
           href="/candidates"
-          className="group flex flex-col items-center justify-center text-center px-5 transition-colors hover:bg-white/[0.03] py-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10"
+          className="group flex flex-col items-center justify-center text-center px-5 transition-colors hover:bg-white/[0.03] py-14 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10"
         >
           <p className="kicker text-teal">For workers</p>
           <h2 className="mx-auto mt-4 max-w-lg text-balance text-3xl font-bold tracking-tight sm:text-[2.5rem] sm:leading-[1.1]">

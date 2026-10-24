@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <section className="flex screen items-center bg-navy text-white">
-      <div className="wrap py-24 sm:py-28">
+    <section className="bg-navy text-white">
+      <div className="wrap py-14 sm:py-20 lg:py-24">
         <p className="kicker text-teal">404</p>
-        <h1 className="display mt-6">This page isn&apos;t on site.</h1>
-        <p className="lede mt-8 text-body">
+        <h1 className="display mt-4">This page isn&apos;t on site.</h1>
+        <p className="lede mt-5 text-body">
           The page you were after has moved or never existed. Try one of these
           instead.
         </p>

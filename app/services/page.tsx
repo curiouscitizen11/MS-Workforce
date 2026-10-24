@@ -61,11 +61,11 @@ const sectors = [
 export default function ServicesPage() {
   return (
     <>
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Services</p>
-          <h1 className="display mt-6">Construction labour hire across Greater Sydney.</h1>
-          <p className="lede mt-8 text-body">
+          <h1 className="display mt-4">Construction labour hire across Greater Sydney.</h1>
+          <p className="lede mt-5 text-body">
             General labourers, trade assistants and site support crews for
             builders and trades. Booked by the day, for short-notice cover, or
             supplied on an ongoing, project-based basis.
@@ -85,11 +85,11 @@ export default function ServicesPage() {
         <section
           key={item.title}
           className={
-            "flex screen items-center " +
+            "" +
             (item.dark ? "bg-navy text-white" : "bg-navy-alt text-white")
           }
         >
-          <div className="wrap py-24 sm:py-28">
+          <div className="wrap py-14 sm:py-20 lg:py-24">
             <div className="flex items-center gap-3">
               <Icon name={item.icon} />
               <p className="kicker text-teal">{item.kicker}</p>
@@ -100,10 +100,10 @@ export default function ServicesPage() {
         </section>
       ))}
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Ways to book</p>
-          <h2 className="display mt-6">Short-notice and ongoing supply.</h2>
+          <h2 className="display mt-4">Short-notice and ongoing supply.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {supply.map((item) => (
               <li key={item.title} className="num-card">
@@ -118,11 +118,11 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Who we work with</p>
-          <h2 className="display mt-6">Built for builders and trades.</h2>
-          <ul className="mt-14 grid gap-3 sm:grid-cols-2">
+          <h2 className="display mt-4">Built for builders and trades.</h2>
+          <ul className="mt-8 grid sm:mt-10 gap-3 sm:grid-cols-2">
             {sectors.map((item) => (
               <li key={item} className="num-card items-center text-lg font-bold tracking-tight sm:text-2xl">
                 <Icon name="building" />

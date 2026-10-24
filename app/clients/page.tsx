@@ -76,11 +76,11 @@ export default function ClientsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">For builders</p>
-          <h1 className="display mt-6">Reliable labour for Sydney builders.</h1>
-          <p className="lede mt-8 text-body">
+          <h1 className="display mt-4">Reliable labour for Sydney builders.</h1>
+          <p className="lede mt-5 text-body">
             Tell us the site, the start time and the roles. We match the right
             people, confirm the details with you, and have them on site ready
             to work.
@@ -116,10 +116,10 @@ export default function ClientsPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">How it works</p>
-          <h2 className="display mt-6">Four steps from brief to site.</h2>
+          <h2 className="display mt-4">Four steps from brief to site.</h2>
           <ol className="mt-8 grid gap-3 sm:mt-10">
             {steps.map((step, index) => (
               <li key={step.title} className="num-card">
@@ -136,10 +136,10 @@ export default function ClientsPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Builders FAQ</p>
-          <h2 className="display mt-6">Common questions.</h2>
+          <h2 className="display mt-4">Common questions.</h2>
           <div className="mt-8 grid gap-3 sm:mt-10">
             {faqs.map((item) => (
               <details key={item.q} className="group rounded-2xl border border-navy-line bg-navy-card px-5 sm:px-7">
@@ -161,11 +161,11 @@ export default function ClientsPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Request labour</p>
-          <h2 className="display mt-6">Send us the brief.</h2>
-          <p className="lede mt-8 text-body">
+          <h2 className="display mt-4">Send us the brief.</h2>
+          <p className="lede mt-5 text-body">
             Fill in the Book labour form with the site, start time, roles and
             numbers, or send the same details by email. Every request gets a
             personal reply from the owner.

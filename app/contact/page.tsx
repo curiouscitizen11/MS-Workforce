@@ -33,16 +33,16 @@ const include = [
 export default function ContactPage() {
   return (
     <>
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Contact</p>
-          <h1 className="display mt-6">Request labour or ask a question.</h1>
+          <h1 className="display mt-4">Request labour or ask a question.</h1>
           <p className="mt-8 max-w-full text-[clamp(1.5rem,6vw,4.5rem)] font-semibold leading-tight tracking-tight [overflow-wrap:anywhere]">
             <a href={EMAIL_HREF} className="text-teal-300">
               {EMAIL}
             </a>
           </p>
-          <p className="lede mt-8 text-body">
+          <p className="lede mt-5 text-body">
             Builders, site managers and trades: email the brief and you will get
             a personal reply. Looking for work? Email{" "}
             <a href={JOBS_EMAIL_HREF} className="text-white underline decoration-white/30 underline-offset-4">
@@ -78,8 +78,8 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Labour requests</p>
           <h2 className="mt-6 max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">
             What to include in a labour request.
@@ -99,10 +99,10 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Details</p>
-          <h2 className="display mt-6">Supplying sites across Sydney.</h2>
+          <h2 className="display mt-4">Supplying sites across Sydney.</h2>
           <dl className="mt-8 max-w-3xl grid gap-3 sm:mt-10">
             {facts.map((item) => (
               <div key={item.label} className="num-card items-center">

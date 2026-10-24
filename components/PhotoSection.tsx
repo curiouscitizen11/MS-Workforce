@@ -8,7 +8,7 @@ export default function PhotoSection() {
 
   return (
     <section className="bg-navy-alt text-white">
-      <div className="wrap py-16 sm:py-24">
+      <div className="wrap py-14 sm:py-20 lg:py-24">
         <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">On site</h2>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((photo) => (

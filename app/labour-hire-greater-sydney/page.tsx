@@ -56,10 +56,10 @@ export default function GreaterSydneyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <section className="bg-navy text-white">
-        <div className="wrap py-20 sm:py-28">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Greater Sydney</p>
-          <h1 className="display mt-6">Construction labour across Greater Sydney.</h1>
-          <p className="lede mt-8 text-body">
+          <h1 className="display mt-4">Construction labour across Greater Sydney.</h1>
+          <p className="lede mt-5 text-body">
             We supply construction labour to building sites across Greater
             Sydney, from the CBD and the suburbs to Western Sydney. Book one
             worker for a day or a crew for the whole project.
@@ -82,7 +82,7 @@ export default function GreaterSydneyPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-16 sm:py-24">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">What we supply on site</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {supply.map((item) => (
@@ -104,7 +104,7 @@ export default function GreaterSydneyPage() {
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-16 sm:py-24">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Questions about Greater Sydney coverage
           </h2>
@@ -120,7 +120,7 @@ export default function GreaterSydneyPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-16 sm:py-24">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Need labour on site?</h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
             Send us the brief and we will tell you straight away whether we can fill it.
@@ -130,12 +130,12 @@ export default function GreaterSydneyPage() {
               href={BOOK_LABOUR_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="pill pill-dark w-full sm:w-auto"
+              className="pill pill-teal w-full sm:w-auto"
             >
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>
             </a>
-            <Link href="/services" className="link-quiet w-full sm:w-auto">
+            <Link href="/services" className="link-quiet link-quiet-light w-full sm:w-auto">
               See all services
             </Link>
           </div>

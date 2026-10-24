@@ -48,10 +48,10 @@ export default function SiteCleansPage() {
   return (
     <>
       <section className="bg-navy text-white">
-        <div className="wrap py-20 sm:py-28">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Site cleans and demolition support</p>
-          <h1 className="display mt-6">Site cleans and demolition support for Sydney builders.</h1>
-          <p className="lede mt-8 text-body">
+          <h1 className="display mt-4">Site cleans and demolition support for Sydney builders.</h1>
+          <p className="lede mt-5 text-body">
             MS Workforce supplies labourers for site cleans and demolition
             support across Greater Sydney. Labour only, supervised by your
             builder. Book a single day or a crew for the whole stage.
@@ -74,25 +74,25 @@ export default function SiteCleansPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-16 sm:py-24">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Site cleans</h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             A clean site is safer and keeps the trades moving. We supply
             labourers to keep it that way from the first week to handover.
           </p>
-          <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-base text-body sm:text-lg">
+          <ul className="mt-6 max-w-2xl list-disc space-y-2 rounded-2xl border border-navy-line bg-navy-card py-5 pl-9 pr-5 text-base text-body marker:text-teal sm:text-lg">
             {cleans.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
 
-          <h2 className="mt-14 text-3xl font-bold tracking-tight sm:text-4xl">Demolition support</h2>
+          <h2 className="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Demolition support</h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             Extra hands for the manual side of demolition and strip-out, so
             your crew can stay on the main task. Your builder or site
             supervisor directs the work and the workers follow your site rules.
           </p>
-          <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-base text-body sm:text-lg">
+          <ul className="mt-6 max-w-2xl list-disc space-y-2 rounded-2xl border border-navy-line bg-navy-card py-5 pl-9 pr-5 text-base text-body marker:text-teal sm:text-lg">
             {demolition.map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -110,7 +110,7 @@ export default function SiteCleansPage() {
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-16 sm:py-24">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">How booking works</h2>
           <ol className="mt-8 grid gap-3 sm:mt-10">
             {steps.map((step, index) => (
@@ -134,7 +134,7 @@ export default function SiteCleansPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-16 sm:py-24">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Need a hand on site?</h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
             Send us the brief and we will tell you straight away whether we can fill it.
@@ -144,15 +144,15 @@ export default function SiteCleansPage() {
               href={BOOK_LABOUR_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="pill pill-dark w-full sm:w-auto"
+              className="pill pill-teal w-full sm:w-auto"
             >
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>
             </a>
-            <a href={REQUEST_LABOUR_HREF} className="link-quiet w-full sm:w-auto">
+            <a href={REQUEST_LABOUR_HREF} className="link-quiet link-quiet-light w-full sm:w-auto">
               Email the brief
             </a>
-            <Link href="/services" className="link-quiet w-full sm:w-auto">
+            <Link href="/services" className="link-quiet link-quiet-light w-full sm:w-auto">
               See all services
             </Link>
           </div>

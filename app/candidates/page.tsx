@@ -96,11 +96,11 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
 export default function CandidatesPage() {
   return (
     <>
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">For workers</p>
-          <h1 className="display mt-6">Construction work across Greater Sydney.</h1>
-          <p className="lede mt-8 text-body">
+          <h1 className="display mt-4">Construction work across Greater Sydney.</h1>
+          <p className="lede mt-5 text-body">
             We place general labourers, trade assistants and site support
             workers with builders across Sydney. Register once through the
             employee portal and we will contact you when work suits your skills
@@ -126,10 +126,10 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">The work</p>
-          <h2 className="display mt-6">Labouring, trade assistant and site support work.</h2>
+          <h2 className="display mt-4">Labouring, trade assistant and site support work.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {work.map((item) => (
               <li key={item.title} className="num-card">
@@ -146,10 +146,10 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">What we look for</p>
-          <h2 className="display mt-6">Reliable people who take the work seriously.</h2>
+          <h2 className="display mt-4">Reliable people who take the work seriously.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {lookFor.map((item) => (
               <li key={item.title} className="num-card">
@@ -164,10 +164,10 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">What you can expect</p>
-          <h2 className="display mt-6">Looked after on every job.</h2>
+          <h2 className="display mt-4">Looked after on every job.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {expect.map((item) => (
               <li key={item} className="flex gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-5 sm:p-7">
@@ -179,15 +179,15 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section id="tickets" className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section id="tickets" className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Get your tickets</p>
-          <h2 className="display mt-6">Missing a ticket? Here&apos;s where to get it in Sydney.</h2>
-          <p className="lede mt-8 text-body">
+          <h2 className="display mt-4">Missing a ticket? Here&apos;s where to get it in Sydney.</h2>
+          <p className="lede mt-5 text-body">
             More tickets mean more sites you can work on. These registered
             training providers run the courses across Sydney. Most take a day or two.
           </p>
-          <ul className="mt-14 grid gap-5 md:grid-cols-2">
+          <ul className="mt-8 grid sm:mt-10 gap-5 md:grid-cols-2">
             {tickets.map((ticket) => (
               <TicketCard key={ticket.title} ticket={ticket} />
             ))}
@@ -220,11 +220,11 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section id="register" className="flex screen scroll-mt-14 items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section id="register" className="scroll-mt-14 bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">How to register</p>
-          <h2 className="display mt-6">Register through the employee portal.</h2>
-          <p className="lede mt-8 text-body">
+          <h2 className="display mt-4">Register through the employee portal.</h2>
+          <p className="lede mt-5 text-body">
             The employee portal is where you submit your details and documents.
             It takes a few minutes. We only ask whether you hold a White Card
             and other tickets; we sight the cards themselves before any

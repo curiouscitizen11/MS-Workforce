@@ -39,7 +39,7 @@ const sections: { title: string; body: React.ReactNode }[] = [
   {
     title: "What we collect",
     body: (
-      <ul className="list-disc space-y-3 pl-5">
+      <ul className="list-disc space-y-3 pl-5 marker:text-teal">
         <li>
           <strong>Workers and applicants:</strong> name, contact details,
           location, right-to-work details, work history, licence and ticket
@@ -174,17 +174,17 @@ export default function PrivacyPage() {
   return (
     <>
       <section className="bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Privacy</p>
-          <h1 className="display mt-6">Privacy Policy</h1>
-          <p className="lede mt-8 text-body">
+          <h1 className="display mt-4">Privacy Policy</h1>
+          <p className="lede mt-5 text-body">
             How we handle your information. Last updated 13 October 2026.
           </p>
         </div>
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-20 sm:py-24">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <div className="grid max-w-3xl gap-4">
             {sections.map((s) => (
               <div key={s.title} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">

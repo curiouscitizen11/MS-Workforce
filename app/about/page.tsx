@@ -34,10 +34,10 @@ const values: { icon: IconName; title: string; body: string }[] = [
 export default function AboutPage() {
   return (
     <>
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">About</p>
-          <h1 className="display mt-6">Why MS Workforce</h1>
+          <h1 className="display mt-4">Why MS Workforce</h1>
           <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-body sm:text-xl">
             <p>
               I&apos;ve spent over five years on Sydney construction sites.
@@ -54,10 +54,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy-alt text-white">
-        <div className="wrap py-24 sm:py-28">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">How we work</p>
-          <h2 className="display mt-6">Safety, reliability, respect.</h2>
+          <h2 className="display mt-4">Safety, reliability, respect.</h2>
           <ul className="mt-8 grid gap-3 sm:mt-10">
             {values.map((item) => (
               <li key={item.title} className="num-card">
