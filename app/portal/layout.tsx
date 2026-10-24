@@ -1,6 +1,7 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import Link from "next/link"
 import { cookies } from "next/headers"
+import { AddHomeHint } from "@/components/portal/AddHomeHint"
 import { PortalNav } from "@/components/portal/Nav"
 import { SideMenu } from "@/components/portal/SideMenu"
 import { readSession } from "@/lib/portal/session"
@@ -12,6 +13,12 @@ export const metadata: Metadata = {
     template: "%s | MS Workforce",
   },
   description: "MS Workforce worker portal.",
+  applicationName: "MS Workforce",
+  appleWebApp: {
+    capable: true,
+    title: "MS Workforce",
+    statusBarStyle: "black-translucent",
+  },
   robots: { index: false, follow: false },
   alternates: { canonical: null },
   openGraph: {
@@ -24,6 +31,10 @@ export const metadata: Metadata = {
     title: "Worker portal",
     description: "MS Workforce worker portal.",
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: "#0b1a2e",
 }
 
 export const dynamic = "force-dynamic"
@@ -47,7 +58,10 @@ export default async function PortalLayout({ children }: { children: React.React
           )}
         </div>
       </header>
-      <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-4">{children}</div>
+      <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-4">
+        <AddHomeHint />
+        {children}
+      </div>
       {current ? <PortalNav role={current.worker.role} /> : null}
     </div>
   )

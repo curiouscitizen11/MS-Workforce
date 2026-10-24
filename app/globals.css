@@ -423,6 +423,32 @@ a.portal-list-row {
   font-size: 14px;
   font-weight: 600;
 }
+.portal-home-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 8px 8px 8px 12px;
+  border: 1px solid var(--p-border, #22354f);
+  border-radius: 6px;
+  background: transparent;
+}
+.portal-home-hint p {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--p-muted, #8fa1b6);
+}
+.portal-home-hint button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--p-text, #e8edf3);
+  font-size: 16px;
+  font-weight: 600;
+}
 .portal-add {
   display: flex;
   align-items: center;
