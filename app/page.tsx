@@ -115,7 +115,7 @@ export default function HomePage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/65">Ways to book</p>
           <h2 className="display mt-6">From one day to the whole job.</h2>
-          <ul className="mt-14 grid gap-px overflow-hidden rounded-md bg-white/10 sm:grid-cols-2">
+          <ul className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2">
             {supply.map((item) => (
               <li key={item.title} className="bg-navy p-6 sm:p-8">
                 <h3 className="text-2xl font-semibold tracking-tight sm:text-3xl">{item.title}</h3>
@@ -134,9 +134,9 @@ export default function HomePage() {
             {steps.map((step, index) => (
               <li
                 key={step.title}
-                className="group rounded-md border border-navy/10 bg-white p-6 transition-colors duration-200 hover:border-teal-600/40 sm:p-8"
+                className="group rounded-2xl border border-navy/10 bg-white p-6 transition-colors duration-200 hover:border-teal-600/40 sm:p-8"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded bg-teal-600 text-sm font-semibold text-white">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-600 text-sm font-semibold text-white">
                   {index + 1}
                 </span>
                 <h3 className="mt-6 text-2xl font-semibold tracking-tight sm:text-3xl">{step.title}</h3>

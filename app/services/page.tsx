@@ -119,7 +119,7 @@ export default function ServicesPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-white/65">Who we work with</p>
           <h2 className="display mt-6">Built for builders and trades.</h2>
-          <ul className="mt-14 grid gap-px overflow-hidden rounded-md bg-white/10 sm:grid-cols-2">
+          <ul className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2">
             {sectors.map((item) => (
               <li key={item} className="bg-navy p-6 text-xl font-semibold tracking-tight sm:p-8 sm:text-2xl">
                 {item}

@@ -45,7 +45,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="-ml-3 inline-flex h-11 w-11 flex-none items-center justify-center rounded text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal md:hidden"
+            className="-ml-3 inline-flex h-11 w-11 flex-none items-center justify-center rounded-full text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal md:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((value) => !value)}
@@ -102,7 +102,7 @@ export default function Header() {
             href={BOOK_LABOUR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden min-h-11 items-center rounded bg-teal-400 px-5 text-sm font-semibold text-navy transition hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
+            className="hidden min-h-11 items-center rounded-full bg-teal-400 px-5 text-sm font-semibold text-navy transition hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
           >
             Book labour
           </a>

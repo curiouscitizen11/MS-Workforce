@@ -106,7 +106,7 @@ export default function LabourersSydneyPage() {
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             From one day to a whole project
           </h2>
-          <ul className="mt-8 grid gap-px overflow-hidden rounded-md bg-white/10 sm:grid-cols-2">
+          <ul className="mt-8 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2">
             {lengths.map((item) => (
               <li key={item.title} className="bg-navy p-6">
                 <h3 className="text-xl font-semibold tracking-tight">{item.title}</h3>

@@ -50,9 +50,9 @@ body {
   .lede {
     @apply max-w-xl text-lg leading-relaxed sm:text-xl;
   }
-  /* Buttons match the worker portal (DESIGN.md): 48px tall, 4px radius, 16px/600, flat, no lift or shadow */
+  /* Buttons: fully round pills, 48px tall, 16px/600, flat, no lift or shadow (colours from the worker portal) */
   .pill {
-    @apply inline-flex min-h-12 items-center justify-center rounded border border-transparent px-6 py-3 text-base font-semibold leading-tight transition-colors duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400;
+    @apply inline-flex min-h-12 items-center justify-center rounded-full border border-transparent px-6 py-3 text-base font-semibold leading-tight transition-colors duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400;
     -webkit-tap-highlight-color: transparent;
   }
   /* Primary: portal accent #2ec4b6 fill, navy text (about 8:1) */
@@ -153,7 +153,7 @@ main section.bg-navy::before {
 }
 main .page-enter > section.bg-navy:first-of-type::before { display: none; }
 /* Cards lift off the tint */
-main section.bg-tint .rounded-md.bg-white,
+main section.bg-tint .rounded-2xl.bg-white,
 main section.bg-tint li.bg-white {
   border-color: rgba(11, 26, 46, 0.12);
 }

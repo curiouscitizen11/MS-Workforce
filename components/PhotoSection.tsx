@@ -12,7 +12,7 @@ export default function PhotoSection() {
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">On site</h2>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((photo) => (
-            <li key={photo.src} className="overflow-hidden rounded-md border border-navy/10 bg-white">
+            <li key={photo.src} className="overflow-hidden rounded-2xl border border-navy/10 bg-white">
               <div className="relative aspect-[4/3]">
                 <Image
                   src={photo.src}
