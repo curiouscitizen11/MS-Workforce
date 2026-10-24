@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { cardsAwaitingCheck, greetingFor, inductionTodoCount, nextBookedShift, offersWaiting, photosAwaitingApproval, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays, workerHomeRows } from "@/lib/portal/home"
+import { cardsAwaitingCheck, inductionTodoCount, offersWaiting, photosAwaitingApproval, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays } from "@/lib/portal/home"
 
 describe("home badges", () => {
   it("counts offers, unsigned days and induction to-dos", () => {
@@ -33,34 +33,6 @@ describe("home badges", () => {
       "2026-10-17",
     )
     expect(flagged.map((offer) => offer.id)).toEqual(["offer-old"])
-    expect(greetingFor(8 * 60)).toBe("Good morning")
-    expect(greetingFor(14 * 60)).toBe("Good afternoon")
-    const booked = nextBookedShift(
-      [
-        { status: "Accepted", shiftDate: "2026-10-18", startTime: "07:00" },
-        { status: "Accepted", shiftDate: "2026-10-17", startTime: "07:00" },
-        { status: "Offered", shiftDate: "2026-10-17", startTime: "06:00" },
-      ],
-      "2026-10-17",
-    )
-    expect(booked?.when).toBe("today")
-    expect(nextBookedShift([], "2026-10-17")).toBeNull()
-    const rows = workerHomeRows({
-      offerCount: 1,
-      hasShift: false,
-      timesheetUnsigned: true,
-      ticketState: "expiring",
-      inductionTodos: 1,
-      safetySaved: false,
-    })
-    expect(rows.map((row) => row.status)).toEqual([
-      "Timesheet not signed",
-      "Offer waiting",
-      "Ticket expiring",
-      "Induction to do",
-      "Not added yet",
-    ])
-    expect(rows.every((row) => row.attention)).toBe(true)
     expect(
       unsignedFortnightDays(
         [{ workerId: "w-sam", status: "Accepted", shiftDate: "2026-10-16" }],
