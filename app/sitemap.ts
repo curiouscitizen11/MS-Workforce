@@ -13,7 +13,7 @@ const pages: { route: string; lastModified: string }[] = [
   { route: "/labour-hire-greater-sydney", lastModified: "2026-10-25" },
   { route: "/clients", lastModified: "2026-10-25" },
   { route: "/candidates", lastModified: "2026-10-25" },
-  { route: "/about", lastModified: "2026-10-23" },
+  { route: "/about", lastModified: "2026-10-25" },
   { route: "/contact", lastModified: "2026-10-23" },
   { route: "/privacy", lastModified: "2026-10-23" },
 ];

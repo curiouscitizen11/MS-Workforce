@@ -36,9 +36,8 @@ export default function AboutPage() {
           <h1 className="display mt-6">Why MS Workforce</h1>
           <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-white/75 sm:text-xl">
             <p>
-              I&apos;ve spent over five years on Sydney construction sites,
-              mostly in asbestos removal, where I hold Class A and Class B
-              supervisor tickets. I&apos;ve seen what a good labourer means to a
+              I&apos;ve spent over five years on Sydney construction sites.
+              I&apos;ve seen what a good labourer means to a
               builder&apos;s program, and how much a no-show costs.
             </p>
             <p>
