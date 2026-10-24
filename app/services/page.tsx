@@ -136,6 +136,9 @@ export default function ServicesPage() {
             <Link href="/site-cleans-demolition-support" className="link-quiet link-quiet-light">
               More on site cleans and demolition support
             </Link>
+            <Link href="/labour-hire-greater-sydney" className="link-quiet link-quiet-light">
+              Where we supply: Greater Sydney
+            </Link>
           </div>
         </div>
       </section>

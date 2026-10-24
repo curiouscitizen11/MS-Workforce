@@ -3,6 +3,7 @@ import Link from "next/link";
 const links = [
   { name: "Services", href: "/services" },
   { name: "Site cleans", href: "/site-cleans-demolition-support" },
+  { name: "Greater Sydney", href: "/labour-hire-greater-sydney" },
   { name: "Builders", href: "/clients" },
   { name: "Apply for work", href: "/candidates" },
   { name: "About", href: "/about" },
