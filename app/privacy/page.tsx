@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, OG_BASE } from "@/components/site";
+import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, socialMeta } from "@/components/site";
+
+const pageDescription =
+  "How MS Workforce collects, uses, stores and shares personal information about workers, applicants, clients and website visitors.";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description:
-    "How MS Workforce collects, uses, stores and shares personal information about workers, applicants, clients and website visitors.",
+  description: pageDescription,
   alternates: { canonical: "/privacy" },
-  openGraph: {
-    ...OG_BASE,
-    title: "Privacy Policy | MS Workforce",
-    description: "How MS Workforce handles personal information.",
-    url: "/privacy",
-  },
+  ...socialMeta("/privacy", "Privacy Policy | MS Workforce", pageDescription),
 };
 
 const mail = "text-teal-700 underline decoration-teal-700/40 underline-offset-4 break-all";

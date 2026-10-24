@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, OG_BASE } from "@/components/site";
+import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, socialMeta } from "@/components/site";
 import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/tickets";
+
+const pageDescription =
+  "Looking for construction labouring work in Greater Sydney? Register with MS Workforce for general labouring, trade assistant and site support work.";
 
 export const metadata: Metadata = {
   title: "Construction Jobs in Sydney",
-  description:
-    "Looking for construction labouring work in Greater Sydney? Register with MS Workforce for general labouring, trade assistant and site support work.",
+  description: pageDescription,
   alternates: { canonical: "/candidates" },
-  openGraph: {
-    ...OG_BASE,
-    title: "Construction Jobs in Sydney | MS Workforce",
-    description:
-      "Register through the employee portal for general labouring, trade assistant and site support work across Greater Sydney.",
-    url: "/candidates",
-  },
+  ...socialMeta("/candidates", "Construction Jobs in Sydney | MS Workforce", pageDescription),
 };
 
 const work = [

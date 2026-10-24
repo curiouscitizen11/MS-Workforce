@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
-import { REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
+import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 import Link from "next/link";
+
+const pageDescription =
+  "MS Workforce is a construction labour hire business supplying general labourers, trade assistants and site support to builders across Sydney.";
 
 export const metadata: Metadata = {
   title: { absolute: "About MS Workforce | Sydney Construction Labour Hire" },
-  description:
-    "MS Workforce is a construction labour hire business supplying general labourers, trade assistants and site support to builders across Sydney.",
+  description: pageDescription,
   alternates: { canonical: "/about" },
-  openGraph: {
-    ...OG_BASE,
-    title: "About MS Workforce",
-    description:
-      "A focused construction labour hire business supplying builders across Sydney.",
-    url: "/about",
-  },
+  ...socialMeta("/about", "About MS Workforce | Sydney Construction Labour Hire", pageDescription),
 };
 
 const values = [

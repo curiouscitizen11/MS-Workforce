@@ -48,3 +48,16 @@ export const OG_BASE = {
     },
   ],
 };
+
+/** Open Graph and Twitter/X tags for one page, so a shared link shows that page's own title and description. */
+export function socialMeta(path: string, title: string, description: string) {
+  return {
+    openGraph: { ...OG_BASE, title, description, url: path },
+    twitter: {
+      card: "summary_large_image" as const,
+      title,
+      description,
+      images: ["/opengraph-image"],
+    },
+  };
+}

@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
+import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
+
+const pageDescription =
+  "General labourers, trade assistants, site cleans and materials handling for builders across Greater Sydney. Day labour to project-based crews.";
 
 export const metadata: Metadata = {
   title: "Construction Labour Hire Services Sydney",
-  description:
-    "General labourers, trade assistants, site cleans and materials handling for builders across Greater Sydney. Day labour to project-based crews.",
+  description: pageDescription,
   alternates: { canonical: "/services" },
-  openGraph: {
-    ...OG_BASE,
-    title: "Construction Labour Hire Services Sydney | MS Workforce",
-    description:
-      "General labourers, trade assistants, site cleans and materials handling for builders across Greater Sydney.",
-    url: "/services",
-  },
+  ...socialMeta("/services", "Construction Labour Hire Services Sydney | MS Workforce", pageDescription),
 };
 
 const roles = [

@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, OG_BASE } from "@/components/site";
+import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, socialMeta } from "@/components/site";
+
+const pageDescription =
+  "How MS Workforce supplies construction labour to Sydney builders: send the brief, we match screened labour, simple weekly invoicing. FAQ included.";
 
 export const metadata: Metadata = {
   title: "Labour Hire for Builders in Sydney",
-  description:
-    "How MS Workforce supplies construction labour to Sydney builders: send the brief, we match screened labour, simple weekly invoicing. FAQ included.",
+  description: pageDescription,
   alternates: { canonical: "/clients" },
-  openGraph: {
-    ...OG_BASE,
-    title: "Labour Hire for Builders in Sydney | MS Workforce",
-    description:
-      "Send the brief, we match screened labour, crew on site, simple weekly invoicing.",
-    url: "/clients",
-  },
+  ...socialMeta("/clients", "Labour Hire for Builders in Sydney | MS Workforce", pageDescription),
 };
 
 const steps = [

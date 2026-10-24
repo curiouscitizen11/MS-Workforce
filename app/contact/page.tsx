@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, OG_BASE } from "@/components/site";
+import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, socialMeta } from "@/components/site";
+
+const pageDescription =
+  "Request construction labour or ask a question. Builders email hello@msworkforce.au, workers email jobs@msworkforce.au. Greater Sydney sites.";
 
 export const metadata: Metadata = {
   title: { absolute: "Contact MS Workforce | Request Construction Labour" },
-  description:
-    "Request construction labour or ask a question. Builders email hello@msworkforce.au, workers email jobs@msworkforce.au. Greater Sydney sites.",
+  description: pageDescription,
   alternates: { canonical: "/contact" },
-  openGraph: {
-    ...OG_BASE,
-    title: "Contact MS Workforce",
-    description: "Request construction labour across Greater Sydney, or ask a question.",
-    url: "/contact",
-  },
+  ...socialMeta("/contact", "Contact MS Workforce | Request Construction Labour", pageDescription),
 };
 
 const facts = [
