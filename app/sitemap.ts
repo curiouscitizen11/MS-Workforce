@@ -9,6 +9,7 @@ const pages: { route: string; lastModified: string }[] = [
   { route: "", lastModified: "2026-10-25" },
   { route: "/services", lastModified: "2026-10-25" },
   { route: "/labourers-sydney", lastModified: "2026-10-25" },
+  { route: "/site-cleans-demolition-support", lastModified: "2026-10-25" },
   { route: "/clients", lastModified: "2026-10-25" },
   { route: "/candidates", lastModified: "2026-10-25" },
   { route: "/about", lastModified: "2026-10-23" },
