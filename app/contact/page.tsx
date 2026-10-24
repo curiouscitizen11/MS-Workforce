@@ -3,9 +3,9 @@ import Link from "next/link";
 import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, OG_BASE } from "@/components/site";
 
 export const metadata: Metadata = {
-  title: "Contact MS Workforce",
+  title: { absolute: "Contact MS Workforce | Request Construction Labour" },
   description:
-    "Request construction labour or ask a question. Builders email hello@msworkforce.au; workers email jobs@msworkforce.au. Supplying construction sites across Sydney.",
+    "Request construction labour or ask a question. Builders email hello@msworkforce.au, workers email jobs@msworkforce.au. Greater Sydney sites.",
   alternates: { canonical: "/contact" },
   openGraph: {
     ...OG_BASE,

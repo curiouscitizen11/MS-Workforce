@@ -3,7 +3,7 @@ import { REQUEST_LABOUR_HREF, OG_BASE } from "@/components/site";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About MS Workforce",
+  title: { absolute: "About MS Workforce | Sydney Construction Labour Hire" },
   description:
     "MS Workforce is a construction labour hire business supplying general labourers, trade assistants and site support to builders across Sydney.",
   alternates: { canonical: "/about" },

@@ -5,7 +5,7 @@ import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, OG_BASE } from
 export const metadata: Metadata = {
   title: "Labour Hire for Builders in Sydney",
   description:
-    "How MS Workforce supplies construction labour to Sydney builders: send the brief, we match screened labour, crew on site, simple weekly invoicing. Builders FAQ included.",
+    "How MS Workforce supplies construction labour to Sydney builders: send the brief, we match screened labour, simple weekly invoicing. FAQ included.",
   alternates: { canonical: "/clients" },
   openGraph: {
     ...OG_BASE,

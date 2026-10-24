@@ -9,7 +9,7 @@ import StickyCta from "@/components/StickyCta";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const description =
-  "Construction labour hire across Greater Sydney. MS Workforce supplies general labourers, trade assistants and site support crews to builders, from day labour and short-notice cover to ongoing, project-based supply.";
+  "Construction labour hire for Greater Sydney builders. General labourers, trade assistants and site cleans, from one day to a whole project.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

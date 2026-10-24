@@ -6,7 +6,7 @@ import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/ticke
 export const metadata: Metadata = {
   title: "Construction Jobs in Sydney",
   description:
-    "Looking for construction labouring work across Greater Sydney? Register with MS Workforce through the employee portal for general labouring, trade assistant and site support work.",
+    "Looking for construction labouring work in Greater Sydney? Register with MS Workforce for general labouring, trade assistant and site support work.",
   alternates: { canonical: "/candidates" },
   openGraph: {
     ...OG_BASE,
