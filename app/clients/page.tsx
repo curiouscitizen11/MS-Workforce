@@ -120,9 +120,9 @@ export default function ClientsPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">How it works</p>
           <h2 className="display mt-6">Four steps from brief to site.</h2>
-          <ol className="mt-14 border-b border-navy-line">
+          <ol className="mt-8 grid gap-3 sm:mt-10">
             {steps.map((step, index) => (
-              <li key={step.title} className="stack-row border-t border-navy-line">
+              <li key={step.title} className="stack-row">
                 <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
                   <h3 className="text-2xl font-semibold tracking-tight sm:text-4xl">{step.title}</h3>
@@ -140,9 +140,9 @@ export default function ClientsPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">Builders FAQ</p>
           <h2 className="display mt-6">Common questions.</h2>
-          <div className="mt-14 border-b border-navy-line">
+          <div className="mt-8 grid gap-3 sm:mt-10">
             {faqs.map((item) => (
-              <details key={item.q} className="group border-t border-navy-line">
+              <details key={item.q} className="group rounded-2xl border border-navy-line bg-navy-card px-5 sm:px-7">
                 <summary className="flex min-h-11 cursor-pointer list-none items-start justify-between gap-6 py-6 text-xl font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal sm:text-2xl [&::-webkit-details-marker]:hidden">
                   <span>{item.q}</span>
                   <span

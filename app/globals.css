@@ -81,7 +81,7 @@ body {
     @apply text-teal-400 decoration-teal-400/40 hover:text-teal-300;
   }
   .stack-row {
-    @apply grid gap-3 py-8 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:py-10;
+    @apply grid gap-3 rounded-2xl border border-navy-line bg-navy-card p-5 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:p-7;
   }
 }
 

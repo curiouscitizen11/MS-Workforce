@@ -126,9 +126,9 @@ export default function CandidatesPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">The work</p>
           <h2 className="display mt-6">Labouring, trade assistant and site support work.</h2>
-          <ul className="mt-14 border-b border-navy-line">
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {work.map((item, index) => (
-              <li key={item.title} className="stack-row border-t border-navy-line">
+              <li key={item.title} className="stack-row">
                 <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
                   <h3 className="text-2xl font-semibold tracking-tight sm:text-3xl">{item.title}</h3>
@@ -146,9 +146,9 @@ export default function CandidatesPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">What we look for</p>
           <h2 className="display mt-6">Reliable people who take the work seriously.</h2>
-          <ul className="mt-14 border-b border-navy-line">
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {lookFor.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy-line">
+              <li key={item.title} className="stack-row">
                 <h3 className="text-2xl font-semibold tracking-tight sm:col-span-4 sm:text-3xl">{item.title}</h3>
                 <p className="text-base leading-relaxed text-body sm:col-span-8 sm:text-lg">{item.body}</p>
               </li>
@@ -161,9 +161,9 @@ export default function CandidatesPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">What you can expect</p>
           <h2 className="display mt-6">Looked after on every job.</h2>
-          <ul className="mt-14 border-b border-navy-line">
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {expect.map((item) => (
-              <li key={item} className="flex gap-5 border-t border-navy-line py-6 sm:py-8">
+              <li key={item} className="flex gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-5 sm:p-7">
                 <span aria-hidden="true" className="mt-3 h-2 w-2 flex-none rounded-full bg-teal" />
                 <p className="text-xl font-medium leading-snug tracking-tight sm:text-2xl">{item}</p>
               </li>

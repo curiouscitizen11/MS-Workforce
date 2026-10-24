@@ -185,9 +185,9 @@ export default function PrivacyPage() {
 
       <section className="bg-navy-alt text-white">
         <div className="wrap py-20 sm:py-24">
-          <div className="max-w-3xl border-b border-navy-line">
+          <div className="grid max-w-3xl gap-4">
             {sections.map((s) => (
-              <div key={s.title} className="border-t border-navy-line py-8">
+              <div key={s.title} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">
                 <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{s.title}</h2>
                 <div className="mt-4 space-y-4 text-lg leading-relaxed text-body">{s.body}</div>
               </div>

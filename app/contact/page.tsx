@@ -83,9 +83,9 @@ export default function ContactPage() {
           <h2 className="mt-6 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
             What to include in a labour request.
           </h2>
-          <ul className="mt-14 max-w-3xl border-b border-navy-line">
+          <ul className="mt-8 max-w-3xl grid gap-3 sm:mt-10">
             {include.map((item, index) => (
-              <li key={item} className="stack-row border-t border-navy-line">
+              <li key={item} className="stack-row">
                 <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
                 <span className="text-xl font-medium tracking-tight sm:col-span-10 sm:text-2xl">{item}</span>
               </li>
@@ -102,9 +102,9 @@ export default function ContactPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">Details</p>
           <h2 className="display mt-6">Supplying sites across Sydney.</h2>
-          <dl className="mt-14 max-w-3xl border-b border-navy-line">
+          <dl className="mt-8 max-w-3xl grid gap-3 sm:mt-10">
             {facts.map((item) => (
-              <div key={item.label} className="stack-row border-t border-navy-line">
+              <div key={item.label} className="stack-row">
                 <dt className="kicker text-teal sm:col-span-4">{item.label}</dt>
                 <dd className="break-words text-xl font-medium tracking-tight sm:col-span-8 sm:text-2xl">
                   {item.href ? (

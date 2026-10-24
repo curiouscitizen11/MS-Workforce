@@ -100,9 +100,9 @@ export default function ServicesPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">Ways to book</p>
           <h2 className="display mt-6">Short-notice and ongoing supply.</h2>
-          <ul className="mt-14 border-b border-navy-line">
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {supply.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy-line">
+              <li key={item.title} className="stack-row">
                 <h3 className="text-2xl font-semibold tracking-tight sm:col-span-5 sm:text-3xl">
                   {item.title}
                 </h3>
@@ -119,9 +119,9 @@ export default function ServicesPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">Who we work with</p>
           <h2 className="display mt-6">Built for builders and trades.</h2>
-          <ul className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2">
+          <ul className="mt-14 grid gap-3 sm:grid-cols-2">
             {sectors.map((item) => (
-              <li key={item} className="bg-navy p-6 text-xl font-semibold tracking-tight sm:p-8 sm:text-2xl">
+              <li key={item} className="rounded-2xl border border-navy-line bg-navy-card p-5 text-xl font-semibold tracking-tight sm:p-7 sm:text-2xl">
                 {item}
               </li>
             ))}

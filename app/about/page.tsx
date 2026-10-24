@@ -54,9 +54,9 @@ export default function AboutPage() {
         <div className="wrap py-24 sm:py-28">
           <p className="kicker text-teal">How we work</p>
           <h2 className="display mt-6">Safety, reliability, respect.</h2>
-          <ul className="mt-14 border-b border-navy-line">
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {values.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy-line">
+              <li key={item.title} className="stack-row">
                 <h3 className="text-2xl font-semibold tracking-tight sm:col-span-4 sm:text-3xl">
                   {item.title}
                 </h3>

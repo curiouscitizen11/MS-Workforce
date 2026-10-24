@@ -112,9 +112,9 @@ export default function SiteCleansPage() {
       <section className="bg-navy text-white">
         <div className="wrap py-16 sm:py-24">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">How booking works</h2>
-          <ol className="mt-8 border-b border-navy-line">
+          <ol className="mt-8 grid gap-3 sm:mt-10">
             {steps.map((step, index) => (
-              <li key={step.title} className="stack-row border-t border-navy-line">
+              <li key={step.title} className="stack-row">
                 <span className="kicker text-teal sm:col-span-2">0{index + 1}</span>
                 <div className="sm:col-span-10">
                   <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{step.title}</h3>

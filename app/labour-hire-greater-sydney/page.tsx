@@ -83,9 +83,9 @@ export default function GreaterSydneyPage() {
       <section className="bg-navy-alt text-white">
         <div className="wrap py-16 sm:py-24">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">What we supply on site</h2>
-          <ul className="mt-8 border-b border-navy-line">
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {supply.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy-line">
+              <li key={item.title} className="stack-row">
                 <h3 className="text-xl font-semibold tracking-tight sm:col-span-5 sm:text-2xl">{item.title}</h3>
                 <p className="text-base leading-relaxed text-body sm:col-span-7 sm:text-lg">{item.body}</p>
               </li>
@@ -104,9 +104,9 @@ export default function GreaterSydneyPage() {
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Questions about Greater Sydney coverage
           </h2>
-          <ul className="mt-8 border-b border-navy-line">
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {faqs.map((item) => (
-              <li key={item.q} className="border-t border-navy-line py-6 sm:py-8">
+              <li key={item.q} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">
                 <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{item.q}</h3>
                 <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">{item.a}</p>
               </li>
