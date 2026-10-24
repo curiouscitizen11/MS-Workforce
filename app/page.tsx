@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { REQUEST_LABOUR_HREF, BOOK_LABOUR_URL } from "@/components/site";
+import { REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, SITE_URL } from "@/components/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: SITE_URL + "/" },
+};
 
 const roles = [
   {
@@ -34,7 +39,7 @@ const steps = [
   },
   {
     title: "We match and confirm",
-    body: "We match workers we have screened ourselves to the job and confirm PPE, access and site requirements with you before the start.",
+    body: "We match workers we have screened ourselves to the job and confirm access and site requirements with you before the start. MS Workforce workers arrive with their own basic PPE: hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses.",
   },
   {
     title: "Crew on site",

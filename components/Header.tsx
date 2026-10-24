@@ -31,10 +31,13 @@ export default function Header() {
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const covered = document.querySelectorAll(".site-chrome-main, .site-chrome-footer, .site-chrome-sticky");
+    covered.forEach((el) => el.setAttribute("inert", ""));
     document.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      covered.forEach((el) => el.removeAttribute("inert"));
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);

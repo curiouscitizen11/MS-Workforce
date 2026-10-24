@@ -39,7 +39,8 @@ const lookFor = [
 ];
 
 const expect = [
-  "Clear details before every start: the site, the start time, the site contact and what to bring.",
+  "Clear details before every start: the site, the start time and the site contact.",
+  "You must bring a hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses.",
   "Correct pay and super, on time.",
   "Straight answers about the work before you say yes.",
   "Someone who picks up your message when something is not right on site.",

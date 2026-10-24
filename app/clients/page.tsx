@@ -23,7 +23,7 @@ const steps = [
   },
   {
     title: "We match the right labour",
-    body: "We match workers we have screened ourselves to the job, and confirm PPE, access and site requirements with you before every start.",
+    body: "We match workers we have screened ourselves to the job, and confirm access and site requirements with you before every start. MS Workforce workers arrive with their own basic PPE: hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses.",
   },
   {
     title: "Crew on site",
@@ -66,7 +66,7 @@ const faqs = [
   },
   {
     q: "What do you need from us to get started?",
-    a: "The site address, start date and time, roles and numbers, expected duration, a site contact, and any PPE, access or parking notes. The Book labour form asks for each of these, or the Email the brief button opens an email with the same prompts filled in.",
+    a: "The site address, start date and time, roles and numbers, expected duration, a site contact, and any access or parking notes. The Book labour form asks for each of these, or the Email the brief button opens an email with the same prompts filled in. MS Workforce workers arrive with their own basic PPE: hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses.",
   },
 ];
 
