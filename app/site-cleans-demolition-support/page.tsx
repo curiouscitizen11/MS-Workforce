@@ -4,7 +4,7 @@ import { BOOK_LABOUR_URL, REQUEST_LABOUR_HREF, socialMeta } from "@/components/s
 
 const pageTitle = "Site Cleans and Demolition Support | MS Workforce";
 const pageDescription =
-  "Site cleans, rubbish removal, skip loading and extra hands for demolition work, supplied to Sydney builders by the day or for a stage. Book labour online.";
+  "Labour for site cleans, soft strip-out support, debris carry-out, skip loading and handover tidy-ups, supervised by your builder. Book labour online.";
 
 export const metadata: Metadata = {
   title: { absolute: pageTitle },
@@ -15,15 +15,18 @@ export const metadata: Metadata = {
 
 const cleans = [
   "Progressive cleans through the build",
-  "Builders cleans before handover",
+  "Builders cleans and tidy-up at handover",
   "Rubbish removal and skip loading",
-  "Keeping walkways and access clear",
+  "Keeping access and work areas clear",
 ];
 
 const demolition = [
+  "Soft strip-out support, working under your direction",
   "Carrying out and loading debris",
-  "Loading skips as the work goes on",
-  "Keeping walkways and access clear while demolition work continues",
+  "Skip loading as the skips fill",
+  "Keeping access and work areas clear while the work goes on",
+  "Protection and set-up help before work starts",
+  "Tidy-up at handover",
 ];
 
 const steps = [
@@ -49,9 +52,9 @@ export default function SiteCleansPage() {
           <p className="kicker text-white/65">Site cleans and demolition support</p>
           <h1 className="display mt-6">Site cleans and demolition support for Sydney builders.</h1>
           <p className="lede mt-8 text-white/75">
-            MS Workforce supplies labourers for site cleans and for extra hands
-            on demolition work, across Greater Sydney. Book a single day or a
-            crew for the whole stage.
+            MS Workforce supplies labourers for site cleans and demolition
+            support across Greater Sydney. Labour only, supervised by your
+            builder. Book a single day or a crew for the whole stage.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
@@ -75,7 +78,7 @@ export default function SiteCleansPage() {
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Site cleans</h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
             A clean site is safer and keeps the trades moving. We supply
-            labourers for the cleaning side of the build.
+            labourers to keep it that way from the first week to handover.
           </p>
           <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-base text-navy/80 sm:text-lg">
             {cleans.map((item) => (
@@ -85,8 +88,9 @@ export default function SiteCleansPage() {
 
           <h2 className="mt-14 text-3xl font-semibold tracking-tight sm:text-4xl">Demolition support</h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
-            Extra hands for the labouring side of demolition work, so your
-            crew can stay on the main task.
+            Extra hands for the manual side of demolition and strip-out, so
+            your crew can stay on the main task. Your builder or site
+            supervisor directs the work and the workers follow your site rules.
           </p>
           <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-base text-navy/80 sm:text-lg">
             {demolition.map((item) => (
@@ -94,7 +98,13 @@ export default function SiteCleansPage() {
             ))}
           </ul>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
-            MS Workforce does not carry out asbestos removal itself, but can connect builders with a licensed asbestos removal contractor when a job needs it. Ask us through Book labour or Email the brief.
+            This is labour only. We do not supply plant or run demolition
+            jobs ourselves.
+          </p>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
+            MS Workforce does not carry out asbestos removal itself, but can
+            connect builders with a licensed asbestos removal contractor when
+            a job needs it. Ask us through Book labour or Email the brief.
           </p>
         </div>
       </section>
