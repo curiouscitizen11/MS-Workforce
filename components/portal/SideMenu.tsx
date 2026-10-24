@@ -107,7 +107,7 @@ export function SideMenu({ name, role, initialOpen = false }: { name: string; ro
     const panel = panelRef.current
     const previous = document.activeElement
     const focusable = () =>
-      panel ? [...panel.querySelectorAll<HTMLElement>("a, button")].filter((node) => !node.hasAttribute("disabled")) : []
+      panel ? Array.from(panel.querySelectorAll<HTMLElement>("a, button")).filter((node) => !node.hasAttribute("disabled")) : []
     focusable()[0]?.focus()
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") {

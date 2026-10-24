@@ -31,7 +31,7 @@ export default async function MePage() {
             <h2 className="text-sm font-semibold">My details</h2>
             <DetailsForm worker={shown} />
           </section>
-          <section className="space-y-2 rounded-2xl border border-navy/10 bg-white p-4">
+          <section id="safety" className="space-y-2 rounded-2xl border border-navy/10 bg-white p-4">
             <h2 className="text-sm font-semibold">Safety info</h2>
             <SafetyForm worker={worker} />
           </section>
@@ -47,7 +47,7 @@ export default async function MePage() {
           Inductions
         </Link>
       </nav>
-      <section className="space-y-2 rounded-2xl border border-navy/10 bg-white p-4">
+      <section id="preferences" className="space-y-2 rounded-2xl border border-navy/10 bg-white p-4">
         <h2 className="text-sm font-semibold">Preferences</h2>
         <p className="text-sm text-navy/70">The portal opens in the MS Workforce dark look. Light is optional.</p>
         <ThemeSwitch theme={theme} />

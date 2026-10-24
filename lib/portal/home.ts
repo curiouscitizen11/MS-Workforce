@@ -81,6 +81,78 @@ export function photosAwaitingApproval(docs: { kind: string; headshotStatus?: st
   return docs.filter((doc) => doc.kind === "headshot" && doc.headshotStatus === "Pending" && !doc.deletedAt).length
 }
 
+export function greetingFor(minutes: number) {
+  if (minutes < 12 * 60) return "Good morning"
+  if (minutes < 17 * 60) return "Good afternoon"
+  return "Good evening"
+}
+
+export function nextBookedShift<T extends { status: string; shiftDate: string; startTime: string }>(offers: T[], today: string) {
+  const accepted = offers
+    .filter((offer) => offer.status === "Accepted" && offer.shiftDate >= today)
+    .sort((a, b) => a.shiftDate.localeCompare(b.shiftDate) || a.startTime.localeCompare(b.startTime))
+  const todayShift = accepted.find((offer) => offer.shiftDate === today)
+  if (todayShift) return { when: "today" as const, shift: todayShift }
+  if (accepted[0]) return { when: "next" as const, shift: accepted[0] }
+  return null
+}
+
+export function workerHomeRows(input: {
+  offerCount: number
+  hasShift: boolean
+  timesheetUnsigned: boolean
+  sheetStatus?: string
+  ticketState: "expired" | "expiring" | "missing" | "ok"
+  inductionTodos: number
+  safetySaved: boolean
+}) {
+  let hours = "Up to date"
+  let hoursAttention = false
+  if (input.timesheetUnsigned) {
+    hours = "Timesheet not signed"
+    hoursAttention = true
+  } else if (input.sheetStatus === "Approved") hours = "Approved"
+  else if (input.sheetStatus === "Submitted" || input.sheetStatus === "Queried") hours = input.sheetStatus
+
+  let shifts = "No shift booked"
+  let shiftsAttention = false
+  if (input.offerCount > 0) {
+    shifts = input.offerCount === 1 ? "Offer waiting" : input.offerCount + " offers waiting"
+    shiftsAttention = true
+  } else if (input.hasShift) shifts = "Booked"
+
+  let tickets = "Up to date"
+  let ticketAttention = false
+  if (input.ticketState === "expired") {
+    tickets = "Expired"
+    ticketAttention = true
+  } else if (input.ticketState === "expiring") {
+    tickets = "Ticket expiring"
+    ticketAttention = true
+  } else if (input.ticketState === "missing") {
+    tickets = "Not added yet"
+    ticketAttention = true
+  }
+
+  return [
+    { href: "/portal/timesheet", label: "Log today's hours", status: hours, attention: hoursAttention },
+    { href: "/portal/offers", label: "My shifts", status: shifts, attention: shiftsAttention },
+    { href: "/portal/tickets", label: "Tickets & training", status: tickets, attention: ticketAttention },
+    {
+      href: "/portal/inductions",
+      label: "Inductions",
+      status: input.inductionTodos > 0 ? "Induction to do" : "Done",
+      attention: input.inductionTodos > 0,
+    },
+    {
+      href: "/portal/me#safety",
+      label: "Safety info",
+      status: input.safetySaved ? "Saved" : "Not added yet",
+      attention: !input.safetySaved,
+    },
+  ]
+}
+
 export function portalHome(role: "worker" | "admin" | null) {
   if (role === "admin") return "/portal/admin"
   if (role === "worker") return "/portal"
