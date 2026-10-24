@@ -114,6 +114,14 @@ export default function CandidatesPage() {
               Email us
             </a>
           </div>
+          <p className="mt-6">
+            <a
+              href="#tickets"
+              className="text-base font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white"
+            >
+              Get your tickets
+            </a>
+          </p>
         </div>
       </section>
 

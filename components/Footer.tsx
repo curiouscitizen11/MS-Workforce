@@ -1,12 +1,4 @@
 import Link from "next/link";
-import {
-  BOOK_LABOUR_URL,
-  EMAIL,
-  EMAIL_HREF,
-  JOBS_EMAIL,
-  JOBS_EMAIL_HREF,
-  REQUEST_LABOUR_HREF,
-} from "@/components/site";
 
 const links = [
   { name: "Services", href: "/services" },
@@ -51,47 +43,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="md:col-span-3">
-            <h2 className="kicker text-white/65">Builders</h2>
-            <ul className="mt-5 space-y-3 text-sm text-white/80">
-              <li>
-                <a href={EMAIL_HREF} className="break-all text-teal-300 transition-colors hover:text-white">
-                  {EMAIL}
-                </a>
-              </li>
-              <li>
-                <a href={BOOK_LABOUR_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
-                  Book labour form<span className="sr-only"> (opens in a new tab)</span>
-                </a>
-              </li>
-              <li>
-                <a href={REQUEST_LABOUR_HREF} className={linkClass}>
-                  Email the brief
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="md:col-span-3">
-            <h2 className="kicker text-white/65">Workers</h2>
-            <ul className="mt-5 space-y-3 text-sm text-white/80">
-              <li>
-                <a href={JOBS_EMAIL_HREF} className="break-all text-teal-300 transition-colors hover:text-white">
-                  {JOBS_EMAIL}
-                </a>
-              </li>
-              <li>
-                <Link href="/candidates#register" className={linkClass}>
-                  Register for work
-                </Link>
-              </li>
-              <li>
-                <Link href="/candidates#tickets" className={linkClass}>
-                  Get your tickets
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
 
         <div className="mt-16 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/70 sm:flex-row sm:justify-between">
