@@ -412,6 +412,31 @@ a.portal-list-row {
 .portal-home-attention {
   color: var(--p-accent, #2ec4b6);
 }
+.portal-row-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
+  background: transparent;
+  border: 0;
+  color: var(--p-accent, #2ec4b6);
+  font-size: 14px;
+  font-weight: 600;
+}
+.portal-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 12px;
+  border: 1px solid var(--p-border, #5d728c);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--p-text, #e8edf3);
+  font-size: 16px;
+  font-weight: 600;
+}
 .portal-root .portal-list-chev {
   flex: none;
   color: #5d728c;

@@ -885,6 +885,27 @@ export async function submitInduction(
   return { ok: true as const, pass: true as const, needsSignature: false as const, score: result.score, critical: result.critical }
 }
 
+export async function saveSiteInduction(ctx: Ctx, workerId: string, input: { name: string; done?: boolean }) {
+  const worker = await ctx.store.workers.get(workerId)
+  if (!worker || worker.role !== "worker") return fail("Log in again.")
+  const name = input.name.trim().replace(/\s+/g, " ")
+  if (!name) return fail("Enter the induction name.")
+  if (name.length > 80) return fail("That name is too long.")
+  if (sensitiveMessage(name)) return fail(SENSITIVE_MESSAGE)
+  const list = worker.siteInductions ? [...worker.siteInductions] : []
+  const index = list.findIndex((item) => item.name.toLowerCase() === name.toLowerCase())
+  const doneOn = input.done ? sydneyToday(ctx.now) : undefined
+  if (index >= 0) {
+    if (input.done) list[index] = { ...list[index], doneOn }
+  } else {
+    list.push({ name, doneOn })
+  }
+  worker.siteInductions = list
+  await persistWorker(ctx, worker)
+  await audit(ctx, workerId, "site-induction", workerId, name)
+  return { ok: true as const }
+}
+
 export async function listOffers(ctx: Ctx, workerId?: string) {
   const offers = await ctx.store.offers.all()
   for (const offer of offers) {

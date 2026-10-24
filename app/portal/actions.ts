@@ -25,6 +25,7 @@ import {
   saveTicketPhoto,
   submitApplication,
   submitInduction,
+  saveSiteInduction,
   approveTimesheetForPay,
   correctTimesheet,
   queryTimesheet,
@@ -180,6 +181,18 @@ export async function saveSafetyInfo(input: {
   if (!current || current.worker.role !== "worker") return { ok: false as const, error: "Log in again." }
   const result = await saveSafety(await ctx(), current.worker.id, input)
   if (result.ok) refresh()
+  return result
+}
+
+export async function saveInduction(input: { name: string; done?: boolean }) {
+  const current = await readSession()
+  if (!current || current.worker.role !== "worker") return { ok: false as const, error: "Log in again." }
+  const result = await saveSiteInduction(await ctx(), current.worker.id, input)
+  if (result.ok) {
+    revalidatePath("/portal/inductions")
+    revalidatePath("/portal/me")
+    revalidatePath("/portal")
+  }
   return result
 }
 

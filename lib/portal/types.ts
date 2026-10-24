@@ -291,6 +291,7 @@ export type Worker = {
   inductionPassed?: string
   inductionScore?: number
   inductionVersion?: string
+  siteInductions?: { name: string; doneOn?: string }[]
   ticketsVerified?: boolean
   verifiedOn?: string
   verifiedBy?: string
