@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/Icons";
 import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageDescription =
@@ -12,26 +13,30 @@ export const metadata: Metadata = {
   ...socialMeta("/services", "Construction Labour Hire Services Sydney | MS Workforce", pageDescription),
 };
 
-const roles = [
+const roles: { icon: IconName; kicker: string; title: string; body: string; dark: boolean }[] = [
   {
+    icon: "hardhat",
     kicker: "01",
     title: "General labourers",
     body: "Reliable labour for site preparation, clean-up, loading and unloading, barrows and back-filling, and the everyday work that keeps a program on track.",
     dark: false,
   },
   {
+    icon: "wrench",
     kicker: "02",
     title: "Trade assistants",
     body: "Practical support for carpenters, concreters, bricklayers, renderers, tilers and other trades. Fetching, cutting, mixing, carrying and setting up, so your trades stay productive.",
     dark: true,
   },
   {
+    icon: "sparkle",
     kicker: "03",
     title: "Site cleans and site support",
     body: "Progressive cleans through the build, builders cleans before handover, rubbish removal, skip loading and keeping walkways and access clear.",
     dark: false,
   },
   {
+    icon: "package",
     kicker: "04",
     title: "Materials handling",
     body: "Receiving deliveries, stacking and protecting materials, and distributing them around the site and between floors when and where the trades need them.",
@@ -39,11 +44,11 @@ const roles = [
   },
 ];
 
-const supply = [
-  { title: "Day labour", body: "A single day, booked when you need it." },
-  { title: "Short-notice cover", body: "For no-shows, pours, deliveries and stages that run long." },
-  { title: "Ongoing supply", body: "Regular labour, with the same workers returning wherever possible." },
-  { title: "Project-based crews", body: "A crew sized to the stage and adjusted as the program moves." },
+const supply: { icon: IconName; title: string; body: string }[] = [
+  { icon: "calendar", title: "Day labour", body: "A single day, booked when you need it." },
+  { icon: "clock", title: "Short-notice cover", body: "For no-shows, pours, deliveries and stages that run long." },
+  { icon: "repeat", title: "Ongoing supply", body: "Regular labour, with the same workers returning wherever possible." },
+  { icon: "layers", title: "Project-based crews", body: "A crew sized to the stage and adjusted as the program moves." },
 ];
 
 const sectors = [
@@ -56,11 +61,11 @@ const sectors = [
 export default function ServicesPage() {
   return (
     <>
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/65">Services</p>
-          <h1 className="display mt-6">Construction labour hire across Greater Sydney.</h1>
-          <p className="lede mt-8 text-white/75">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
+          <p className="kicker text-teal">Services</p>
+          <h1 className="display mt-4">Construction labour hire across Greater Sydney.</h1>
+          <p className="lede mt-5 text-body">
             General labourers, trade assistants and site support crews for
             builders and trades. Booked by the day, for short-notice cover, or
             supplied on an ongoing, project-based basis.
@@ -80,49 +85,48 @@ export default function ServicesPage() {
         <section
           key={item.title}
           className={
-            "flex screen items-center " +
-            (item.dark ? "bg-navy text-white" : "bg-tint text-navy")
+            "" +
+            (item.dark ? "bg-navy text-white" : "bg-navy-alt text-white")
           }
         >
-          <div className="wrap py-24 sm:py-28">
-            <p className={"kicker " + (item.dark ? "text-white/70" : "text-navy/75")}>
-              {item.kicker}
-            </p>
-            <h2 className="display mt-6">{item.title}</h2>
-            <p className={"lede mt-8 " + (item.dark ? "text-white/75" : "text-navy/75")}>
-              {item.body}
-            </p>
+          <div className="wrap py-14 sm:py-20 lg:py-24">
+            <div className="flex items-center gap-3">
+              <Icon name={item.icon} />
+              <p className="kicker text-teal">{item.kicker}</p>
+            </div>
+            <h2 className="display mt-5">{item.title}</h2>
+            <p className="lede mt-5 text-body">{item.body}</p>
           </div>
         </section>
       ))}
 
-      <section className="flex screen items-center bg-tint text-navy">
-        <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-navy/75">Ways to book</p>
-          <h2 className="display mt-6">Short-notice and ongoing supply.</h2>
-          <ul className="mt-14 border-b border-navy/10">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
+          <p className="kicker text-teal">Ways to book</p>
+          <h2 className="display mt-4">Short-notice and ongoing supply.</h2>
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {supply.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy/10">
-                <h3 className="text-2xl font-semibold tracking-tight sm:col-span-5 sm:text-3xl">
-                  {item.title}
-                </h3>
-                <p className="text-base leading-relaxed text-navy/75 sm:col-span-7 sm:text-lg">
-                  {item.body}
-                </p>
+              <li key={item.title} className="num-card">
+                <Icon name={item.icon} />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                </div>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-24 sm:py-28">
-          <p className="kicker text-white/65">Who we work with</p>
-          <h2 className="display mt-6">Built for builders and trades.</h2>
-          <ul className="mt-14 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2">
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
+          <p className="kicker text-teal">Who we work with</p>
+          <h2 className="display mt-4">Built for builders and trades.</h2>
+          <ul className="mt-8 grid sm:mt-10 gap-3 sm:grid-cols-2">
             {sectors.map((item) => (
-              <li key={item} className="bg-navy p-6 text-xl font-semibold tracking-tight sm:p-8 sm:text-2xl">
-                {item}
+              <li key={item} className="num-card items-center text-lg font-bold tracking-tight sm:text-2xl">
+                <Icon name="building" />
+                <span className="min-w-0 flex-1">{item}</span>
               </li>
             ))}
           </ul>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Icon, { type IconName } from "@/components/Icons";
 import { BOOK_LABOUR_URL, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageTitle = "Construction Labour Hire in Greater Sydney | MS Workforce";
@@ -13,11 +14,11 @@ export const metadata: Metadata = {
   ...socialMeta("/labour-hire-greater-sydney", pageTitle, pageDescription),
 };
 
-const supply = [
-  { title: "General labourers", body: "Site preparation, clean-up, loading and unloading, and the day-to-day work that keeps a build moving." },
-  { title: "Trade assistants", body: "Hands-on support for carpenters, concreters, bricklayers and other trades." },
-  { title: "Site cleans and site support", body: "Progressive cleans, builders cleans, rubbish removal and skip loading." },
-  { title: "Materials handling", body: "Receiving deliveries and stacking, protecting and distributing materials around the site." },
+const supply: { icon: IconName; title: string; body: string }[] = [
+  { icon: "hardhat", title: "General labourers", body: "Site preparation, clean-up, loading and unloading, and the day-to-day work that keeps a build moving." },
+  { icon: "wrench", title: "Trade assistants", body: "Hands-on support for carpenters, concreters, bricklayers and other trades." },
+  { icon: "sparkle", title: "Site cleans and site support", body: "Progressive cleans, builders cleans, rubbish removal and skip loading." },
+  { icon: "package", title: "Materials handling", body: "Receiving deliveries and stacking, protecting and distributing materials around the site." },
 ];
 
 // These questions and answers use wording already on the Builders page. The FAQ structured
@@ -55,10 +56,10 @@ export default function GreaterSydneyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <section className="bg-navy text-white">
-        <div className="wrap py-20 sm:py-28">
-          <p className="kicker text-white/65">Greater Sydney</p>
-          <h1 className="display mt-6">Construction labour across Greater Sydney.</h1>
-          <p className="lede mt-8 text-white/75">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
+          <p className="kicker text-teal">Greater Sydney</p>
+          <h1 className="display mt-4">Construction labour across Greater Sydney.</h1>
+          <p className="lede mt-5 text-body">
             We supply construction labour to building sites across Greater
             Sydney, from the CBD and the suburbs to Western Sydney. Book one
             worker for a day or a crew for the whole project.
@@ -80,18 +81,21 @@ export default function GreaterSydneyPage() {
         </div>
       </section>
 
-      <section className="bg-tint text-navy">
-        <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">What we supply on site</h2>
-          <ul className="mt-8 border-b border-navy/10">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">What we supply on site</h2>
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {supply.map((item) => (
-              <li key={item.title} className="stack-row border-t border-navy/10">
-                <h3 className="text-xl font-semibold tracking-tight sm:col-span-5 sm:text-2xl">{item.title}</h3>
-                <p className="text-base leading-relaxed text-navy/75 sm:col-span-7 sm:text-lg">{item.body}</p>
+              <li key={item.title} className="num-card">
+                <Icon name={item.icon} />
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                </div>
               </li>
             ))}
           </ul>
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-navy/75 sm:text-lg">
+          <p className="mt-8 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
             Labour is booked by the day, as short-notice cover, or on an
             ongoing, project-based basis. We match workers we have screened
             ourselves to the job.
@@ -100,25 +104,25 @@ export default function GreaterSydneyPage() {
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Questions about Greater Sydney coverage
           </h2>
-          <ul className="mt-8 border-b border-white/10">
+          <ul className="mt-8 grid gap-3 sm:mt-10">
             {faqs.map((item) => (
-              <li key={item.q} className="border-t border-white/10 py-6 sm:py-8">
-                <h3 className="text-xl font-semibold tracking-tight sm:text-2xl">{item.q}</h3>
-                <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">{item.a}</p>
+              <li key={item.q} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">
+                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.q}</h3>
+                <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">{item.a}</p>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      <section className="bg-tint text-navy">
-        <div className="wrap py-16 sm:py-24">
-          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Need labour on site?</h2>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-navy/75 sm:text-lg">
+      <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
+          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Need labour on site?</h2>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
             Send us the brief and we will tell you straight away whether we can fill it.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -126,12 +130,12 @@ export default function GreaterSydneyPage() {
               href={BOOK_LABOUR_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="pill pill-dark w-full sm:w-auto"
+              className="pill pill-teal w-full sm:w-auto"
             >
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>
             </a>
-            <Link href="/services" className="link-quiet w-full sm:w-auto">
+            <Link href="/services" className="link-quiet link-quiet-light w-full sm:w-auto">
               See all services
             </Link>
           </div>

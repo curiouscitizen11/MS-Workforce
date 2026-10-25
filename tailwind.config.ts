@@ -20,7 +20,11 @@ const config: Config = {
           700: "#061626",
           800: "#040F1A",
           900: "#02070D",
+          alt: "#0e2240",
+          card: "#152d4a",
+          line: "#22354f",
         },
+        body: "#c9d4e0",
         teal: {
           DEFAULT: "#2ec4b6",
           50: "#E6F7F5",
