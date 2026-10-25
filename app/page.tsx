@@ -206,29 +206,26 @@ export default function HomePage() {
 
       <PhotoSection />
 
-      <section className="grid grid-rows-2 bg-navy text-white md:grid-cols-2 md:grid-rows-1">
-        <a
-          href={BOOK_LABOUR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex flex-col items-center justify-center text-center border-b transition-colors hover:bg-white/[0.03] border-navy-line px-5 py-14 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10 md:border-b-0 md:border-r"
-        >
-          <p className="kicker text-teal">For builders</p>
-          <h2 className="mx-auto mt-4 max-w-lg text-balance text-3xl font-bold tracking-tight sm:text-[2.5rem] sm:leading-[1.1]">
-            Need labour on site? Send us the brief.
+      <section className="bg-navy text-white">
+        <div className="wrap py-14 text-center sm:py-20 lg:py-24">
+          <h2 className="mx-auto max-w-2xl text-balance text-3xl font-bold tracking-tight sm:text-[2.5rem] sm:leading-[1.1]">
+            Need labour on site, or looking for work?
           </h2>
-          <span className="mt-8 text-sm font-medium text-teal-300 transition">Book labour →<span className="sr-only"> (form opens in a new tab)</span></span>
-        </a>
-        <Link
-          href="/candidates"
-          className="group flex flex-col items-center justify-center text-center px-5 transition-colors hover:bg-white/[0.03] py-14 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-teal sm:px-10"
-        >
-          <p className="kicker text-teal">For workers</p>
-          <h2 className="mx-auto mt-4 max-w-lg text-balance text-3xl font-bold tracking-tight sm:text-[2.5rem] sm:leading-[1.1]">
-            Looking for construction work in Sydney? Register with us.
-          </h2>
-          <span className="mt-8 text-sm font-medium text-teal-300 transition">Apply for work →</span>
-        </Link>
+          <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
+            <a
+              href={BOOK_LABOUR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pill pill-teal w-full sm:w-auto"
+            >
+              Book labour
+              <span className="sr-only"> (form opens in a new tab)</span>
+            </a>
+            <Link href="/candidates" className="pill pill-line w-full sm:w-auto">
+              Apply for work
+            </Link>
+          </div>
+        </div>
       </section>
     </>
   );
