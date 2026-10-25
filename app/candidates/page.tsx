@@ -209,14 +209,6 @@ export default function CandidatesPage() {
               requirements with the provider.
             </p>
           </div>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a href={formUrl} className="pill pill-teal w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
-              Got your tickets? Register now
-            </a>
-            <a href={WORK_ENQUIRY_HREF} className="pill pill-line w-full sm:w-auto">
-              Email us
-            </a>
-          </div>
         </div>
       </section>
 
