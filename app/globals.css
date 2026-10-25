@@ -28,7 +28,27 @@ body {
   }
 }
 
+.sticky-cta {
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 250ms ease-out, opacity 250ms ease-out, visibility 0s linear 250ms;
+  will-change: transform;
+}
+.sticky-cta[data-shown="true"] {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: transform 250ms ease-out, opacity 250ms ease-out, visibility 0s;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .sticky-cta,
+  .sticky-cta[data-shown="true"] {
+    transition: none;
+  }
   html {
     scroll-behavior: auto;
   }
