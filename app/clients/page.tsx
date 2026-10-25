@@ -166,30 +166,17 @@ export default function ClientsPage() {
           <p className="kicker text-teal">Request labour</p>
           <h2 className="display mt-4">Send us the brief.</h2>
           <p className="lede mt-5 text-body">
-            Fill in the Book labour form with the site, start time, roles and
-            numbers, or send the same details by email. Every request gets a
-            personal reply from the owner.
+            Every request gets a personal reply from the owner.
           </p>
           <div className="mt-10 flex flex-col items-start gap-6">
-            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-              <a
-                href={BOOK_LABOUR_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pill pill-teal w-full sm:w-auto"
-              >
-                Book labour
-                <span className="sr-only"> (form opens in a new tab)</span>
-              </a>
-              <a href={REQUEST_LABOUR_HREF} className="pill pill-line w-full sm:w-auto">
-                Email the brief
-              </a>
-            </div>
             <a
-              href={EMAIL_HREF}
-              className="inline-flex min-h-11 items-center break-all text-lg font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 sm:text-2xl"
+              href={BOOK_LABOUR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pill pill-teal w-full sm:w-auto"
             >
-              {EMAIL}
+              Book labour
+              <span className="sr-only"> (form opens in a new tab)</span>
             </a>
             <Link
               href="/privacy"
