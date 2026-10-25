@@ -71,7 +71,7 @@ export default function ContactPage() {
           <ContactButtons className="mt-3" />
           <Link
             href="/privacy"
-            className="mt-6 inline-block text-sm text-body underline decoration-white/30 underline-offset-4 hover:text-white"
+            className="mt-4 inline-flex min-h-11 items-center text-sm text-body underline decoration-white/30 underline-offset-4 hover:text-white"
           >
             How we handle your information
           </Link>

@@ -68,7 +68,7 @@ export default function Header() {
           </button>
           <Link
             href="/"
-            className="block leading-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
+            className="flex min-h-11 flex-col justify-center leading-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
           >
             <span className="block text-[19px] font-semibold tracking-tight">
               MS <span className="text-teal-400">|</span> WORKFORCE

@@ -60,7 +60,7 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
               href={provider.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-white underline decoration-teal/50 underline-offset-4 hover:decoration-teal"
+              className="inline-flex min-h-11 items-center font-medium text-white underline decoration-teal/50 underline-offset-4 hover:decoration-teal"
             >
               {provider.name}
               {provider.label ? ": " + provider.label : ""}
@@ -81,7 +81,7 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-teal-300 underline decoration-teal/40 underline-offset-4"
+              className="inline-flex min-h-11 items-center text-sm font-medium text-teal-300 underline decoration-teal/40 underline-offset-4"
             >
               {link.label}
               <span className="sr-only"> (opens in a new tab)</span>
@@ -235,19 +235,19 @@ export default function CandidatesPage() {
               href={formUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-lg font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 sm:text-2xl"
+              className="inline-flex min-h-11 items-center text-lg font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 sm:text-2xl"
             >
               Open the employee portal
             </a>
             <a
               href={WORK_ENQUIRY_HREF}
-              className="text-lg font-medium text-white underline decoration-white/30 underline-offset-4 sm:text-2xl break-all"
+              className="inline-flex min-h-11 items-center text-lg font-medium text-white underline decoration-white/30 underline-offset-4 sm:text-2xl break-all"
             >
               {JOBS_EMAIL}
             </a>
             <Link
               href="/privacy"
-              className="text-sm text-body underline decoration-white/30 underline-offset-4 hover:text-white"
+              className="inline-flex min-h-11 items-center text-sm text-body underline decoration-white/30 underline-offset-4 hover:text-white"
             >
               How we handle your information
             </Link>

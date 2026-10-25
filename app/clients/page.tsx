@@ -187,13 +187,13 @@ export default function ClientsPage() {
             </div>
             <a
               href={EMAIL_HREF}
-              className="break-all text-lg font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 sm:text-2xl"
+              className="inline-flex min-h-11 items-center break-all text-lg font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 sm:text-2xl"
             >
               {EMAIL}
             </a>
             <Link
               href="/privacy"
-              className="text-sm text-body underline decoration-white/30 underline-offset-4 hover:text-white"
+              className="inline-flex min-h-11 items-center text-sm text-body underline decoration-white/30 underline-offset-4 hover:text-white"
             >
               How we handle your information
             </Link>
