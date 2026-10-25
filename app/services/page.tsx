@@ -71,9 +71,6 @@ export default function ServicesPage() {
             supplied on an ongoing, project-based basis.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a href={REQUEST_LABOUR_HREF} className="pill pill-teal w-full sm:w-auto">
-              Request labour
-            </a>
             <Link href="/clients" className="pill pill-line w-full sm:w-auto">
               How it works
             </Link>
