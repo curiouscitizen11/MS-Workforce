@@ -149,16 +149,7 @@ export default function LabourersSydneyPage() {
             Send us the brief and we will tell you straight away whether we can fill it.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={BOOK_LABOUR_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pill pill-teal w-full sm:w-auto"
-            >
-              Book labour
-              <span className="sr-only"> (form opens in a new tab)</span>
-            </a>
-            <Link href="/services" className="link-quiet link-quiet-light w-full sm:w-auto">
+            <Link href="/services" className="pill pill-line w-full sm:w-auto">
               See all services
             </Link>
           </div>
