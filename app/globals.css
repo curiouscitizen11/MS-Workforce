@@ -911,6 +911,98 @@ a.portal-list-row {
   outline: 2px solid #2ec4b6;
   outline-offset: 2px;
 }
+.portal-root .portal-field,
+.portal-root .portal-sign {
+  border-radius: 16px;
+}
+.portal-cal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.portal-cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.portal-cal-nav .pill,
+.portal-cal > .pill {
+  min-height: 44px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.portal-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.portal-cal-dow {
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--p-muted, #8fa1b6);
+}
+.portal-cal-day {
+  display: flex;
+  min-height: 44px;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: var(--p-text, #e8edf3);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+}
+.portal-cal-now {
+  border-color: #2ec4b6;
+}
+.portal-cal-on {
+  background: #2ec4b6;
+  border-color: #2ec4b6;
+  color: #0b1a2e;
+}
+.portal-cal-on .portal-cal-num {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.portal-cal-day:focus-visible {
+  outline: 2px solid #2ec4b6;
+  outline-offset: 2px;
+}
+.portal-cal-marks {
+  display: flex;
+  min-height: 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.portal-dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 999px;
+  background: #2ec4b6;
+}
+.portal-cal-on .portal-dot {
+  background: #0b1a2e;
+}
+.portal-dot-hollow {
+  background: transparent;
+  border: 1.5px solid #2ec4b6;
+}
+.portal-cal-on .portal-dot-hollow {
+  border-color: #0b1a2e;
+}
+.portal-cal-sym {
+  font-size: 11px;
+  line-height: 1;
+}
 .portal-menu-chev {
   margin-left: auto;
   color: var(--p-muted, #5d728c);
