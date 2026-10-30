@@ -1,4 +1,23 @@
+import { formatHours } from "@/lib/portal/hours"
 import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
+
+type SummaryOffer = { workerId: string; status: string; shiftDate: string }
+type SummarySheet = { workerId: string; workDate: string; status: string; totalHours?: number; signaturePng?: string }
+
+export function fortnightSummary(offers: SummaryOffer[], sheets: SummarySheet[], workerId: string, today: string) {
+  const days = new Set(datesInFortnight(fortnightContaining(today)))
+  const shifts = offers.filter(
+    (offer) => offer.workerId === workerId && days.has(offer.shiftDate) && (offer.status === "Accepted" || offer.status === "Offered"),
+  )
+  const hours = sheets.filter((sheet) => sheet.workerId === workerId && days.has(sheet.workDate))
+  const approvedHours = hours.filter((sheet) => sheet.status === "Approved").reduce((sum, sheet) => sum + (sheet.totalHours || 0), 0)
+  const unsigned = unsignedFortnightDays(offers, sheets, workerId, today)
+  const empty = shifts.length === 0 && hours.length === 0
+  const text = empty
+    ? "This fortnight: nothing yet"
+    : "This fortnight: " + formatHours(approvedHours) + " h approved · " + (unsigned === 0 ? "all signed" : unsigned + " not signed")
+  return { text, approvedHours, unsigned, empty }
+}
 
 export function offersWaiting(offers: { workerId: string; status: string }[], workerId: string) {
   return offers.filter((offer) => offer.workerId === workerId && offer.status === "Offered").length

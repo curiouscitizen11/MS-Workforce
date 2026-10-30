@@ -14,9 +14,7 @@ import {
 import { isMock } from "@/lib/portal/config"
 import { complianceFor } from "@/lib/portal/services"
 import { formatDate, formatTime, sydneyParts, sydneyToday } from "@/lib/portal/dates"
-import { inductionTodoCount, offersWaiting, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays } from "@/lib/portal/home"
-import { formatHours } from "@/lib/portal/hours"
-import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
+import { fortnightSummary, inductionTodoCount, offersWaiting, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays } from "@/lib/portal/home"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { TICKET_LABELS } from "@/lib/portal/types"
@@ -40,7 +38,6 @@ export default async function DashboardPage() {
   const now = new Date()
   const today = sydneyToday(now)
   const afternoon = sydneyParts(now).minutes >= 14 * 60
-  const fortnight = fortnightContaining(today)
   const check = complianceFor(worker, today)
   const offers = (await store.offers.all()).filter((offer) => offer.workerId === worker.id)
   const open = offers.find((offer) => offer.status === "Offered")
@@ -129,23 +126,10 @@ export default async function DashboardPage() {
         <Tile href="/portal/me" label="My details" icon={<DetailsIcon />} />
         <Tile href="/portal/help" label="Help" icon={<HelpIcon />} />
       </div>
-      <section className="rounded-2xl border border-navy/10 bg-white p-3">
-        <h2 className="text-sm font-semibold">This fortnight</h2>
-        <ul className="mt-2 space-y-1">
-          {datesInFortnight(fortnight).map((day) => {
-            const sheet = sheets.find((item) => item.workDate === day && item.status !== "Draft")
-            const onShift = offers.some((offer) => offer.status === "Accepted" && offer.shiftDate === day)
-            return (
-              <li key={day} className="flex items-center justify-between text-sm">
-                <span>{formatDate(day)}</span>
-                <span className="font-semibold text-navy/70">
-                  {sheet ? formatHours(sheet.totalHours) + " h · " + sheet.status : onShift ? "Not signed" : "—"}
-                </span>
-              </li>
-            )
-          })}
-        </ul>
-      </section>
+      <Link href="/portal/fortnight" className="flex min-h-12 items-center justify-between gap-3 rounded-2xl border border-navy/10 bg-white px-4 py-3 text-sm font-semibold">
+        <span>{fortnightSummary(offers, sheets, worker.id, today).text}</span>
+        <span aria-hidden="true">›</span>
+      </Link>
       {latest?.status === "Approved" ? (
         <Link href={"/portal/timesheet/" + latest.id} className="block rounded-2xl border border-navy/10 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Signed hours</p>
