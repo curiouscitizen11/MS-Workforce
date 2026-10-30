@@ -9,7 +9,10 @@ import {
   createOffers,
   deleteWorkerImages,
   requestMagicLink,
+  finishJoin,
+  prepareJoin,
   requestOtp,
+  resendJoinCode,
   renewWorkerSession,
   respondToOffer,
   revealPassport,
@@ -37,12 +40,15 @@ import {
 import { approveHeadshot as approveHeadshotRecord, rejectHeadshot as rejectHeadshotRecord, saveHeadshot } from "@/lib/portal/headshot"
 import { toE164 } from "@/lib/portal/phone"
 import {
+  clearJoinDraft,
   clearOtpCookie,
   clearPendingCookie,
   clearSessionCookie,
+  readJoinDraft,
   readOtpCookie,
   readPendingWorkerId,
   readSession,
+  writeJoinDraft,
   writeMobileCookie,
   writeOtpCookie,
   writePendingCookie,
@@ -145,6 +151,41 @@ export async function logOut() {
   clearPendingCookie()
   refresh()
   return { ok: true as const }
+}
+
+export async function sendJoinDetails(input: unknown) {
+  const result = await prepareJoin(await ctx(), input, ip())
+  if (!result.ok) return result
+  writeJoinDraft(result.draft)
+  writeMobileCookie(result.draft.mobile)
+  await rememberDemoOtp(result.draft.mobile)
+  return { ok: true as const, devCode: result.devCode }
+}
+
+export async function sendJoinCodeAgain() {
+  const draft = readJoinDraft()
+  if (!draft) return { ok: false as const, error: "Start again. Your details have expired." }
+  const result = await resendJoinCode(await ctx(), draft.mobile, ip())
+  if (!result.ok) return result
+  await rememberDemoOtp(draft.mobile)
+  return { ok: true as const, devCode: result.devCode }
+}
+
+export async function checkJoinCode(code: string) {
+  await restoreDemoOtp()
+  const draft = readJoinDraft()
+  if (!draft) return { ok: false as const, error: "Start again. Your details have expired." }
+  const result = await finishJoin(await ctx(), draft, code)
+  if (!result.ok) {
+    await rememberDemoOtp(draft.mobile)
+    return result
+  }
+  clearOtpCookie()
+  clearJoinDraft()
+  writeSessionCookie(result.session)
+  clearPendingCookie()
+  refresh()
+  return { ok: true as const, next: "/portal/onboarding" }
 }
 
 export async function applyForWork(input: unknown) {

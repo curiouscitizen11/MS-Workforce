@@ -4,6 +4,7 @@ import { hidePortalChrome } from "@/lib/portal/chrome"
 describe("portal chrome", () => {
   it("hides the menu and bottom bar on apply and both login screens", () => {
     expect(hidePortalChrome("/portal/apply")).toBe(true)
+    expect(hidePortalChrome("/portal/join")).toBe(true)
     expect(hidePortalChrome("/portal/login")).toBe(true)
     expect(hidePortalChrome("/portal/login/admin")).toBe(true)
     expect(hidePortalChrome("/portal")).toBe(false)

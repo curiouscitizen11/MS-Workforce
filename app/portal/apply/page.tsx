@@ -1,14 +1,14 @@
 import type { Metadata } from "next"
-import { ApplyForm } from "@/components/portal/ApplyForm"
+import { JoinForm } from "@/components/portal/JoinForm"
 import { Heading } from "@/components/portal/ui"
 
-export const metadata: Metadata = { title: "Tell us about you" }
+export const metadata: Metadata = { title: "Join MS Workforce" }
 
 export default function ApplyPage() {
   return (
     <div className="space-y-4">
-      <Heading kicker="Apply" title="Tell us about you" text="One short form. No tax, bank or super details." />
-      <ApplyForm />
+      <Heading kicker="Join" title="Join MS Workforce" text="One short form. No tax, bank or super details." />
+      <JoinForm />
     </div>
   )
 }

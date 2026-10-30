@@ -9,6 +9,19 @@ const COOKIE = "msw_portal"
 const PENDING = "msw_admin_pending"
 const OTP = "msw_demo_otp"
 const MOBILE = "msw_mobile"
+const JOIN = "msw_join"
+const JOIN_MS = 30 * 60 * 1000
+
+export type JoinDraft = {
+  name: string
+  mobile: string
+  email: string
+  suburb: string
+  postcode: string
+  roles: string[]
+  experience: string
+  exp: number
+}
 
 function cookieOptions(maxAge?: number, expires?: Date) {
   return {
@@ -86,6 +99,21 @@ export function writeMobileCookie(mobile: string) {
 
 export function readMobileCookie() {
   return cookies().get(MOBILE)?.value || ""
+}
+
+export function writeJoinDraft(draft: Omit<JoinDraft, "exp">, nowMs = Date.now()) {
+  const value: JoinDraft = { ...draft, exp: nowMs + JOIN_MS }
+  cookies().set(JOIN, pack(value), cookieOptions(JOIN_MS / 1000))
+}
+
+export function readJoinDraft(nowMs = Date.now()) {
+  const value = unpack<JoinDraft>(cookies().get(JOIN)?.value)
+  if (!value?.mobile || !value.exp || value.exp < nowMs) return null
+  return value
+}
+
+export function clearJoinDraft() {
+  cookies().set(JOIN, "", cookieOptions(0))
 }
 
 export function writePendingCookie(workerId: string, nowMs: number) {

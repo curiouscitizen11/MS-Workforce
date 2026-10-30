@@ -59,6 +59,7 @@ import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
 import {
   ROLES,
+  blankTickets,
   SUPERVISOR_ROLES,
   TICKET_ANSWERS,
   WORK_AREAS,
@@ -146,19 +147,16 @@ export function loginSms(code: string) {
   return code + " is your MS Workforce code. It expires in 10 minutes.\n\n@www.msworkforce.au #" + code
 }
 
-export async function requestOtp(ctx: Ctx, input: { mobile: string; ip: string }) {
-  const mobile = toE164(input.mobile)
-  if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
-  const worker = await findWorkerByMobile(ctx, mobile)
-  if (!worker) return fail("That mobile is not on file. Apply for work first.", "unknown")
-  if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+const ALREADY_JOINED = "Looks like you've already joined. Log in instead."
+
+async function issueOtp(ctx: Ctx, mobile: string, ip: string) {
   const challenges = await ctx.store.challenges.all()
   const recent = challenges.filter((item) => item.target === mobile && within(item.createdAt, ctx.now, OTP_SEND_WINDOW_MS))
   if (recent.some((item) => item.lockedUntil && Date.parse(item.lockedUntil) > ctx.now.getTime())) {
     return fail("Too many tries. Wait 15 minutes, then request a new code.", "locked")
   }
   if (recent.length >= OTP_MAX_SENDS) return fail("Wait a few minutes before asking for another code.", "rate")
-  const ipCount = challenges.filter((item) => item.ip === input.ip && within(item.createdAt, ctx.now, OTP_IP_WINDOW_MS)).length
+  const ipCount = challenges.filter((item) => item.ip === ip && within(item.createdAt, ctx.now, OTP_IP_WINDOW_MS)).length
   if (ipCount >= OTP_IP_MAX) return fail("Too many codes from this connection. Try again later.", "rate")
   const code = String(randomInt(0, 1000000)).padStart(6, "0")
   await ctx.store.challenges.save({
@@ -169,15 +167,13 @@ export async function requestOtp(ctx: Ctx, input: { mobile: string; ip: string }
     expiresAt: new Date(ctx.now.getTime() + OTP_TTL_MS).toISOString(),
     attempts: 0,
     createdAt: ctx.now.toISOString(),
-    ip: input.ip,
+    ip,
   })
   await ctx.notify.sms(mobile, loginSms(code), "Login code sent")
   return { ok: true as const, devCode: ctx.mode === "mock" ? code : undefined }
 }
 
-export async function verifyOtp(ctx: Ctx, input: { mobile: string; code: string }) {
-  const mobile = toE164(input.mobile)
-  if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
+async function consumeOtp(ctx: Ctx, mobile: string, code: string) {
   const challenges = (await ctx.store.challenges.all())
     .filter((item) => item.target === mobile && !item.consumedAt)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
@@ -187,7 +183,7 @@ export async function verifyOtp(ctx: Ctx, input: { mobile: string; code: string 
     return fail("Too many tries. Wait 15 minutes, then request a new code.", "locked")
   }
   if (Date.parse(latest.expiresAt) < ctx.now.getTime()) return fail("That code has expired. Request a new one.")
-  if (latest.codeHash !== pepper(input.code.trim())) {
+  if (latest.codeHash !== pepper(code.trim())) {
     latest.attempts += 1
     if (latest.attempts >= OTP_MAX_ATTEMPTS) {
       latest.lockedUntil = new Date(ctx.now.getTime() + OTP_LOCK_MS).toISOString()
@@ -200,6 +196,31 @@ export async function verifyOtp(ctx: Ctx, input: { mobile: string; code: string 
   }
   latest.consumedAt = ctx.now.toISOString()
   await ctx.store.challenges.save(latest)
+  return { ok: true as const }
+}
+
+export async function requestOtp(ctx: Ctx, input: { mobile: string; ip: string }) {
+  const mobile = toE164(input.mobile)
+  if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
+  const worker = await findWorkerByMobile(ctx, mobile)
+  if (!worker) return fail("That mobile is not on file. Apply for work first.", "unknown")
+  if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  return issueOtp(ctx, mobile, input.ip)
+}
+
+export async function requestJoinCode(ctx: Ctx, input: { mobile: string; ip: string }) {
+  const mobile = toE164(input.mobile)
+  if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
+  const worker = await findWorkerByMobile(ctx, mobile)
+  if (worker) return fail(ALREADY_JOINED, "exists")
+  return issueOtp(ctx, mobile, input.ip)
+}
+
+export async function verifyOtp(ctx: Ctx, input: { mobile: string; code: string }) {
+  const mobile = toE164(input.mobile)
+  if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
+  const consumed = await consumeOtp(ctx, mobile, input.code)
+  if (!consumed.ok) return consumed
   const worker = await findWorkerByMobile(ctx, mobile)
   if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
   if (worker.role === "admin") return { ok: true as const, needsTotp: true as const, workerId: worker.id }
@@ -294,6 +315,87 @@ const applySchema = z.object({
     driverLicence: z.enum(TICKET_ANSWERS),
   }),
 })
+
+const joinDetailsSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  mobile: z.string(),
+  email: z.string().trim().max(120).optional(),
+  confirmEmail: z.string().trim().max(120).optional(),
+  suburb: z.string().trim().min(2).max(80),
+  postcode: z.string().trim().regex(/^\d{4}$/),
+  roles: z.array(z.enum(ROLES)).min(1),
+  experience: z.string().trim().max(1000).optional(),
+  privacyConsent: z.literal(true),
+})
+
+export type JoinDetails = {
+  name: string
+  mobile: string
+  email: string
+  suburb: string
+  postcode: string
+  roles: string[]
+  experience: string
+}
+
+export async function prepareJoin(ctx: Ctx, input: unknown, ip: string) {
+  const parsed = joinDetailsSchema.safeParse(input)
+  if (!parsed.success) return fail("Check the form and try again.")
+  const data = parsed.data
+  const sensitive = texts([data.name, data.experience, data.suburb, data.email, data.postcode])
+  if (sensitive) return fail(sensitive)
+  const mobile = toE164(data.mobile)
+  if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
+  const emailProblemFound = emailProblem(data.email || "", data.confirmEmail || "")
+  if (emailProblemFound) return fail(emailError(emailProblemFound))
+  const sent = await requestJoinCode(ctx, { mobile, ip })
+  if (!sent.ok) return sent
+  const draft: JoinDetails = {
+    name: data.name,
+    mobile,
+    email: (data.email || "").trim(),
+    suburb: data.suburb,
+    postcode: data.postcode,
+    roles: data.roles,
+    experience: data.experience || "",
+  }
+  return { ok: true as const, devCode: sent.devCode, draft }
+}
+
+export async function resendJoinCode(ctx: Ctx, mobile: string, ip: string) {
+  return requestJoinCode(ctx, { mobile, ip })
+}
+
+export async function finishJoin(ctx: Ctx, draft: JoinDetails, code: string) {
+  const existing = await findWorkerByMobile(ctx, draft.mobile)
+  if (existing) return fail(ALREADY_JOINED, "exists")
+  const consumed = await consumeOtp(ctx, draft.mobile, code)
+  if (!consumed.ok) return consumed
+  const again = await findWorkerByMobile(ctx, draft.mobile)
+  if (again) return fail(ALREADY_JOINED, "exists")
+  const nowIso = ctx.now.toISOString()
+  const worker: Worker = {
+    id: newId("w"),
+    role: "worker",
+    name: draft.name,
+    mobile: draft.mobile,
+    email: draft.email || undefined,
+    suburb: draft.suburb,
+    postcode: draft.postcode,
+    status: "Applicant",
+    roles: draft.roles,
+    experience: draft.experience,
+    whatsappOk: false,
+    privacyConsent: true,
+    tickets: blankTickets(),
+    createdAt: nowIso,
+    updatedAt: nowIso,
+  }
+  await persistWorker(ctx, worker)
+  await audit(ctx, worker.id, "apply", worker.id)
+  const session = await openSession(ctx, worker)
+  return { ok: true as const, session }
+}
 
 export async function submitApplication(ctx: Ctx, input: unknown) {
   const parsed = applySchema.safeParse(input)
