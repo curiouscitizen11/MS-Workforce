@@ -59,6 +59,7 @@ export default async function AdminWorkerPage({ params }: { params: { id: string
     <div className="space-y-4">
       <Heading kicker={worker.status} title={worker.name} text={worker.suburb || ""} />
       <StatusChip level={badgeLevel(check.badge)}>{check.label}</StatusChip>
+      {worker.invitedAs ? <p className="portal-banner text-sm">{worker.invitedAs}</p> : null}
       <a className="pill pill-teal w-full" href={"tel:" + worker.mobile}>
         Call {formatAuMobile(worker.mobile)}
       </a>

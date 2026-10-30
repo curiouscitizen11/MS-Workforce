@@ -25,6 +25,7 @@ import {
   warningWindowDays,
 } from "@/lib/portal/compliance"
 import { decryptString } from "@/lib/portal/crypto"
+import { createInviteToken, readInviteToken } from "@/lib/portal/invite"
 import { emailError, emailProblem } from "@/lib/portal/email"
 import { WHAT_TO_BRING } from "@/lib/portal/seed"
 import { addDays, daysBetween, formatDate, isMondayInSydney, sydneyParts, sydneyToday } from "@/lib/portal/dates"
@@ -326,6 +327,7 @@ const joinDetailsSchema = z.object({
   roles: z.array(z.enum(ROLES)).min(1),
   experience: z.string().trim().max(1000).optional(),
   privacyConsent: z.literal(true),
+  inviteToken: z.string().max(4000).optional(),
 })
 
 export type JoinDetails = {
@@ -336,6 +338,7 @@ export type JoinDetails = {
   postcode: string
   roles: string[]
   experience: string
+  invitedAs?: string
 }
 
 export async function prepareJoin(ctx: Ctx, input: unknown, ip: string) {
@@ -359,7 +362,27 @@ export async function prepareJoin(ctx: Ctx, input: unknown, ip: string) {
     roles: data.roles,
     experience: data.experience || "",
   }
+  if (data.inviteToken) {
+    const invite = readInviteToken(data.inviteToken, ctx.now.getTime())
+    if (invite.ok) draft.invitedAs = invite.invitedAs
+  }
   return { ok: true as const, devCode: sent.devCode, draft }
+}
+
+export async function makeWorkerInvite(ctx: Ctx, input: unknown) {
+  const parsed = z
+    .object({
+      name: z.string().trim().min(2).max(80),
+      mobile: z.string(),
+    })
+    .safeParse(input)
+  if (!parsed.success) return fail("Check the name and mobile.")
+  const sensitive = texts([parsed.data.name])
+  if (sensitive) return fail(sensitive)
+  const mobile = toE164(parsed.data.mobile)
+  if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
+  const token = createInviteToken(parsed.data.name, mobile, ctx.now.getTime())
+  return { ok: true as const, path: "/portal/join?invite=" + encodeURIComponent(token) }
 }
 
 export async function resendJoinCode(ctx: Ctx, mobile: string, ip: string) {
@@ -390,9 +413,11 @@ export async function finishJoin(ctx: Ctx, draft: JoinDetails, code: string) {
     tickets: blankTickets(),
     createdAt: nowIso,
     updatedAt: nowIso,
+    invitedAs: draft.invitedAs,
   }
   await persistWorker(ctx, worker)
   await audit(ctx, worker.id, "apply", worker.id)
+  if (worker.invitedAs) await audit(ctx, worker.id, "invite", worker.id, worker.invitedAs)
   const session = await openSession(ctx, worker)
   return { ok: true as const, session }
 }

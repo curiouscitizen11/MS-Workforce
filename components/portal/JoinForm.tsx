@@ -8,14 +8,24 @@ import { emailError, emailProblem } from "@/lib/portal/email"
 import { toE164 } from "@/lib/portal/phone"
 import { ROLES } from "@/lib/portal/types"
 
-export function JoinForm() {
+export function JoinForm({
+  initialName = "",
+  initialMobile = "",
+  inviteToken = "",
+  expired = false,
+}: {
+  initialName?: string
+  initialMobile?: string
+  inviteToken?: string
+  expired?: boolean
+}) {
   const router = useRouter()
   const [step, setStep] = useState<"details" | "code">("details")
   const [error, setError] = useState("")
   const [joined, setJoined] = useState(false)
   const [pending, start] = useTransition()
-  const [name, setName] = useState("")
-  const [mobile, setMobile] = useState("")
+  const [name, setName] = useState(initialName)
+  const [mobile, setMobile] = useState(initialMobile)
   const [email, setEmail] = useState("")
   const [confirmEmail, setConfirmEmail] = useState("")
   const [suburb, setSuburb] = useState("")
@@ -108,6 +118,7 @@ export function JoinForm() {
             roles,
             experience,
             privacyConsent: true,
+            inviteToken: inviteToken || undefined,
           })
           if (!result.ok) {
             if (already(result.error, "code" in result ? String(result.code) : undefined)) return
@@ -122,6 +133,7 @@ export function JoinForm() {
     >
       {step === "details" ? (
         <>
+          {expired ? <p className="portal-banner text-sm">That link has expired. You can still apply</p> : null}
           <Field label="Full name" name="name" value={name} onChange={(event) => setName(event.target.value)} required />
           <Field label="Mobile" name="mobile" inputMode="tel" autoComplete="tel" value={mobile} onChange={(event) => setMobile(event.target.value)} required />
           <Field label="Email (helps if texts fail)" name="email" type="text" inputMode="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />

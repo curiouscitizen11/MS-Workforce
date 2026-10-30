@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { InviteWorker } from "@/components/portal/InviteWorker"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { HoursIcon, PhotoIcon, ShiftsIcon, TicketsIcon, Tile, WorkersIcon } from "@/components/portal/Tiles"
 import { isMock } from "@/lib/portal/config"
@@ -56,6 +57,7 @@ export default async function AdminHomePage() {
         <Tile href="/portal/admin/photos" label="Photos to approve" count={photos} countLabel={photos + " photos to approve"} icon={<PhotoIcon />} />
         <Tile href="#people" label="Workers" count={workers.length} countLabel={workers.length + " workers"} icon={<WorkersIcon />} />
       </div>
+      <InviteWorker />
       <section id="people" className="space-y-2">
         {workers.map((worker) => {
           const check = complianceFor(worker, today)

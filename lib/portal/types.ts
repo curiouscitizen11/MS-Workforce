@@ -298,6 +298,7 @@ export type Worker = {
   verificationMethod?: string
   imagesDeletedOn?: string
   notes?: string
+  invitedAs?: string
   preferredName?: string
   postcode?: string
   emergencyRelationship?: string

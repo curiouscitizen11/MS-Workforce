@@ -10,6 +10,7 @@ import {
   deleteWorkerImages,
   requestMagicLink,
   finishJoin,
+  makeWorkerInvite,
   prepareJoin,
   requestOtp,
   resendJoinCode,
@@ -48,6 +49,7 @@ import {
   readOtpCookie,
   readPendingWorkerId,
   readSession,
+  requireAdmin,
   writeJoinDraft,
   writeMobileCookie,
   writeOtpCookie,
@@ -151,6 +153,13 @@ export async function logOut() {
   clearPendingCookie()
   refresh()
   return { ok: true as const }
+}
+
+export async function makeInviteLink(input: unknown) {
+  await requireAdmin()
+  const result = await makeWorkerInvite(await ctx(), input)
+  if (!result.ok) return result
+  return { ok: true as const, url: siteOrigin() + result.path }
 }
 
 export async function sendJoinDetails(input: unknown) {
