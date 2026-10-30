@@ -5,7 +5,7 @@ import { HoursIcon, PhotoIcon, ShiftsIcon, TicketsIcon, Tile, WorkersIcon } from
 import { isMock } from "@/lib/portal/config"
 import { complianceFor } from "@/lib/portal/services"
 import { sydneyToday } from "@/lib/portal/dates"
-import { cardsAwaitingCheck, photosAwaitingApproval } from "@/lib/portal/home"
+import { cardsAwaitingCheck, photosAwaitingApproval, waitingForApproval } from "@/lib/portal/home"
 import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 
@@ -23,10 +23,32 @@ export default async function AdminHomePage() {
   const waiting = offers.filter((offer) => offer.status === "Offered").length
   const toCheck = cardsAwaitingCheck(workers)
   const photos = photosAwaitingApproval(docs)
+  const waitingPeople = waitingForApproval(workers)
   return (
     <div className="space-y-4">
       <DemoBanner mock={isMock()} />
       <Heading kicker="Admin" title="Admin desk" text="Check tickets, send offers, and read signed hours." />
+      {waitingPeople.length ? (
+        <section className="portal-panel space-y-2">
+          <p className="text-sm font-semibold">
+            <StatusChip level="pending">{waitingPeople.length} waiting for approval</StatusChip>
+          </p>
+          <ul className="space-y-1">
+            {waitingPeople.slice(0, 5).map((person) => (
+              <li key={person.id}>
+                <Link href={"/portal/admin/workers/" + person.id} className="block min-h-12 py-2 text-sm font-semibold">
+                  {person.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {waitingPeople.length > 5 ? (
+            <a className="text-sm font-semibold text-teal-600 underline" href="#people">
+              See all
+            </a>
+          ) : null}
+        </section>
+      ) : null}
       <div className="portal-grid">
         <Tile href="/portal/admin/offers" label="Offers" count={waiting} countLabel={waiting + " offers waiting"} icon={<ShiftsIcon />} />
         <Tile href="/portal/admin/timesheets" label="Hours" count={sheets.length} countLabel={sheets.length + " signed"} icon={<HoursIcon />} />

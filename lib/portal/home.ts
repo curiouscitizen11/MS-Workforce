@@ -19,6 +19,12 @@ export function fortnightSummary(offers: SummaryOffer[], sheets: SummarySheet[],
   return { text, approvedHours, unsigned, empty }
 }
 
+export function waitingForApproval<T extends { role: string; status: string; onboardingSubmitted?: string; createdAt: string; updatedAt?: string }>(workers: T[]) {
+  return workers
+    .filter((worker) => worker.role === "worker" && worker.onboardingSubmitted && (worker.status === "Applicant" || worker.status === "Onboarding"))
+    .sort((a, b) => (b.updatedAt || b.onboardingSubmitted || b.createdAt).localeCompare(a.updatedAt || a.onboardingSubmitted || a.createdAt))
+}
+
 export function offersWaiting(offers: { workerId: string; status: string }[], workerId: string) {
   return offers.filter((offer) => offer.workerId === workerId && offer.status === "Offered").length
 }

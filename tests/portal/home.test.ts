@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { cardsAwaitingCheck, fortnightSummary, inductionTodoCount, offersWaiting, photosAwaitingApproval, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays } from "@/lib/portal/home"
+import { cardsAwaitingCheck, fortnightSummary, inductionTodoCount, offersWaiting, photosAwaitingApproval, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays, waitingForApproval } from "@/lib/portal/home"
 
 describe("home badges", () => {
   it("counts offers, unsigned days and induction to-dos", () => {
@@ -67,5 +67,32 @@ describe("home badges", () => {
     expect(added.approvedHours).toBe(15.5)
     expect(added.text).toBe("This fortnight: 15.5 h approved · all signed")
     expect(added.text).not.toContain("4.0")
+  })
+
+  it("lists who is waiting for approval, newest first, and caps the names at five", () => {
+    expect(waitingForApproval([])).toEqual([])
+    const row = (id: string, name: string, status: string, onboardingSubmitted: string | undefined, updatedAt: string) => ({
+      id,
+      name,
+      role: "worker",
+      status,
+      onboardingSubmitted,
+      createdAt: "2026-10-01T00:00:00.000Z",
+      updatedAt,
+    })
+    const listed = waitingForApproval([
+      row("onb", "Onboarding Owen", "Onboarding", "2026-10-02", "2026-10-02T00:00:00.000Z"),
+      row("app", "Applicant Ava", "Applicant", "2026-10-05", "2026-10-05T00:00:00.000Z"),
+      row("ready", "Ready Sam", "Ready", "2026-10-09", "2026-10-09T00:00:00.000Z"),
+      row("off", "Inactive Ian", "Inactive", "2026-10-08", "2026-10-08T00:00:00.000Z"),
+      row("new", "Casey Morgan", "Applicant", undefined, "2026-10-10T00:00:00.000Z"),
+      { ...row("boss", "Mav", "Ready", "2026-10-01", "2026-10-01T00:00:00.000Z"), role: "admin" },
+    ])
+    expect(listed.map((person) => person.name)).toEqual(["Applicant Ava", "Onboarding Owen"])
+    const many = waitingForApproval(
+      ["F", "E", "D", "C", "B", "A"].map((name, index) => row(name, name, "Onboarding", "2026-10-0" + (index + 1), "2026-10-0" + (index + 1) + "T00:00:00.000Z")),
+    )
+    expect(many.map((person) => person.name)).toEqual(["A", "B", "C", "D", "E", "F"])
+    expect(many.slice(0, 5).map((person) => person.name)).toEqual(["A", "B", "C", "D", "E"])
   })
 })
