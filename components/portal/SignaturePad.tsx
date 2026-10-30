@@ -34,7 +34,7 @@ export function SignaturePad({ onChange }: { onChange: (value: string | null) =>
       <canvas
         ref={ref}
         aria-label="Signature"
-        className="h-28 w-full touch-none rounded-xl border border-[#5d728c] bg-[#0b1a2e]"
+        className="portal-sign h-28 w-full touch-none rounded-2xl border border-[#5d728c] bg-[#0b1a2e]"
         onPointerDown={(event) => {
           const canvas = ref.current
           const context = canvas?.getContext("2d")

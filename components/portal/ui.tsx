@@ -74,7 +74,7 @@ export function DemoBanner({ mock }: { mock: boolean }) {
 }
 
 export const fieldClass =
-  "mt-1 w-full min-h-12 rounded-xl border border-navy/20 bg-white px-3 text-base text-navy outline-none ring-teal-300 focus:border-teal-600 focus:ring-2"
+  "portal-field mt-1 w-full min-h-12 rounded-2xl border border-navy/20 bg-white px-3 text-base text-navy outline-none ring-teal-300 focus:border-teal-600 focus:ring-2"
 
 export function Field({
   label,

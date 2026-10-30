@@ -66,7 +66,7 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 - On screens 768px wide and up, centre the content column at a max width of 480px. Lines stay full-width inside the column. Don't switch to a grid.
 
 ## 5. Radius, lines and dividers
-- Buttons are fully round pills (`9999px`). Cards, panels and menu rows are about 16px. Dialogs are about 16px. Inputs and the signature pad stay at `--radius-sm: 4px` (see 11 and 12). The focus ring is 2px.
+- Buttons are fully round pills (`9999px`). Cards, panels, menu rows, inputs and the signature pad are about 16px. Dialogs are about 16px. The focus ring is 2px. See 11 and 12.
 - All lines are 1px solid `--line`. The only exceptions are the strip's 3px teal left edge and the 2px focus ring.
 - A list has a top line and a bottom line on every row. Rows span the full width with no inset.
 - `box-shadow: none` everywhere. No heavy glows, gradients or button lift.
@@ -119,14 +119,14 @@ Flagged: describes the older flat Home; not current. Marek to decide.
 
 ## 11. Form fields
 - Label sits above the field: 13px `--text-muted`, 8px gap, never only a placeholder.
-- Input: height 48px, radius 4px, background `--bg`, 1px `--field-border`, padding 0 12px, 16px `--text`, placeholder `--text-faint`.
+- Input: height 48px, radius about 16px (softer than a square, not a pill), background `--bg`, 1px `--field-border`, padding 0 12px, 16px `--text`, placeholder `--text-faint`.
 - Focus: border `--accent` plus the 2px focus ring.
 - Error: border `--error`, with a 13px `--error` message under the field in plain words ("Enter a 10-digit mobile number"), linked with `aria-describedby`.
 - Space fields 16px apart. Use the correct `inputmode` and `autocomplete` (`tel`, `one-time-code`, `numeric`). Dates use the native picker.
 - Checkboxes and radios: native, `accent-color: var(--accent)`, 24px, with a 44px label tap area.
 
 ## 12. Signature pad
-- Full content width, height 200px (160px minimum), radius 4px, background `--bg`, 1px `--field-border`, with a dashed `--line` baseline 40px from the bottom and an 11px muted "Sign here" note.
+- Full content width, height 200px (160px minimum), radius about 16px, background `--bg`, 1px `--field-border`, with a dashed `--line` baseline 40px from the bottom and an 11px muted "Sign here" note.
 - **Pen: `#ffffff`, 3px line width** (scale by `devicePixelRatio`), round cap and join. Never navy or grey ink on navy.
 - Add `touch-action: none` on the canvas so the page doesn't scroll while signing. Support Pointer Events (finger, Apple Pencil, mouse or trackpad on Mac).
 - "Clear" is a text button above the pad, on the right. "Sign" or "Submit" stays disabled until there is ink.

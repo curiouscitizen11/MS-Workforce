@@ -46,7 +46,7 @@ export function OfferActions({ offerId, blocked }: { offerId: string; blocked?: 
         <>
           <label className="block text-sm font-semibold" htmlFor="reason">
             Reason, if you want to add one
-            <input id="reason" className="mt-1 w-full min-h-12 rounded-xl border border-navy/20 px-3 text-base" value={reason} onChange={(event) => setReason(event.target.value)} />
+            <input id="reason" className="portal-field mt-1 w-full min-h-12 rounded-2xl border border-navy/20 px-3 text-base" value={reason} onChange={(event) => setReason(event.target.value)} />
           </label>
           <button className="pill pill-line-dark w-full" type="button" disabled={pending} onClick={() => send(false)}>
             Confirm decline

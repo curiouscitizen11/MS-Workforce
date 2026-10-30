@@ -96,13 +96,13 @@ export default async function DashboardPage() {
             <Link href={"/portal/shifts/" + todayShift.id} className="pill pill-line-dark w-full px-3">
               Site info
             </Link>
-            <Link href="/portal/timesheet" className="pill pill-teal w-full px-3">
+            <Link href="/portal/timesheet" className="pill pill-line-dark w-full px-3">
               {afternoon ? "Log today's hours" : "Log hours"}
             </Link>
           </div>
         </section>
       ) : afternoon ? (
-        <Link href="/portal/timesheet" className="pill pill-teal w-full">
+        <Link href="/portal/timesheet" className="pill pill-line-dark w-full">
           Log today&apos;s hours
         </Link>
       ) : null}

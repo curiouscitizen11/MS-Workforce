@@ -134,7 +134,7 @@ export function SafetyForm({ worker }: { worker: Worker }) {
       </label>
       {error ? <p role="alert" className="text-sm font-semibold text-[#B91C1C]">{error}</p> : null}
       {saved ? <p className="text-sm font-semibold text-[#15803D]">{saved}</p> : null}
-      <button className="pill pill-teal w-full" disabled={pending}>
+      <button className="pill pill-line-dark w-full" disabled={pending}>
         Save safety info
       </button>
     </form>
