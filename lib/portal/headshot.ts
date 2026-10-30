@@ -125,7 +125,7 @@ export async function saveHeadshot(ctx: Ctx, workerId: string, input: { bytes: B
 
 export async function approveHeadshot(ctx: Ctx, adminId: string, documentId: string) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const doc = await ctx.store.documents.get(documentId)
   if (!doc || doc.kind !== "headshot" || doc.deletedAt || doc.headshotStatus !== "Pending") {
     return fail("That photo is not waiting for a check.")
@@ -144,7 +144,7 @@ export async function approveHeadshot(ctx: Ctx, adminId: string, documentId: str
 
 export async function rejectHeadshot(ctx: Ctx, adminId: string, documentId: string, reason: string) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   if (!(HEADSHOT_REJECT_REASONS as readonly string[]).includes(reason)) return fail("Choose a reason from the list.")
   const doc = await ctx.store.documents.get(documentId)
   if (!doc || doc.kind !== "headshot" || doc.deletedAt || doc.headshotStatus === "Rejected") {

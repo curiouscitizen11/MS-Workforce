@@ -56,7 +56,7 @@ export function buildSeed(now = new Date()): SeedData {
     {
       id: "w-mav",
       role: "admin",
-      name: "Mav",
+      name: "Marek",
       mobile: "+61400000001",
       email: "hello@msworkforce.au",
       suburb: "Northern Beaches",
@@ -92,7 +92,7 @@ export function buildSeed(now = new Date()): SeedData {
       inductionVersion: "v1.0",
       ticketsVerified: true,
       verifiedOn: addDays(today, -2),
-      verifiedBy: "Mav",
+      verifiedBy: "Marek",
       verificationMethod: "Photo in portal",
       otherTicketsHeld: ["Forklift (LF)"],
       tickets: {
@@ -101,7 +101,7 @@ export function buildSeed(now = new Date()): SeedData {
           status: "Yes, I have it",
           number: "WC-441928",
           expiry: addDays(today, 400),
-          checkedBy: "Mav",
+          checkedBy: "Marek",
           checkedAt: addDays(today, -2) + "T00:00:00.000Z",
         },
         heights: { status: "Yes, I have it" },

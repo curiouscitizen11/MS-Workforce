@@ -34,7 +34,7 @@ export default async function MePage() {
         <>
           <section className="space-y-2 rounded-2xl border border-navy/10 bg-white p-4">
             <h2 className="text-sm font-semibold">My photo</h2>
-            <p className="text-sm leading-relaxed text-navy/70">A clear photo of your face for your worker ID card. Mav checks it before it shows.</p>
+            <p className="text-sm leading-relaxed text-navy/70">A clear photo of your face for your worker ID card. Marek checks it before it shows.</p>
             <Link href="/portal/me/photo" className="pill pill-line-dark w-full">
               Add or change photo
             </Link>

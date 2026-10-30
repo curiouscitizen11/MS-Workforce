@@ -234,7 +234,7 @@ export async function confirmAdminTotp(ctx: Ctx, workerId: string, code: string)
   const { adminTotpSecret } = await import("@/lib/portal/config")
   const { verifyTotp } = await import("@/lib/portal/totp")
   const worker = await ctx.store.workers.get(workerId)
-  if (!worker || worker.role !== "admin") return fail("Mav's login is required.")
+  if (!worker || worker.role !== "admin") return fail("Marek's login is required.")
   if (!verifyTotp(code, adminTotpSecret(), ctx.now.getTime())) return fail("That authenticator code is not right.")
   const session = await openSession(ctx, worker)
   return { ok: true as const, session }
@@ -1245,7 +1245,7 @@ export async function correctTimesheet(
   patch: { start: string; finish: string; breakMinutes: number; breakStart?: string; note?: string },
 ) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const sheet = await ctx.store.timesheets.get(sheetId)
   if (!sheet || sheet.status === "Draft") return fail("Only a signed timesheet can be corrected.")
   const breakMinutes = Number(patch.breakMinutes)
@@ -1292,7 +1292,7 @@ export async function correctTimesheet(
 
 export async function approveTimesheetForPay(ctx: Ctx, adminId: string, sheetId: string) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const sheet = await ctx.store.timesheets.get(sheetId)
   if (!sheet) return fail("That timesheet is not signed.")
   if (sheet.status === "Approved") return fail("These hours are already approved for pay.")
@@ -1309,7 +1309,7 @@ export async function approveTimesheetForPay(ctx: Ctx, adminId: string, sheetId:
 
 export async function queryTimesheet(ctx: Ctx, adminId: string, sheetId: string, note?: string) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const sheet = await ctx.store.timesheets.get(sheetId)
   if (!sheet || sheet.status === "Draft") return fail("That timesheet is not signed.")
   const before = sheet.status
@@ -1349,7 +1349,7 @@ export async function createOffers(
   },
 ) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   if (texts([input.placementRef, input.suburb, input.address, input.highRisk, input.parking, input.bring])) {
     return fail(SENSITIVE_MESSAGE)
   }
@@ -1425,7 +1425,7 @@ export async function markTicketChecked(
   input: { licenceKey: string; number: string; expiry: string; noExpiry: boolean },
 ) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const worker = await ctx.store.workers.get(workerId)
   if (!worker || worker.role === "admin") return fail("Worker not found.")
   if (!isPhotoLicenceKey(input.licenceKey)) return fail("Choose a ticket from the list.")
@@ -1491,7 +1491,7 @@ export async function markTicketChecked(
 
 export async function flagTicketMismatch(ctx: Ctx, adminId: string, workerId: string, licenceKey: string) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const worker = await ctx.store.workers.get(workerId)
   if (!worker || worker.role === "admin") return fail("Worker not found.")
   if (!isPhotoLicenceKey(licenceKey)) return fail("Choose a ticket from the list.")
@@ -1529,7 +1529,7 @@ export async function verifyWorker(
   },
 ) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const worker = await ctx.store.workers.get(workerId)
   if (!worker || worker.role === "admin") return fail("Worker not found.")
   if (patch.verificationMethod) {
@@ -1560,7 +1560,7 @@ export async function verifyWorker(
 
 export async function revealPassport(ctx: Ctx, adminId: string, workerId: string) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const worker = await ctx.store.workers.get(workerId)
   if (!worker?.passport) return fail("No passport number is stored.")
   await audit(ctx, adminId, "view-passport", workerId)
@@ -1573,7 +1573,7 @@ export async function revealPassport(ctx: Ctx, adminId: string, workerId: string
 
 export async function deleteWorkerImages(ctx: Ctx, adminId: string, workerId: string) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const worker = await ctx.store.workers.get(workerId)
   if (!worker) return fail("Worker not found.")
   const docs = (await ctx.store.documents.all()).filter((doc) => doc.workerId === workerId && !doc.deletedAt)
@@ -1596,7 +1596,7 @@ export async function deleteWorkerImages(ctx: Ctx, adminId: string, workerId: st
 
 export async function revokeSessions(ctx: Ctx, adminId: string, workerId: string) {
   const admin = await ctx.store.workers.get(adminId)
-  if (!admin || admin.role !== "admin") return fail("Mav's login is required.")
+  if (!admin || admin.role !== "admin") return fail("Marek's login is required.")
   const sessions = (await ctx.store.sessions.all()).filter((session) => session.workerId === workerId)
   for (const session of sessions) await ctx.store.sessions.remove(session.id)
   await audit(ctx, adminId, "revoke-sessions", workerId)

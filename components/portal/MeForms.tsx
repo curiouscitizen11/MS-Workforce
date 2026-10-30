@@ -109,12 +109,12 @@ export function SafetyForm({ worker }: { worker: Worker }) {
             setError(result.error)
             return
           }
-          setSaved("Saved. Only Mav can see this.")
+          setSaved("Saved. Only Marek can see this.")
         })
       }}
     >
       <p className="text-sm leading-relaxed">
-        This is private. Only Mav sees it. We share it with the site supervisor or first aider only if you said yes below, or in an emergency.
+        This is private. Only Marek sees it. We share it with the site supervisor or first aider only if you said yes below, or in an emergency.
       </p>
       <label className="block text-sm font-semibold" htmlFor="emergencyContact">
         Emergency contact

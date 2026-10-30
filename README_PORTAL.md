@@ -1,6 +1,6 @@
-# Worker portal — setup for Mav
+# Worker portal — setup for Marek
 
-The worker portal lives at `/portal` on the same website as www.msworkforce.au. Workers log in with a text message code. You (Mav) are the only admin.
+The worker portal lives at `/portal` on the same website as www.msworkforce.au. Workers log in with a text message code. You (Marek) are the only admin.
 
 You can try the whole portal on your computer with no accounts. Real texts, emails, Notion and photo storage stay switched off until you follow the steps below.
 
@@ -23,7 +23,7 @@ A Vercel preview of this branch is also demo mode. It does not need Neon, Twilio
 Demo logins are on the login screen:
 
 - **Sam Lee**, mobile `0400 111 222` — a ready worker with an open shift offer and a signed timesheet.
-- **Mav**, mobile `0400 000 001` — admin. After the text code, the screen shows a second demo authenticator code.
+- **Marek**, mobile `0400 000 001` — admin. After the text code, the screen shows a second demo authenticator code.
 
 The login screen shows the demo code. No real text is sent.
 

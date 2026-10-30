@@ -303,7 +303,7 @@ export async function uploadHeadshot(formData: FormData) {
 
 export async function approveHeadshot(documentId: string) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await approveHeadshotRecord(await ctx(), current.worker.id, documentId)
   if (result.ok) refresh()
   return result
@@ -311,7 +311,7 @@ export async function approveHeadshot(documentId: string) {
 
 export async function rejectHeadshot(documentId: string, reason: string) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await rejectHeadshotRecord(await ctx(), current.worker.id, documentId, reason)
   if (result.ok) refresh()
   return result
@@ -335,7 +335,7 @@ export async function uploadTicketPhoto(formData: FormData) {
 
 export async function flagTicketMismatch(input: { workerId: string; licenceKey: string }) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await flagTicketMismatchRecord(await ctx(), current.worker.id, input.workerId, input.licenceKey)
   if (result.ok) refresh()
   return result
@@ -343,7 +343,7 @@ export async function flagTicketMismatch(input: { workerId: string; licenceKey: 
 
 export async function markTicketChecked(input: { workerId: string; licenceKey: string; number: string; expiry: string; noExpiry: boolean }) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await markTicketCheckedRecord(await ctx(), current.worker.id, input.workerId, input)
   if (result.ok) refresh()
   return result
@@ -398,7 +398,7 @@ export async function lodgeTimesheet(input: {
 
 export async function adjustTimesheet(sheetId: string, patch: { start: string; finish: string; breakMinutes: number; breakStart?: string; note?: string }) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await correctTimesheet(await ctx(), current.worker.id, sheetId, patch)
   if (result.ok) refresh()
   return result
@@ -406,7 +406,7 @@ export async function adjustTimesheet(sheetId: string, patch: { start: string; f
 
 export async function approveTimesheet(sheetId: string) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await approveTimesheetForPay(await ctx(), current.worker.id, sheetId)
   if (result.ok) refresh()
   return result
@@ -414,7 +414,7 @@ export async function approveTimesheet(sheetId: string) {
 
 export async function markTimesheetQueried(sheetId: string, note?: string) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await queryTimesheet(await ctx(), current.worker.id, sheetId, note)
   if (result.ok) refresh()
   return result
@@ -422,7 +422,7 @@ export async function markTimesheetQueried(sheetId: string, note?: string) {
 
 export async function sendShiftOffers(input: Parameters<typeof createOffers>[2]) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await createOffers(await ctx(), current.worker.id, input)
   if (result.ok) refresh()
   return result
@@ -430,7 +430,7 @@ export async function sendShiftOffers(input: Parameters<typeof createOffers>[2])
 
 export async function saveVerification(workerId: string, patch: Parameters<typeof verifyWorker>[3]) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await verifyWorker(await ctx(), current.worker.id, workerId, patch)
   if (result.ok) refresh()
   return result
@@ -438,13 +438,13 @@ export async function saveVerification(workerId: string, patch: Parameters<typeo
 
 export async function showPassport(workerId: string) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   return revealPassport(await ctx(), current.worker.id, workerId)
 }
 
 export async function removeImages(workerId: string) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   const result = await deleteWorkerImages(await ctx(), current.worker.id, workerId)
   if (result.ok) refresh()
   return result
@@ -452,7 +452,7 @@ export async function removeImages(workerId: string) {
 
 export async function signOutWorker(workerId: string) {
   const current = await readSession()
-  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Mav's login is required." }
+  if (!current || current.worker.role !== "admin") return { ok: false as const, error: "Marek's login is required." }
   return revokeSessions(await ctx(), current.worker.id, workerId)
 }
 

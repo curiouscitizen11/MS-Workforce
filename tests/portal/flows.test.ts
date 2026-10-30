@@ -372,13 +372,13 @@ describe("portal flows", () => {
     if (!checked) throw new Error("missing worker")
     expect(checked.tickets.heights.number).toBe("HT-22")
     expect(checked.tickets.heights.expiry).toBe("2026-11-01")
-    expect(checked.tickets.heights.checkedBy).toBe("Mav")
+    expect(checked.tickets.heights.checkedBy).toBe("Marek")
     expect(checked.tickets.heights.checkedAt).toBeTruthy()
     const flag = complianceFor(checked, "2026-10-17")
     expect(flag.badge).toBe("warning")
     expect(flag.reasons.some((reason) => reason.includes("Work at heights"))).toBe(true)
 
-    checked.licenceChecks = { "Forklift (LF)": { number: "LF-9", expiry: "2026-10-01", checkedBy: "Mav", checkedAt: ctx.now.toISOString() } }
+    checked.licenceChecks = { "Forklift (LF)": { number: "LF-9", expiry: "2026-10-01", checkedBy: "Marek", checkedAt: ctx.now.toISOString() } }
     const forklift = complianceFor(checked, "2026-10-17")
     expect(forklift.badge).toBe("restricted")
     expect(forklift.reasons.some((reason) => reason.includes("Forklift"))).toBe(true)
@@ -393,7 +393,7 @@ describe("portal flows", () => {
     checked.tickets.heights.checkedAt = old
     checked.tickets.heights.number = "HT-22"
     checked.tickets.heights.expiry = "2027-04-01"
-    checked.tickets.heights.checkedBy = "Mav"
+    checked.tickets.heights.checkedBy = "Marek"
     await ctx.store.workers.save(checked)
     for (const doc of await ctx.store.documents.all()) {
       if (doc.workerId === "w-sam" && doc.licenceKey === "heights" && !doc.deletedAt) {
@@ -421,7 +421,7 @@ describe("portal flows", () => {
     const kept = await ctx.store.workers.get("w-sam")
     expect(kept?.tickets.heights.number).toBe("HT-22")
     expect(kept?.tickets.heights.expiry).toBe("2027-04-01")
-    expect(kept?.tickets.heights.checkedBy).toBe("Mav")
+    expect(kept?.tickets.heights.checkedBy).toBe("Marek")
     expect(kept?.tickets.heights.checkedAt).toBe(old)
     expect(kept?.tickets.heights.photosDeletedAt).toBeTruthy()
     expect(await ctx.store.blobs.get("doc-age-front")).toBeNull()
@@ -440,7 +440,7 @@ describe("portal flows", () => {
     expect(kept.ok).toBe(false)
     const sam = await ctx.store.workers.get("w-sam")
     expect(sam?.tickets.whiteCard.number).toBe("WC-441928")
-    expect(sam?.tickets.whiteCard.checkedBy).toBe("Mav")
+    expect(sam?.tickets.whiteCard.checkedBy).toBe("Marek")
     expect(sam?.ticketsVerified).toBe(true)
 
     const huge = Buffer.alloc(TICKET_PHOTO_MAX_BYTES + 1, 0)
@@ -503,14 +503,14 @@ describe("portal flows", () => {
     await ctx.store.documents.save(young)
     const alex = await ctx.store.workers.get("w-alex")
     if (!alex) throw new Error("missing alex")
-    alex.tickets.whiteCard = { status: "Yes, I have it", number: "WC-1", expiry: "2027-01-01", checkedBy: "Mav", checkedAt: due }
+    alex.tickets.whiteCard = { status: "Yes, I have it", number: "WC-1", expiry: "2027-01-01", checkedBy: "Marek", checkedAt: due }
     await ctx.store.workers.save(alex)
     const later = await purgeDocuments(ctx)
     expect(later.removed).toBe(1)
     expect(await ctx.store.blobs.get("doc-young")).toBeNull()
     const kept = await ctx.store.workers.get("w-alex")
     expect(kept?.tickets.whiteCard.number).toBe("WC-1")
-    expect(kept?.tickets.whiteCard.checkedBy).toBe("Mav")
+    expect(kept?.tickets.whiteCard.checkedBy).toBe("Marek")
     expect(kept?.tickets.whiteCard.photosDeletedAt).toBeTruthy()
 
     const casey = await ctx.store.workers.get("w-casey")
@@ -622,7 +622,7 @@ describe("portal flows", () => {
     expect(result.ok).toBe(false)
   })
 
-  it("signs Mav in only with the authenticator code", async () => {
+  it("signs Marek in only with the authenticator code", async () => {
     const { ctx } = harness()
     const sent = await requestOtp(ctx, { mobile: "0400 000 001", ip: "10.0.0.9" })
     expect(sent.ok).toBe(true)

@@ -86,7 +86,7 @@ describe("home badges", () => {
       row("ready", "Ready Sam", "Ready", "2026-10-09", "2026-10-09T00:00:00.000Z"),
       row("off", "Inactive Ian", "Inactive", "2026-10-08", "2026-10-08T00:00:00.000Z"),
       row("new", "Casey Morgan", "Applicant", undefined, "2026-10-10T00:00:00.000Z"),
-      { ...row("boss", "Mav", "Ready", "2026-10-01", "2026-10-01T00:00:00.000Z"), role: "admin" },
+      { ...row("boss", "Marek", "Ready", "2026-10-01", "2026-10-01T00:00:00.000Z"), role: "admin" },
     ])
     expect(listed.map((person) => person.name)).toEqual(["Applicant Ava", "Onboarding Owen"])
     const many = waitingForApproval(

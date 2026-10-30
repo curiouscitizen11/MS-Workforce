@@ -41,7 +41,7 @@ describe("portal side menu", () => {
     expect(open).toContain('aria-current="page"')
     expect(open).toContain('href="/portal/tickets"')
     const admin = renderToStaticMarkup(
-      createElement(PortalMenuPanel, { name: "Mav", role: "admin", pathname: "/portal/admin/offers", onClose: () => undefined, onLogout: () => undefined }),
+      createElement(PortalMenuPanel, { name: "Marek", role: "admin", pathname: "/portal/admin/offers", onClose: () => undefined, onLogout: () => undefined }),
     )
     for (const label of ["Home", "Shifts", "Hours", "Me", "Preferences", "Log out"]) expect(admin).toContain(label)
     expect(admin).not.toContain("Tickets &amp; training")

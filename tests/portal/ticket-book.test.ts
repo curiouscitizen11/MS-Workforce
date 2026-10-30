@@ -156,7 +156,7 @@ describe("tickets and training picker", () => {
     expect(blocked.ok).toBe(false)
     const sam = await ctx.store.workers.get("w-sam")
     if (!sam) throw new Error("missing worker")
-    sam.licenceChecks = { "Forklift (LF)": { number: "LF-1", expiry: "2027-01-01", checkedBy: "Mav", checkedAt: "2026-10-01T00:00:00.000Z" } }
+    sam.licenceChecks = { "Forklift (LF)": { number: "LF-1", expiry: "2027-01-01", checkedBy: "Marek", checkedAt: "2026-10-01T00:00:00.000Z" } }
     await ctx.store.workers.save(sam)
     const saved = await saveOtherLicences(ctx, "w-sam", ["Forklift (LF)", "Boom lift ticket"], {
       "Boom lift ticket": { number: "BL-9", expiry: "2027-05-01" },
@@ -164,7 +164,7 @@ describe("tickets and training picker", () => {
     expect(saved.ok).toBe(true)
     const after = await ctx.store.workers.get("w-sam")
     expect(after?.otherTicketsHeld).toEqual(["Forklift (LF)", "Boom lift ticket"])
-    expect(after?.licenceChecks?.["Forklift (LF)"]?.checkedBy).toBe("Mav")
+    expect(after?.licenceChecks?.["Forklift (LF)"]?.checkedBy).toBe("Marek")
     expect(after?.licenceChecks?.["Boom lift ticket"]?.number).toBe("BL-9")
     const split = notionOtherTickets(after?.otherTicketsHeld)
     expect(split.known).toEqual(["Forklift (LF)"])

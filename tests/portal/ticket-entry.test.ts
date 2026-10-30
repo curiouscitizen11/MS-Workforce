@@ -232,7 +232,7 @@ describe("worker ticket number and expiry", () => {
     const again = await saveOtherLicences(ctx, "w-sam", ["Forklift (LF)"], { "Forklift (LF)": { number: "LF-10293", expiry: "2027-06-01" } })
     expect(again.ok).toBe(true)
     const kept = await ctx.store.workers.get("w-sam")
-    expect(kept?.licenceChecks?.["Forklift (LF)"]?.checkedBy).toBe("Mav")
+    expect(kept?.licenceChecks?.["Forklift (LF)"]?.checkedBy).toBe("Marek")
     const mismatch = await flagTicketMismatch(ctx, "w-mav", "w-sam", "Forklift (LF)")
     expect(mismatch.ok).toBe(true)
     expect((await ctx.store.workers.get("w-sam"))?.licenceChecks?.["Forklift (LF)"]?.checkedBy).toBeUndefined()
