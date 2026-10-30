@@ -29,7 +29,7 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
       <DemoBanner mock={isMock()} />
       <Heading kicker="Log in" title="Use your mobile" text="We'll text a 6-digit code. No password." />
       {searchParams.error ? <p className="text-sm font-semibold text-[#B91C1C]">That login link has expired. Request a new one.</p> : null}
-      <LoginForm mock={isMock()} demos={demos} initialMobile={readMobileCookie()} />
+      <LoginForm mock={isMock()} demos={demos} initialMobile={await readMobileCookie()} />
       <p className="text-sm">
         New here?{" "}
         <a className="font-semibold text-teal-600 underline" href="/portal/apply">

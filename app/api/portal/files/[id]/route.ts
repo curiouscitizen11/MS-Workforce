@@ -7,7 +7,8 @@ import { getStore } from "@/lib/portal/store"
 import { ticketPhotoDecision } from "@/lib/portal/ticket-photos"
 import { NextResponse } from "next/server"
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params
   const url = new URL(request.url)
   const exp = Number(url.searchParams.get("exp"))
   const signature = url.searchParams.get("sig") || ""

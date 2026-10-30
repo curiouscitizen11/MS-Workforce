@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Me" }
 
 export default async function MePage() {
   const { worker } = await requireUser()
-  const theme = themeFromCookie(cookies().get(THEME_COOKIE)?.value)
+  const theme = themeFromCookie((await cookies()).get(THEME_COOKIE)?.value)
   const shown = { ...worker, mobile: formatAuMobile(worker.mobile) }
   const offers = worker.role === "worker" ? (await (await getStore()).offers.all()).filter((offer) => offer.workerId === worker.id) : []
   const inductions = inductionRows({ inductionPassed: worker.inductionPassed, siteInductions: worker.siteInductions, offers })

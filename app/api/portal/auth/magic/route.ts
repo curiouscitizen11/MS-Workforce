@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(login)
   }
   if (result.needsTotp) {
-    writePendingCookie(result.workerId, Date.now())
+    await writePendingCookie(result.workerId, Date.now())
     return NextResponse.redirect(new URL("/portal/login/admin", request.url))
   }
   const response = NextResponse.redirect(new URL("/portal", request.url))

@@ -18,7 +18,7 @@ Do not ask workers for a tax file number, bank details or super. Those stay in X
 
 Leave `PORTAL_MODE` unset, or set it to `mock` in `.env.local`. Demo mode never calls Notion, Twilio or email, even if those keys are sitting in the file.
 
-A Vercel preview of this branch is also demo mode. It does not need Neon, Twilio, Notion or Blob. It switches to the real accounts only when `PORTAL_MODE` is set to `live`. On the production site, if `PORTAL_MODE` is left blank and both the database address and the Notion token are set, the portal treats that as live.
+A Vercel preview of this branch is also demo mode. It does not need Neon, Twilio, Notion or Blob. It switches to the real accounts only when `PORTAL_MODE` is set to exactly `live`. If that setting is blank, or set to any other word, the portal stays in demo mode even when the database and Notion keys are present.
 
 Demo logins are on the login screen:
 
@@ -38,7 +38,7 @@ Other demo people:
 
 Create these accounts yourself. Put the keys in Vercel (Project → Settings → Environment Variables), not in the code. Copy the names from `.env.example`.
 
-Set `PORTAL_MODE` to `live` only after every item below is filled in, and only on production. Preview links stay in demo mode. On production, if `PORTAL_MODE` is left blank and both the database address and the Notion token are set, the portal treats that as live. Missing login secrets are rejected only in live mode. Demo mode uses stand-in secrets so a preview can open with no environment variables.
+Set `PORTAL_MODE` to exactly `live` only after every item below is filled in, and only on production. Anything else, including a blank value, keeps the portal in demo mode even if the database and Notion keys are already set. Missing login secrets are rejected only in live mode. Demo mode uses stand-in secrets so a preview can open with no environment variables.
 
 ### 1. Neon (the login database)
 
@@ -160,9 +160,9 @@ These addresses do the quiet work. Call them with header `Authorization: Bearer`
 
 - `/api/portal/cron/outbox` — sends queued Notion updates.
 - `/api/portal/cron/reminders` — texts workers when a ticket is inside the warning window (60 days for asbestos A/B and first aid, 30 days for other tickets), then again at 14 days, 7 days and on the day. On Mondays it also emails you a list of anyone who is not clear to book.
-- `/api/portal/cron/purge` — deletes ticket photos 7 days after that card was marked checked, and passport numbers older than 14 days. The number, expiry and check record stay. Each deletion is written to the audit log. Vercel runs this once a day, at 16:15 UTC, after this branch is merged. Preview links do not run it. `CRON_SECRET` must be set or the live job is refused.
+- `/api/portal/cron/purge` — deletes ticket photos 7 days after that card was marked checked, and passport numbers older than 14 days. The number, expiry and check record stay. Each deletion is written to the audit log. `CRON_SECRET` must be set or the live job is refused.
 
-On Vercel’s free plan, scheduled jobs usually run once a day. Once a day is enough for reminders and the photo purge. For Notion updates, once a day is slow; a paid plan can run the outbox every few minutes. Until then, worker actions are saved in the database and reach Notion on the next run.
+All three jobs are in `vercel.json`, once a day: Notion sync at 07:15 UTC, the photo purge at 16:15 UTC, and reminders at 21:15 UTC. Preview links do not run them. On Vercel’s free plan each job can run only once a day, and it may start any time during that hour. A job every few minutes is not allowed on the free plan, so it was not added. Notion updates wait for the daily sync. A paid plan can run the sync more often. Do not change the plan from here.
 
 In mock mode these addresses are open and they do not call Notion.
 

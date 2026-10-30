@@ -112,9 +112,9 @@ function bind(db: MemoryDb, persist: () => void): Store {
 export function createMemoryStore(options?: { seed?: boolean; now?: Date; persistPath?: string | null }): Store {
   const persistPath = options?.persistPath ?? null
   let db: MemoryDb
-  if (persistPath && existsSync(persistPath)) {
+  if (persistPath && existsSync(/* turbopackIgnore: true */ persistPath)) {
     try {
-      const parsed = JSON.parse(readFileSync(persistPath, "utf8")) as MemoryDb
+      const parsed = JSON.parse(readFileSync(/* turbopackIgnore: true */ persistPath, "utf8")) as MemoryDb
       db = parsed.version === SEED_VERSION ? parsed : buildSeed(options?.now)
     } catch {
       db = buildSeed(options?.now)

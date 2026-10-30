@@ -8,8 +8,8 @@ import { redirect } from "next/navigation"
 
 export const metadata: Metadata = { title: "One more code" }
 
-export default function AdminLoginPage() {
-  const workerId = readPendingWorkerId()
+export default async function AdminLoginPage() {
+  const workerId = await readPendingWorkerId()
   if (!workerId) redirect("/portal/login")
   const devCode = isMock() ? totpCode(adminTotpSecret(), Date.now()) : undefined
   return (

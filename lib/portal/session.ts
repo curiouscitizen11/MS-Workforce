@@ -73,62 +73,62 @@ export function sessionCookieValue(session: Session) {
   })
 }
 
-export function writeSessionCookie(session: Session) {
-  cookies().set(COOKIE, sessionCookieValue(session), cookieOptions(undefined, new Date(session.expiresAt)))
+export async function writeSessionCookie(session: Session) {
+  ;(await cookies()).set(COOKIE, sessionCookieValue(session), cookieOptions(undefined, new Date(session.expiresAt)))
 }
 
-export function writeOtpCookie(challenge: OtpChallenge) {
+export async function writeOtpCookie(challenge: OtpChallenge) {
   if (!isMock()) return
-  cookies().set(OTP, pack(challenge), cookieOptions(10 * 60))
+  ;(await cookies()).set(OTP, pack(challenge), cookieOptions(10 * 60))
 }
 
-export function readOtpCookie() {
-  return unpack<OtpChallenge>(cookies().get(OTP)?.value)
+export async function readOtpCookie() {
+  return unpack<OtpChallenge>((await cookies()).get(OTP)?.value)
 }
 
-export function clearOtpCookie() {
-  cookies().set(OTP, "", cookieOptions(0))
+export async function clearOtpCookie() {
+  ;(await cookies()).set(OTP, "", cookieOptions(0))
 }
 
-export function clearSessionCookie() {
-  cookies().set(COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 })
+export async function clearSessionCookie() {
+  ;(await cookies()).set(COOKIE, "", { httpOnly: true, path: "/", maxAge: 0 })
 }
 
-export function writeMobileCookie(mobile: string) {
-  cookies().set(MOBILE, mobile, cookieOptions(365 * 24 * 60 * 60))
+export async function writeMobileCookie(mobile: string) {
+  ;(await cookies()).set(MOBILE, mobile, cookieOptions(365 * 24 * 60 * 60))
 }
 
-export function readMobileCookie() {
-  return cookies().get(MOBILE)?.value || ""
+export async function readMobileCookie() {
+  return (await cookies()).get(MOBILE)?.value || ""
 }
 
-export function writeJoinDraft(draft: Omit<JoinDraft, "exp">, nowMs = Date.now()) {
+export async function writeJoinDraft(draft: Omit<JoinDraft, "exp">, nowMs = Date.now()) {
   const value: JoinDraft = { ...draft, exp: nowMs + JOIN_MS }
-  cookies().set(JOIN, pack(value), cookieOptions(JOIN_MS / 1000))
+  ;(await cookies()).set(JOIN, pack(value), cookieOptions(JOIN_MS / 1000))
 }
 
-export function readJoinDraft(nowMs = Date.now()) {
-  const value = unpack<JoinDraft>(cookies().get(JOIN)?.value)
+export async function readJoinDraft(nowMs = Date.now()) {
+  const value = unpack<JoinDraft>((await cookies()).get(JOIN)?.value)
   if (!value?.mobile || !value.exp || value.exp < nowMs) return null
   return value
 }
 
-export function clearJoinDraft() {
-  cookies().set(JOIN, "", cookieOptions(0))
+export async function clearJoinDraft() {
+  ;(await cookies()).set(JOIN, "", cookieOptions(0))
 }
 
-export function writePendingCookie(workerId: string, nowMs: number) {
+export async function writePendingCookie(workerId: string, nowMs: number) {
   const exp = Math.floor(nowMs / 1000) + PENDING_2FA_MS / 1000
   const payload = workerId + "." + exp
-  cookies().set(PENDING, payload + "." + sign(payload), cookieOptions(PENDING_2FA_MS / 1000))
+  ;(await cookies()).set(PENDING, payload + "." + sign(payload), cookieOptions(PENDING_2FA_MS / 1000))
 }
 
-export function clearPendingCookie() {
-  cookies().set(PENDING, "", { httpOnly: true, path: "/", maxAge: 0 })
+export async function clearPendingCookie() {
+  ;(await cookies()).set(PENDING, "", { httpOnly: true, path: "/", maxAge: 0 })
 }
 
-export function readPendingWorkerId(nowMs = Date.now()) {
-  const raw = cookies().get(PENDING)?.value
+export async function readPendingWorkerId(nowMs = Date.now()) {
+  const raw = (await cookies()).get(PENDING)?.value
   if (!raw) return null
   const [workerId, exp, signature] = raw.split(".")
   if (!workerId || !exp || !signature) return null
@@ -139,7 +139,7 @@ export function readPendingWorkerId(nowMs = Date.now()) {
 
 export async function readSession(): Promise<{ session: Session; worker: Worker } | null> {
   const parsed = unpack<{ id: string; workerId: string; role: "worker" | "admin"; expiresAt: string }>(
-    cookies().get(COOKIE)?.value,
+    (await cookies()).get(COOKIE)?.value,
   )
   if (!parsed?.id || !parsed.workerId || !parsed.expiresAt) return null
   if (Date.parse(parsed.expiresAt) < Date.now()) return null

@@ -1,11 +1,11 @@
 # AGENTS.md: standing rules for any coding agent
 
-These rules apply to every coding agent (Cursor, cloud agents or anyone else) working on this repo for MS Workforce. Read them before you start and follow them every time. They were approved by Mav on 23 Oct 2026.
+These rules apply to every coding agent (Cursor, cloud agents or anyone else) working on this repo for MS Workforce. Read them before you start and follow them every time. They were approved by Marek on 23 Oct 2026.
 
 ## 1. Never merge or deploy
 - Never merge a pull request, never push to `main`, never deploy to production.
 - Never change Vercel settings, plans, environment variables, domains or DNS.
-- Keep draft pull requests as drafts. Mav reviews and approves everything before it goes live.
+- Keep draft pull requests as drafts. Marek reviews and approves everything before it goes live.
 
 ## 2. Commit and push as you go
 - Commit and push after every finished item, with a short, clear message.
@@ -33,7 +33,7 @@ These rules apply to every coding agent (Cursor, cloud agents or anyone else) wo
 - The public name is "MS Workforce" only. Never write "Pty Ltd" or any company suffix anywhere.
 
 ## 8. Test for iPhone and Mac
-- Mav uses an iPhone and a Mac. Test every screen in iPhone Safari sizes (360, 390 and 430 px wide) and on Mac Safari/desktop.
+- Marek uses an iPhone and a Mac. Test every screen in iPhone Safari sizes (360, 390 and 430 px wide) and on Mac Safari/desktop.
 - Touch targets at least 44 x 44 px (48 px preferred).
 
 ## 9. Design

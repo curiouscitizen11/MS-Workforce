@@ -1,10 +1,7 @@
 export function portalMode(): "mock" | "live" {
-  const forced = process.env.PORTAL_MODE
-  if (forced === "live") return "live"
-  if (forced === "mock") return "mock"
-  // Preview deploys stay in the demo, even when the project copied live keys across.
-  if (process.env.VERCEL_ENV === "preview") return "mock"
-  if (process.env.DATABASE_URL && process.env.NOTION_TOKEN) return "live"
+  // Live only when this is exactly "live". A blank value, "mock", or any other
+  // word stays in the demo, even if the database and Notion keys are set.
+  if (process.env.PORTAL_MODE === "live") return "live"
   return "mock"
 }
 

@@ -270,6 +270,19 @@ describe("preview starts with no secrets", () => {
     })
   })
 
+  it("stays in demo mode when PORTAL_MODE is blank, even if the database and Notion keys are set", () => {
+    withEnv({ DATABASE_URL: "postgres://example", NOTION_TOKEN: "ntn" }, () => {
+      expect(portalMode()).toBe("mock")
+      expect(() => sessionSecret()).not.toThrow()
+    })
+    withEnv({ PORTAL_MODE: "mock", DATABASE_URL: "postgres://example", NOTION_TOKEN: "ntn" }, () => {
+      expect(portalMode()).toBe("mock")
+    })
+    withEnv({ PORTAL_MODE: "LIVE", DATABASE_URL: "postgres://example", NOTION_TOKEN: "ntn" }, () => {
+      expect(portalMode()).toBe("mock")
+    })
+  })
+
   it("uses demo mode when the database and Notion are not configured", () => {
     withEnv({}, () => {
       expect(portalMode()).toBe("mock")

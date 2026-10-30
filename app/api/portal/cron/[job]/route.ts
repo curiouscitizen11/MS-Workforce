@@ -5,7 +5,8 @@ import { purgeHeadshots } from "@/lib/portal/headshot"
 import { processOutbox, purgeDocuments, runReminders, wipePassports } from "@/lib/portal/services"
 import { getStore } from "@/lib/portal/store"
 
-export async function GET(request: Request, { params }: { params: { job: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ job: string }> }) {
+  const params = await context.params
   if (portalMode() !== "mock") {
     const secret = process.env.CRON_SECRET
     if (!secret || request.headers.get("authorization") !== "Bearer " + secret) {

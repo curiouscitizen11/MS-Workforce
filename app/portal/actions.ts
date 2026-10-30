@@ -67,8 +67,8 @@ async function ctx(): Promise<Ctx> {
   return { store, now: new Date(), mode, notify: createNotify(store, mode) }
 }
 
-function ip() {
-  return headers().get("x-forwarded-for")?.split(",")[0]?.trim() || "local"
+async function ip() {
+  return (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "local"
 }
 
 function refresh() {
@@ -78,7 +78,7 @@ function refresh() {
 
 async function restoreDemoOtp() {
   if (!isMock()) return
-  const saved = readOtpCookie()
+  const saved = await readOtpCookie()
   if (!saved) return
   const store = await getStore()
   if (!(await store.challenges.get(saved.id))) await store.challenges.save(saved)
@@ -91,13 +91,13 @@ async function rememberDemoOtp(mobile: string) {
   const latest = (await (await getStore()).challenges.all())
     .filter((item) => item.target === target)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
-  if (latest) writeOtpCookie(latest)
+  if (latest) await writeOtpCookie(latest)
 }
 
 export async function sendLoginCode(mobile: string) {
-  const result = await requestOtp(await ctx(), { mobile, ip: ip() })
+  const result = await requestOtp(await ctx(), { mobile, ip: await ip() })
   if (result.ok) {
-    writeMobileCookie(mobile)
+    await writeMobileCookie(mobile)
     await rememberDemoOtp(mobile)
   }
   return result
@@ -107,7 +107,7 @@ export async function renewSession() {
   const current = await readSession()
   if (!current || current.worker.role !== "worker") return { ok: true as const }
   const result = await renewWorkerSession(await ctx(), current.session.id)
-  if (result.renewed) writeSessionCookie(result.session)
+  if (result.renewed) await writeSessionCookie(result.session)
   return { ok: true as const }
 }
 
@@ -118,24 +118,24 @@ export async function checkLoginCode(mobile: string, code: string) {
     await rememberDemoOtp(mobile)
     return result
   }
-  clearOtpCookie()
+  await clearOtpCookie()
   if (result.needsTotp) {
-    writePendingCookie(result.workerId, Date.now())
+    await writePendingCookie(result.workerId, Date.now())
     return { ok: true as const, next: "/portal/login/admin" }
   }
-  writeSessionCookie(result.session)
-  clearPendingCookie()
+  await writeSessionCookie(result.session)
+  await clearPendingCookie()
   refresh()
   return { ok: true as const, next: result.session.role === "admin" ? "/portal/admin" : "/portal" }
 }
 
 export async function checkAdminCode(code: string) {
-  const workerId = readPendingWorkerId()
+  const workerId = await readPendingWorkerId()
   if (!workerId) return { ok: false as const, error: "That login expired. Request a new code." }
   const result = await confirmAdminTotp(await ctx(), workerId, code)
   if (!result.ok) return result
-  writeSessionCookie(result.session)
-  clearPendingCookie()
+  await writeSessionCookie(result.session)
+  await clearPendingCookie()
   refresh()
   return { ok: true as const, next: "/portal/admin" }
 }
@@ -150,8 +150,8 @@ export async function logOut() {
     const store = await getStore()
     await store.sessions.remove(current.session.id)
   }
-  clearSessionCookie()
-  clearPendingCookie()
+  await clearSessionCookie()
+  await clearPendingCookie()
   refresh()
   return { ok: true as const }
 }
@@ -164,23 +164,23 @@ export async function makeInviteLink(input: unknown) {
 }
 
 export async function sendBookLabour(input: unknown) {
-  const result = await submitBookLabour(await ctx(), input, ip())
+  const result = await submitBookLabour(await ctx(), input, await ip())
   return result
 }
 
 export async function sendJoinDetails(input: unknown) {
-  const result = await prepareJoin(await ctx(), input, ip())
+  const result = await prepareJoin(await ctx(), input, await ip())
   if (!result.ok) return result
-  writeJoinDraft(result.draft)
-  writeMobileCookie(result.draft.mobile)
+  await writeJoinDraft(result.draft)
+  await writeMobileCookie(result.draft.mobile)
   await rememberDemoOtp(result.draft.mobile)
   return { ok: true as const, devCode: result.devCode }
 }
 
 export async function sendJoinCodeAgain() {
-  const draft = readJoinDraft()
+  const draft = await readJoinDraft()
   if (!draft) return { ok: false as const, error: "Start again. Your details have expired." }
-  const result = await resendJoinCode(await ctx(), draft.mobile, ip())
+  const result = await resendJoinCode(await ctx(), draft.mobile, await ip())
   if (!result.ok) return result
   await rememberDemoOtp(draft.mobile)
   return { ok: true as const, devCode: result.devCode }
@@ -188,17 +188,17 @@ export async function sendJoinCodeAgain() {
 
 export async function checkJoinCode(code: string) {
   await restoreDemoOtp()
-  const draft = readJoinDraft()
+  const draft = await readJoinDraft()
   if (!draft) return { ok: false as const, error: "Start again. Your details have expired." }
   const result = await finishJoin(await ctx(), draft, code)
   if (!result.ok) {
     await rememberDemoOtp(draft.mobile)
     return result
   }
-  clearOtpCookie()
-  clearJoinDraft()
-  writeSessionCookie(result.session)
-  clearPendingCookie()
+  await clearOtpCookie()
+  await clearJoinDraft()
+  await writeSessionCookie(result.session)
+  await clearPendingCookie()
   refresh()
   return { ok: true as const, next: "/portal/onboarding" }
 }
@@ -389,8 +389,8 @@ export async function lodgeTimesheet(input: {
   const result = await submitTimesheet(await ctx(), {
     ...input,
     workerId: current.worker.id,
-    ip: ip(),
-    userAgent: headers().get("user-agent") || "",
+    ip: await ip(),
+    userAgent: (await headers()).get("user-agent") || "",
   })
   if (result.ok) refresh()
   return result

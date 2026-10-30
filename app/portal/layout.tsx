@@ -42,7 +42,7 @@ export const dynamic = "force-dynamic"
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
   const current = await readSession()
   const home = current?.worker.role === "admin" ? "/portal/admin" : "/portal"
-  const theme = themeFromCookie(cookies().get(THEME_COOKIE)?.value)
+  const theme = themeFromCookie((await cookies()).get(THEME_COOKIE)?.value)
   return (
     <div className="portal-root min-h-svh" data-theme={theme}>
       <header className="portal-header">

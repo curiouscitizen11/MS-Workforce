@@ -1,6 +1,14 @@
 {
   "crons": [
     {
+      "path": "/api/portal/cron/outbox",
+      "schedule": "15 7 * * *"
+    },
+    {
+      "path": "/api/portal/cron/reminders",
+      "schedule": "15 21 * * *"
+    },
+    {
       "path": "/api/portal/cron/purge",
       "schedule": "15 16 * * *"
     }

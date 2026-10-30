@@ -3,7 +3,7 @@
 Simple, professional marketing website for MS Workforce – construction labour hire across Sydney.
 
 ## Stack
-- Next.js 15 (App Router)
+- Next.js 16 (App Router)
 - TypeScript
 - Tailwind CSS
 - Deployed free on Vercel
@@ -26,7 +26,7 @@ Open [http://localhost:3000](http://localhost:3000).
 1. Push this folder to a GitHub repository (or import directly).
 2. Go to vercel.com → New Project → Import the repo.
 3. Deploy. You get a free `.vercel.app` URL immediately.
-4. After company registration, point `msworkforce.com.au` DNS to Vercel.
+4. The live site is already at [www.msworkforce.au](https://www.msworkforce.au). Do not change DNS.
 
 ## Pages
 - `/` – Home
