@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { applyForWork } from "@/app/portal/actions"
+import { TicketCard } from "@/components/portal/TicketCard"
 import { TicketChoices } from "@/components/portal/TicketChoices"
 import { Field, TickIcon, fieldClass } from "@/components/portal/ui"
 import { emailError, emailProblem } from "@/lib/portal/email"
@@ -145,23 +146,28 @@ export function ApplyForm() {
         </>
       ) : null}
       {step === 2 ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {ticketFields.map(([key, label]) => (
-            <TicketChoices
-              key={key}
-              name={key}
-              label={label}
-              value={tickets[key] || "No"}
-              course={key === "whiteCard"}
-              onChange={(choice) => setTickets({ ...tickets, [key]: choice })}
-            />
+            <TicketCard key={key} type={key} label={label}>
+              <TicketChoices
+                name={key}
+                label={label}
+                hideLegend
+                value={tickets[key] || "No"}
+                course={key === "whiteCard"}
+                onChange={(choice) => setTickets({ ...tickets, [key]: choice })}
+              />
+            </TicketCard>
           ))}
-          <TicketChoices
-            name="driverLicence"
-            label="Driver licence"
-            value={tickets.driverLicence || "No"}
-            onChange={(choice) => setTickets({ ...tickets, driverLicence: choice })}
-          />
+          <TicketCard type="driverLicence" label="Driver licence">
+            <TicketChoices
+              name="driverLicence"
+              label="Driver licence"
+              hideLegend
+              value={tickets.driverLicence || "No"}
+              onChange={(choice) => setTickets({ ...tickets, driverLicence: choice })}
+            />
+          </TicketCard>
         </div>
       ) : null}
       {step === 3 ? (
