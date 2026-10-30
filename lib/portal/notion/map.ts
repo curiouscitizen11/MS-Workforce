@@ -269,9 +269,9 @@ export function timesheetNotionProperties(sheet: Timesheet): Record<string, unkn
 
 type FieldType = "title" | "text" | "phone" | "email" | "select" | "multi" | "date" | "checkbox" | "number"
 
-const TITLE_FIELDS = new Set(["Name", "Offer", "Entry"])
+const TITLE_FIELDS = new Set(["Name", "Offer", "Entry", "Placement"])
 const PHONE_FIELDS = new Set(["Mobile", "Emergency phone", "Site phone"])
-const EMAIL_FIELDS = new Set(["Email", "Supervisor email"])
+const EMAIL_FIELDS = new Set(["Email", "Supervisor email", "Site email"])
 const SELECT_FIELDS = new Set([
   "Status",
   "RTW evidence",
@@ -293,6 +293,8 @@ const SELECT_FIELDS = new Set([
   "Source",
   "Experience level",
   "VEVO method",
+  "Request source",
+  "Heard about us",
 ])
 const DATE_FIELDS = new Set([
   "Date of birth",
@@ -327,8 +329,10 @@ const DATE_FIELDS = new Set([
   "Visa expiry",
   "Available from",
   "ID sighted on",
+  "Start",
+  "End",
 ])
-const NUMBER_FIELDS = new Set(["Induction score", "Expected hours", "Total hours"])
+const NUMBER_FIELDS = new Set(["Induction score", "Expected hours", "Total hours", "Workers needed"])
 
 export function toNotionProperties(flat: Record<string, unknown>) {
   const out: Record<string, unknown> = {}

@@ -49,7 +49,8 @@ import { MS_PHONE, fortnightContaining, olderThanDays, payFortnight, timesheetRe
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
 import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
-import { offerNotionProperties, timesheetNotionProperties, toNotionProperties, workerNotionProperties, writeNotionProperties } from "@/lib/portal/notion/map"
+import { BOOK_IP_MAX, BOOK_IP_WINDOW_MS, bookAlertBody, checkBookLabour, placementProperties } from "@/lib/portal/book-labour"
+import { assertNotionPayloadSafe, offerNotionProperties, timesheetNotionProperties, toNotionProperties, workerNotionProperties, writeNotionProperties } from "@/lib/portal/notion/map"
 import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
 import { acceptedHeldLabel } from "@/lib/portal/ticket-catalogue"
@@ -1881,7 +1882,31 @@ function databaseId(kind: string) {
   if (kind === "shiftOffers") return process.env.NOTION_SHIFT_OFFERS_DB
   if (kind === "timesheets") return process.env.NOTION_TIMESHEETS_DB
   if (kind === "induction") return process.env.NOTION_INDUCTION_DB
+  if (kind === "placements") return process.env.NOTION_PLACEMENTS_DB
   return undefined
+}
+
+export async function submitBookLabour(ctx: Ctx, input: unknown, ip: string) {
+  const checked = checkBookLabour(input, ctx.now.getTime())
+  if (!checked.ok) return checked
+  if ("ignored" in checked) return { ok: true as const, ignored: true as const }
+  const recent = (await ctx.store.outbox.all()).filter(
+    (item) => item.kind === "placements" && item.payload.ip === ip && within(item.createdAt, ctx.now, BOOK_IP_WINDOW_MS),
+  )
+  if (recent.length >= BOOK_IP_MAX) return fail("Too many requests from this connection. Try again later.", "rate")
+  const properties = placementProperties(checked.value)
+  try {
+    assertNotionPayloadSafe(properties)
+  } catch {
+    return fail("Check the form and try again.")
+  }
+  await enqueue(ctx, "placements", { properties, ip })
+  try {
+    await alertMav(ctx, "New Book labour: " + checked.value.company + " – " + checked.value.suburb, bookAlertBody(checked.value))
+  } catch {
+    // The request is already saved. A missing email setup must not hide that from the builder.
+  }
+  return { ok: true as const }
 }
 
 export function complianceFor(worker: Worker, checkDate: string) {

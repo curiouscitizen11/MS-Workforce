@@ -7,6 +7,7 @@ describe("portal chrome", () => {
     expect(hidePortalChrome("/portal/join")).toBe(true)
     expect(hidePortalChrome("/portal/login")).toBe(true)
     expect(hidePortalChrome("/portal/login/admin")).toBe(true)
+    expect(hidePortalChrome("/portal/book-labour")).toBe(true)
     expect(hidePortalChrome("/portal")).toBe(false)
     expect(hidePortalChrome("/portal/tickets")).toBe(false)
     expect(hidePortalChrome("/portal/me")).toBe(false)

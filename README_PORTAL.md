@@ -94,6 +94,8 @@ The Workers database has a text field called **Site inductions**. When a worker 
 
 Passport numbers and ticket photos never go to Notion. Visa and VEVO notes stay in the admin screen only.
 
+Book labour requests (`/portal/book-labour`) add a new row in the Placements database (`NOTION_PLACEMENTS_DB`). They do not update an old row. The columns must already be named Placement, Client, Site contact, Site phone, Site email, Site address, Site suburb, Roles requested, Labour request details, Workers needed, Start, Open ended, End, Shift, Heard about us, Status and Request source. Status is saved as Enquiry. Request source is saved as Website form. Heard about us uses Google, Referral / word of mouth, LinkedIn, Facebook / Instagram, Saw a worker or ute on site, or Other. The portal does not create these columns. If a column name is missing, that answer is skipped and the rest still saves. If a dropdown choice is missing, the whole row waits and tries again.
+
 **Shift offers** is a new database. It does not exist yet. The plan is in `lib/portal/notion/shift-offers.mjs`. To print that plan without changing Notion:
 
 ```bash

@@ -28,6 +28,7 @@ import {
   saveTicketAnswers,
   saveTicketPhoto,
   submitApplication,
+  submitBookLabour,
   submitInduction,
   saveSiteInduction,
   approveTimesheetForPay,
@@ -160,6 +161,11 @@ export async function makeInviteLink(input: unknown) {
   const result = await makeWorkerInvite(await ctx(), input)
   if (!result.ok) return result
   return { ok: true as const, url: siteOrigin() + result.path }
+}
+
+export async function sendBookLabour(input: unknown) {
+  const result = await submitBookLabour(await ctx(), input, ip())
+  return result
 }
 
 export async function sendJoinDetails(input: unknown) {
