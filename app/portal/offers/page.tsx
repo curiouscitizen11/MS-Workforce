@@ -136,13 +136,13 @@ export default async function OffersPage({ searchParams }: { searchParams: { mon
                         Open timesheet
                       </Link>
                     </p>
-                  ) : (
+                  ) : entry.offer.status === "Accepted" ? (
                     <p className="mt-1">
                       <Link href="/portal/timesheet" className="font-semibold text-teal-600 underline">
                         Log hours
                       </Link>
                     </p>
-                  )}
+                  ) : null}
                 </li>
               )
             })}

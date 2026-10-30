@@ -135,8 +135,8 @@ Flagged: describes the older flat Home; not current. Marek to decide.
 ## 13. Empty, loading and error states
 - **Empty**: a 32px line icon in `--text-faint`, a 16px `--text` line ("No shifts yet"), and a 13px muted next step. Centred, 48px top padding, no illustrations.
 - **Loading**: thin rows (62px) with a `--line` placeholder bar, or the text "Loading…". No spinners in bubbles, and no shimmer under reduced motion.
-- **Error banner**: 1px `--error` border, radius 6px, transparent background, padding 12px 16px, 13px text: what went wrong plus one action ("Couldn't save. Check your signal and try again."). Use `role="alert"`.
-- **Success**: a 1px `--accent` line banner, same style as the error banner. It fades after 4s, or stays if it holds a link.
+- **Error banner**: 1px `--error` border, radius about 16px (same as the cards), transparent background, padding 12px 16px, 13px text: what went wrong plus one action ("Couldn't save. Check your signal and try again."). Use `role="alert"`.
+- **Success**: a 1px `--accent` line banner, same style as the error banner, including the 16px corners. It fades after 4s, or stays if it holds a link.
 - Never show raw error codes or stack traces to workers.
 
 ## 14. Contrast and accessibility
