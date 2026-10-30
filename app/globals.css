@@ -7,19 +7,19 @@
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
   scroll-behavior: smooth;
-  background: #0a2540;
+  background: #0b1a2e;
 }
 
 body {
-  @apply text-navy antialiased;
-  background-color: #eef3f7;
+  @apply text-white antialiased;
+  background-color: #0b1a2e;
 }
 
 ::selection {
-  background: #0a2540;
-  color: #ffffff;
+  background: #2ec4b6;
+  color: #0b1a2e;
 }
 
 @media (max-width: 767px) {
@@ -28,17 +28,27 @@ body {
   }
 }
 
-body:has(.portal-root) .site-chrome-header,
-body:has(.portal-root) .site-chrome-footer,
-body:has(.portal-root) .site-chrome-sticky {
-  display: none;
+.sticky-cta {
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 250ms ease-out, opacity 250ms ease-out, visibility 0s linear 250ms;
+  will-change: transform;
 }
-
-body:has(.portal-root) .site-chrome-main {
-  padding-top: 0;
+.sticky-cta[data-shown="true"] {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: transform 250ms ease-out, opacity 250ms ease-out, visibility 0s;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .sticky-cta,
+  .sticky-cta[data-shown="true"] {
+    transition: none;
+  }
   html {
     scroll-behavior: auto;
   }
@@ -55,26 +65,26 @@ body:has(.portal-root) .site-chrome-main {
     @apply text-[11px] font-medium uppercase tracking-[0.22em];
   }
   .display {
-    @apply max-w-5xl text-balance text-[2.1rem] font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl xl:text-[4.75rem];
+    @apply max-w-5xl text-balance text-[2.25rem] font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-[4.75rem];
   }
   .lede {
-    @apply max-w-xl text-lg leading-relaxed sm:text-xl;
+    @apply max-w-xl text-lg leading-relaxed text-body sm:text-xl;
   }
+  /* Buttons: fully round pills, 48px tall, 16px/600, flat, no lift or shadow (colours from the worker portal) */
   .pill {
-    @apply inline-flex min-h-12 items-center justify-center rounded-full border-2 border-transparent px-6 py-3 text-[15px] font-semibold leading-tight transition duration-200 ease-out hover:-translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-300;
+    @apply inline-flex min-h-12 items-center justify-center rounded-full border border-transparent px-6 py-3 text-base font-semibold leading-tight transition-colors duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400;
     -webkit-tap-highlight-color: transparent;
   }
-  /* Primary: solid teal, navy text (contrast ~6.9:1) */
+  /* Primary: portal accent #2ec4b6 fill, navy text (about 8:1) */
   .pill-teal {
-    @apply border-teal-400 bg-teal-400 text-navy shadow-sm hover:border-teal-300 hover:bg-teal-300;
+    @apply border-teal-400 bg-teal-400 text-navy hover:border-teal-300 hover:bg-teal-300;
   }
-  /* Secondary solid: white with navy text (~15.8:1) */
+  /* Secondary on navy (portal): transparent, 1px #5d728c border, light text */
   .pill-light {
-    @apply border-white bg-white text-navy hover:bg-navy-50;
+    @apply border-[#5d728c] bg-transparent text-[#e8edf3] hover:bg-white/[0.04];
   }
-  /* Secondary on navy: 2px white border, white text */
   .pill-line {
-    @apply border-white bg-transparent text-white hover:bg-white hover:text-navy;
+    @apply border-[#5d728c] bg-transparent text-[#e8edf3] hover:bg-white/[0.04];
   }
   /* On light backgrounds */
   .pill-dark {
@@ -83,8 +93,22 @@ body:has(.portal-root) .site-chrome-main {
   .pill-line-dark {
     @apply border-navy bg-transparent text-navy hover:bg-navy hover:text-white;
   }
+  /* Quiet secondary action: underlined text link with a 44px tap area */
+  .link-quiet {
+    @apply inline-flex min-h-11 items-center justify-center px-2 text-[15px] font-medium underline underline-offset-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400;
+  }
+  .link-quiet-light {
+    @apply text-teal-400 decoration-teal-400/40 hover:text-teal-300;
+  }
+  /* Numbered card: teal number badge on the left, content on the right */
+  .num-card {
+    @apply flex items-start gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-6 sm:p-7;
+  }
+  .num-badge {
+    @apply inline-flex h-10 w-10 flex-none items-center justify-center rounded-full bg-teal text-base font-bold leading-none text-navy;
+  }
   .stack-row {
-    @apply grid gap-3 py-8 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:py-10;
+    @apply grid gap-3 rounded-2xl border border-navy-line bg-navy-card p-5 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:p-7;
   }
 }
 
@@ -128,55 +152,43 @@ main .page-enter > section:first-of-type img {
 }
 .reveal.is-in { opacity: 1; transform: none; }
 
-/* Hover polish */
-.pill {
-  transition: transform 200ms var(--ease-apple), box-shadow 200ms var(--ease-apple),
-    background-color 200ms var(--ease-apple), color 200ms var(--ease-apple),
-    border-color 200ms var(--ease-apple);
-}
-main li.rounded-3xl, main .rounded-3xl > li, main .rounded-2xl {
-  transition: transform 200ms var(--ease-apple), box-shadow 200ms var(--ease-apple);
-}
-@media (hover: hover) {
-  .pill:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -10px rgba(10, 37, 64, 0.45); }
-  .pill:active { transform: translateY(0); }
-  main li.rounded-3xl:hover, main .rounded-2xl:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 30px -18px rgba(10, 37, 64, 0.35);
-  }
-}
-
+/* Hover polish: flat, no movement or shadow (portal rule) */
 @media (prefers-reduced-motion: reduce) {
   .page-enter,
   main .page-enter > section:first-of-type .wrap > *,
   main .page-enter > section:first-of-type img { animation: none !important; }
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .pill:hover, main li.rounded-3xl:hover, main .rounded-2xl:hover { transform: none !important; }
 }
 
-/* ---- Brand backgrounds (soft tint + navy bands) ---- */
-.bg-tint {
-  background-color: #eef3f7;
-  background-image: linear-gradient(180deg, #f3f7fa 0%, #eaf1f5 100%);
-}
-main section.bg-navy {
+/* ---- Brand backgrounds: deep navy family (option A) ----
+   base #0b1a2e (bg-navy), alternate #0e2240 (bg-navy-alt), cards #152d4a (bg-navy-card),
+   lines #22354f (border-navy-line), body text #c9d4e0 (text-body), accent #2ec4b6. */
+main section {
   position: relative;
   isolation: isolate;
-  background-image: radial-gradient(120% 60% at 50% 0%, rgba(13, 148, 136, 0.16) 0%, rgba(13, 148, 136, 0) 60%);
 }
-/* thin teal divider at the top of each navy band */
-main section.bg-navy::before {
+/* thin teal rule at the top of every section after the first on a page */
+body:not(:has(.portal-root)) main section::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
-  height: 3px;
-  background: linear-gradient(90deg, rgba(51, 191, 175, 0) 0%, #33bfaf 20%, #33bfaf 80%, rgba(51, 191, 175, 0) 100%);
-  opacity: 0.7;
+  height: 1px;
+  background: rgba(46, 196, 182, 0.28);
   pointer-events: none;
   z-index: -1;
 }
-main .page-enter > section.bg-navy:first-of-type::before { display: none; }
-/* Cards lift off the tint */
+body:not(:has(.portal-root)) main .page-enter > section:first-of-type::before { display: none; }
+
+body:has(.portal-root) .site-chrome-header,
+body:has(.portal-root) .site-chrome-footer,
+body:has(.portal-root) .site-chrome-sticky {
+  display: none;
+}
+
+body:has(.portal-root) .site-chrome-main {
+  padding-top: 0;
+}
+
 /* Portal themes. Public pages do not use .portal-root. Hex values match lib/portal/theme.ts. */
 .portal-root {
   background: #0b1a2e;
@@ -1015,11 +1027,4 @@ a.portal-list-row {
 }
 @media (prefers-reduced-motion: reduce) {
   .portal-menu-panel { animation: none; }
-}
-
-main section.bg-tint .rounded-3xl.bg-white,
-main section.bg-tint .rounded-2xl.bg-white,
-main section.bg-tint li.bg-white {
-  border-color: rgba(10, 37, 64, 0.08);
-  box-shadow: 0 1px 2px rgba(10, 37, 64, 0.04), 0 8px 24px -16px rgba(10, 37, 64, 0.22);
 }

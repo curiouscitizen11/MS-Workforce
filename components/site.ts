@@ -16,9 +16,8 @@ const requestBody = [
   "Role(s) and number of workers:",
   "Expected duration (day, week, ongoing):",
   "Site contact name and phone:",
+  "PPE and site requirements:",
   "Parking or access notes:",
-  "",
-  "MS Workforce workers arrive with their own basic PPE: hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses.",
   "",
   "Thanks,",
 ].join("\n");
@@ -49,3 +48,16 @@ export const OG_BASE = {
     },
   ],
 };
+
+/** Open Graph and Twitter/X tags for one page, so a shared link shows that page's own title and description. */
+export function socialMeta(path: string, title: string, description: string) {
+  return {
+    openGraph: { ...OG_BASE, title, description, url: path },
+    twitter: {
+      card: "summary_large_image" as const,
+      title,
+      description,
+      images: ["/opengraph-image"],
+    },
+  };
+}

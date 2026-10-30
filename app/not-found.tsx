@@ -3,18 +3,16 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Page not found",
-  description: "The page you were after has moved or never existed.",
   robots: { index: false, follow: true },
-  alternates: { canonical: null },
 };
 
 export default function NotFound() {
   return (
-    <section className="flex screen items-center bg-navy text-white">
-      <div className="wrap py-24 sm:py-28">
-        <p className="kicker text-white/65">404</p>
-        <h1 className="display mt-6">This page isn&apos;t on site.</h1>
-        <p className="lede mt-8 text-white/75">
+    <section className="bg-navy text-white">
+      <div className="wrap py-14 sm:py-20 lg:py-24">
+        <p className="kicker text-teal">404</p>
+        <h1 className="display mt-4">This page isn&apos;t on site.</h1>
+        <p className="lede mt-5 text-body">
           The page you were after has moved or never existed. Try one of these
           instead.
         </p>
@@ -26,7 +24,7 @@ export default function NotFound() {
             For builders
           </Link>
           <Link href="/candidates" className="pill pill-line w-full sm:w-auto">
-            Find work
+            Apply for work
           </Link>
         </div>
       </div>

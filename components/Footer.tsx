@@ -1,106 +1,55 @@
 import Link from "next/link";
-import {
-  BOOK_LABOUR_URL,
-  EMAIL,
-  EMAIL_HREF,
-  JOBS_EMAIL,
-  JOBS_EMAIL_HREF,
-  REQUEST_LABOUR_HREF,
-} from "@/components/site";
 
 const links = [
   { name: "Services", href: "/services" },
+  { name: "Site cleans", href: "/site-cleans-demolition-support" },
+  { name: "Greater Sydney", href: "/labour-hire-greater-sydney" },
   { name: "Builders", href: "/clients" },
-  { name: "Find work", href: "/candidates" },
+  { name: "Apply for work", href: "/candidates" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
   { name: "Privacy", href: "/privacy" },
 ];
 
-const linkClass = "transition-colors hover:text-white";
-
 export default function Footer() {
   return (
     <footer className="relative z-0 bg-navy text-white">
-      <div className="wrap py-16 sm:py-20">
-        <div className="grid gap-12 md:grid-cols-12">
+      <div className="wrap pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-10 md:pb-10">
+        <div className="grid gap-6 md:grid-cols-12 md:items-start">
           <div className="md:col-span-4">
             <div className="leading-none">
               <div className="text-lg font-semibold tracking-tight">
-                MS <span className="text-teal">|</span> WORKFORCE
+                MS <span className="text-teal-400">|</span> WORKFORCE
               </div>
               <div className="mt-1 text-[10px] font-medium tracking-[0.2em] text-white/60">
                 LABOUR HIRE
               </div>
             </div>
-            <p className="mt-6 max-w-xs text-sm leading-relaxed text-white/65">
-              Construction labour hire for builders across Greater Sydney.
-              Based on the Northern Beaches.
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/65">
+              Construction labour hire for builders across Sydney.
             </p>
           </div>
 
-          <div className="md:col-span-2">
-            <h2 className="kicker text-white/65">Pages</h2>
-            <ul className="mt-5 space-y-3 text-sm text-white/80">
+          <nav aria-label="Footer" className="md:col-span-8">
+            <h2 className="sr-only">Pages</h2>
+            <ul className="grid grid-cols-2 gap-x-4 text-sm text-white/65 md:grid-cols-4">
               {links.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className={linkClass}>
+                  <Link
+                    href={item.href}
+                    className="flex min-h-11 items-center transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
+                  >
                     {item.name}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div className="md:col-span-3">
-            <h2 className="kicker text-white/65">Builders</h2>
-            <ul className="mt-5 space-y-3 text-sm text-white/80">
-              <li>
-                <a href={EMAIL_HREF} className="break-all text-teal-300 transition-colors hover:text-white">
-                  {EMAIL}
-                </a>
-              </li>
-              <li>
-                <a href={BOOK_LABOUR_URL} target="_blank" rel="noopener noreferrer" className={linkClass}>
-                  Book labour form<span className="sr-only"> (opens in a new tab)</span>
-                </a>
-              </li>
-              <li>
-                <a href={REQUEST_LABOUR_HREF} className={linkClass}>
-                  Email the brief
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="md:col-span-3">
-            <h2 className="kicker text-white/65">Workers</h2>
-            <ul className="mt-5 space-y-3 text-sm text-white/80">
-              <li>
-                <a href={JOBS_EMAIL_HREF} className="break-all text-teal-300 transition-colors hover:text-white">
-                  {JOBS_EMAIL}
-                </a>
-              </li>
-              <li>
-                <Link href="/candidates#register" className={linkClass}>
-                  Register for work
-                </Link>
-              </li>
-              <li>
-                <Link href="/candidates#tickets" className={linkClass}>
-                  Get your tickets
-                </Link>
-              </li>
-            </ul>
-          </div>
+          </nav>
         </div>
 
-        <div className="mt-16 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/70 sm:flex-row sm:justify-between">
-          <span>
-            © {new Date().getFullYear()} MS Workforce. All rights reserved. ·{" "}
-            <Link href="/privacy" className={linkClass}>Privacy</Link>
-          </span>
-          <span>Supplying construction sites across Greater Sydney, NSW.</span>
+        <div className="mt-6 space-y-1 border-t border-[#22354f] pt-5 text-xs text-white/60 md:flex md:justify-between md:space-y-0">
+          <p>© {new Date().getFullYear()} MS Workforce</p>
+          <p>Supplying construction sites across Greater Sydney, NSW.</p>
         </div>
       </div>
     </footer>

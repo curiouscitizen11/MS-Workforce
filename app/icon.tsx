@@ -17,11 +17,11 @@ export default function Icon() {
           color: "#ffffff",
           fontSize: 30,
           fontWeight: 700,
-          borderRadius: 8,
+          borderRadius: 14,
           letterSpacing: -1,
         }}
       >
-        M<span style={{ color: "#2ec4b6" }}>S</span>
+        M<span style={{ color: "#2DD4BF" }}>S</span>
       </div>
     ),
     size

@@ -9,7 +9,7 @@ import StickyCta from "@/components/StickyCta";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const description =
-  "Construction labour hire across Greater Sydney. MS Workforce supplies general labourers, trade assistants and site support crews to builders, from day labour and short-notice cover to ongoing, project-based supply. Based on the Northern Beaches.";
+  "Construction labour hire for Greater Sydney builders. General labourers, trade assistants and site cleans, from one day to a whole project.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -21,7 +21,6 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   keywords: [
     "construction labour hire Sydney",
-    "labour hire Northern Beaches",
     "general labourers Sydney",
     "trade assistants Sydney",
     "site cleans",
@@ -29,6 +28,7 @@ export const metadata: Metadata = {
     "builders labour hire",
     "Greater Sydney labour hire",
   ],
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_AU",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0A2540",
+  themeColor: "#0b1a2e",
 };
 
 const organisation = {
@@ -61,13 +61,21 @@ const organisation = {
   description,
   logo: SITE_URL + "/icon",
   image: SITE_URL + "/opengraph-image",
-  areaServed: [
-    { "@type": "Place", name: "Northern Beaches, Sydney NSW" },
-    { "@type": "City", name: "Sydney" },
-  ],
+  areaServed: [{ "@type": "AdministrativeArea", name: "Greater Sydney, New South Wales, Australia" }],
+  knowsAbout: ["Construction labour hire"],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Construction labour hire",
+    itemListElement: [
+      "General labourers",
+      "Trade assistants",
+      "Site cleans and site support",
+      "Materials handling",
+    ].map((name) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name } })),
+  },
   contactPoint: [
-    { "@type": "ContactPoint", contactType: "sales", email: EMAIL, areaServed: "AU", availableLanguage: "en-AU" },
-    { "@type": "ContactPoint", contactType: "recruitment", email: JOBS_EMAIL, areaServed: "AU", availableLanguage: "en-AU" },
+    { "@type": "ContactPoint", contactType: "sales", email: EMAIL, areaServed: "Greater Sydney", availableLanguage: "en-AU" },
+    { "@type": "ContactPoint", contactType: "recruitment", email: JOBS_EMAIL, areaServed: "Greater Sydney", availableLanguage: "en-AU" },
   ],
 };
 
@@ -78,7 +86,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-AU">
-      <body className={inter.className + " bg-tint text-navy antialiased"}>
+      <body className={inter.className + " bg-navy text-white antialiased"}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}

@@ -1,6 +1,6 @@
 # MS Workforce Website
 
-Simple, professional marketing website for MS Workforce – construction labour hire based on Sydney’s Northern Beaches.
+Simple, professional marketing website for MS Workforce – construction labour hire across Sydney.
 
 ## Stack
 - Next.js 15 (App Router)
@@ -40,3 +40,7 @@ Open [http://localhost:3000](http://localhost:3000).
 - Logo is currently text-based in the header for simplicity. You can replace it with the geometric logo image later.
 - Contact form is currently a simple email prompt (can be upgraded with Formspree, Resend, or similar once ready).
 - All content is realistic for a new labour hire company focused on construction, safety and straightforward service.
+
+## Photos and phone number (hidden until filled in)
+- **Photos:** put the image files in `public/photos/` (create the folder), then add one entry per photo to the `photos` list in `data/photos.ts` (`src: "/photos/name.jpg"`, plus a required `alt` description). With the list empty, no photo section shows. Photos appear on the home page, between "Where we work" and the two final buttons.
+- **Phone / WhatsApp:** set `PHONE` and `WHATSAPP` in `data/contact.ts`. While empty, no button shows. When set, the buttons appear on the Contact page, under Book labour. Both are empty today.
