@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { applyForWork } from "@/app/portal/actions"
 import { TicketChoices } from "@/components/portal/TicketChoices"
-import { Field, fieldClass } from "@/components/portal/ui"
+import { Field, TickIcon, fieldClass } from "@/components/portal/ui"
 import { emailError, emailProblem } from "@/lib/portal/email"
 import { toE164 } from "@/lib/portal/phone"
 import { ROLES } from "@/lib/portal/types"
@@ -128,9 +128,10 @@ export function ApplyForm() {
                     key={role}
                     type="button"
                     aria-pressed={on}
-                    className={"min-h-12 rounded-full border px-4 text-sm font-semibold " + (on ? "border-navy bg-navy text-white" : "border-navy/20 bg-white")}
+                    className={"portal-role" + (on ? " portal-role-on" : "")}
                     onClick={() => setRoles(on ? roles.filter((item) => item !== role) : [...roles, role])}
                   >
+                    {on ? <TickIcon /> : null}
                     {role}
                   </button>
                 )

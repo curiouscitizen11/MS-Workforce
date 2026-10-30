@@ -813,6 +813,36 @@ a.portal-list-row {
   outline: 2px solid #2ec4b6;
   outline-offset: 2px;
 }
+.portal-role {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  border: 1px solid #5d728c;
+  background: transparent;
+  color: #e8edf3;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+}
+.portal-root[data-theme="light"] .portal-role {
+  color: var(--p-text);
+}
+.portal-role-on,
+.portal-root[data-theme="light"] .portal-role-on {
+  background: #2ec4b6;
+  border-color: #2ec4b6;
+  color: #0b1a2e;
+}
+.portal-role:focus-visible {
+  outline: 2px solid #2ec4b6;
+  outline-offset: 2px;
+}
 .portal-menu-chev {
   margin-left: auto;
   color: var(--p-muted, #5d728c);
