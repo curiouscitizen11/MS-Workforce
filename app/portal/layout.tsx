@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from "next"
 import Link from "next/link"
 import { cookies } from "next/headers"
 import { AddHomeHint } from "@/components/portal/AddHomeHint"
-import { PortalNav } from "@/components/portal/Nav"
-import { SideMenu } from "@/components/portal/SideMenu"
+import { PortalBottomNav, PortalHeaderSlot } from "@/components/portal/PortalChrome"
 import { readSession } from "@/lib/portal/session"
 import { THEME_COOKIE, themeFromCookie } from "@/lib/portal/theme"
 
@@ -48,7 +47,7 @@ export default async function PortalLayout({ children }: { children: React.React
     <div className="portal-root min-h-svh" data-theme={theme}>
       <header className="portal-header">
         <div className="portal-header-inner">
-          {current ? <SideMenu name={current.worker.name} role={current.worker.role} /> : <span className="portal-header-side" />}
+          {current ? <PortalHeaderSlot name={current.worker.name} role={current.worker.role} /> : <span className="portal-header-side" />}
           <Link href={current ? home : "/portal/login"} className="portal-wordmark">
             MS <span>WORKFORCE</span>
           </Link>
@@ -63,7 +62,7 @@ export default async function PortalLayout({ children }: { children: React.React
         <AddHomeHint />
         {children}
       </div>
-      {current ? <PortalNav role={current.worker.role} /> : null}
+      {current ? <PortalBottomNav role={current.worker.role} /> : null}
     </div>
   )
 }

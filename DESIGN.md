@@ -84,6 +84,7 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 - Worker rows are the extras only, in this order: Tickets & training, Inductions, Safety info, Preferences, Help / contact MS Workforce, Log out. Home, Shifts, Hours and Me stay on the bottom bar, so they are not in the ☰.
 - Admin rows keep their current entries (Home, Shifts, Hours, Me, Preferences, Log out) and use the same tile look.
 - The current page has a light teal fill (about 16% teal), bold text, and `aria-current="page"`.
+- Apply, Log in and Admin log in do not show the ☰ or the bottom bar, whether or not someone is signed in. The wordmark stays. Logged-out pages keep the Website link.
 - Behaviour: opens on tap or Enter. Closes on the overlay, Esc, Close/☰ or after choosing a link. Focus moves into the panel and is trapped there, then returns to ☰ on close. Body scroll locks while it's open. Slide is 200ms ease-out, and there's no animation under `prefers-reduced-motion`.
 
 ## 8. Home: status strip
@@ -155,7 +156,7 @@ Flagged: describes the older flat Home; not current. Marek to decide.
 | Thin 1.3px stroke SVG icons | Filled, two-tone, emoji or icon-font icons |
 | Teal for the primary button, a selected state, the wordmark and the focus ring | Blue selected states, teal body text, or more than one main button |
 | Counts as plain teal numbers | Red dots or count badges in circles |
-| ☰ top-left on every portal screen | A bottom tab bar or floating action buttons |
+| ☰ top-left on signed-in screens, except Apply, Log in and Admin log in | A bottom tab bar or floating action buttons |
 | White, thick signature ink | Dark ink on the navy pad |
 | Test at 360, 390 and 430px and on Mac | Hover-only actions or tiny tap targets |
 | Use demo data ("Jordan Example") | Real names, numbers or photos |
