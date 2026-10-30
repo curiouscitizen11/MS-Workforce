@@ -10,6 +10,7 @@ import { HealthQuestions } from "@/components/portal/HealthQuestions"
 import { TicketBook } from "@/components/portal/TicketBook"
 import { fieldClass } from "@/components/portal/ui"
 import { FITNESS_DECLARATION } from "@/lib/portal/fitness"
+import { firstIncompleteOnboardingStep } from "@/lib/portal/onboarding-step"
 import { healthFromWorker, healthRecord } from "@/lib/portal/health"
 import {
   EMERGENCY_RELATIONSHIPS,
@@ -28,7 +29,7 @@ import type { PhotoRef } from "@/lib/portal/ticket-photos"
 
 export function OnboardingForm({ worker, photos, today }: { worker: Worker; photos: PhotoRef[]; today: string }) {
   const router = useRouter()
-  const [step, setStep] = useState(worker.onboardingSubmitted ? 6 : 0)
+  const [step, setStep] = useState(() => firstIncompleteOnboardingStep(worker))
   const [error, setError] = useState("")
   const [pending, start] = useTransition()
   const [signature, setSignature] = useState<string | null>(worker.signaturePng || null)
