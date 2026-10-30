@@ -117,7 +117,7 @@ export function LoginForm({
             onChange={(event) => setCode(event.target.value)}
           />
           {devCode ? (
-            <span className="mt-2 block rounded-xl bg-teal-50 px-3 py-2 text-sm font-semibold text-navy">
+            <span className="portal-banner mt-2 block text-sm">
               Demo code {devCode}
             </span>
           ) : (
@@ -229,7 +229,7 @@ export function AdminCodeForm({ devCode }: { devCode?: string }) {
           onChange={(event) => setCode(event.target.value)}
         />
       </label>
-      {devCode ? <p className="rounded-xl bg-teal-50 px-3 py-2 text-sm font-semibold">Demo code {devCode}</p> : null}
+      {devCode ? <p className="portal-banner text-sm">Demo code {devCode}</p> : null}
       {error ? (
         <p role="alert" className="text-sm font-semibold text-[#B91C1C]">
           {error}

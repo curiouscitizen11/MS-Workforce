@@ -162,7 +162,7 @@ export function VerifyPanel({
           Show passport once
         </button>
       ) : null}
-      {passport ? <p className="rounded-xl bg-navy px-3 py-2 text-sm font-semibold text-white">{passport}</p> : null}
+      {passport ? <p className="portal-banner text-sm">{passport}</p> : null}
       <button type="button" className="pill pill-line-dark w-full" onClick={() => start(async () => { await removeImages(workerId); router.refresh() })}>
         Delete images now
       </button>

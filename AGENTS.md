@@ -37,10 +37,11 @@ These rules apply to every coding agent (Cursor, cloud agents or anyone else) wo
 - Touch targets at least 44 x 44 px (48 px preferred).
 
 ## 9. Design
-- Follow `DESIGN.md` once it exists (the design guide is pending Mav's pick of a mockup).
-- Until then, follow Mav's design preference:
-  - Simple, clean lines.
-  - No rounded "bubble" tiles, no pill-shaped buttons, no shadows.
+- Follow `DESIGN.md`.
+- Approved 25 Oct 2026 by Marek:
+  - Fully round pill buttons, 48px tall (44px minimum). Primary is solid teal `#2ec4b6` with navy text. Secondary has a 1px outline. One main button per screen.
+  - Cards and panels about 16px radius with a subtle border. No heavy glows or gradients.
+  - Navy `#0b1a2e` dark background, lighter navy cards, and teal accents.
+  - Selected states are solid teal with a tick, never blue.
   - A ☰ menu button in the top-left corner.
-  - Dark navy background with teal used sparingly as an accent.
   - Thin line icons (inline SVG).

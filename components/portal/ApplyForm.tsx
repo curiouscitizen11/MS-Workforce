@@ -189,7 +189,7 @@ export function ApplyForm() {
         </p>
       ) : null}
       <button className="pill pill-teal w-full" disabled={pending}>
-        {step === 3 ? (pending ? "Sending" : "Submit application") : "Next"}
+        {step === 3 ? (pending ? "Sending" : "Apply for work") : "Next"}
       </button>
       {step > 0 ? (
         <button type="button" className="min-h-12 w-full text-sm font-semibold text-teal-600" onClick={() => setStep(step - 1)}>

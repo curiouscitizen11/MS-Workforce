@@ -1,11 +1,23 @@
 # DESIGN.md: worker portal design guide
 
-The look for every screen of the MS Workforce worker portal. Coding agents follow this alongside `AGENTS.md`. Mav confirmed the choices on 24 Oct 2026: layout C, "Status strip and list". Source: `Competitor_Research/portal-mockups/mockups.html` and `portal_mockups_ABC.png` (in the Drive files, not in this repo). If this guide and the mockups disagree, this guide wins. If something isn't covered here, keep it plain: thin lines, navy, very little teal.
+> **Approved 25 Oct 2026 by Marek.** These rules replace any line below that disagrees with them.
+>
+> - Fully round pill buttons, 48px tall (44px minimum tap size).
+> - Primary is solid teal `#2ec4b6` with navy text. Secondary has a 1px outline. One main button per screen.
+> - Cards and panels about 16px radius with a subtle border. No heavy glows or gradients.
+> - Navy `#0b1a2e` dark background with lighter navy cards and teal accents.
+> - Selected states are solid teal with a tick, never blue.
+> - Long lists use tappable, searchable pickers.
+> - Compact bottom areas.
+> - Wording "Apply for work" and "Book labour".
+> - A thin teal line between sections is for the website only. Do not add it to the portal.
+
+The look for every screen of the MS Workforce worker portal. Coding agents follow this alongside `AGENTS.md`. Mav confirmed the choices on 24 Oct 2026: layout C, "Status strip and list". Source: `Competitor_Research/portal-mockups/mockups.html` and `portal_mockups_ABC.png` (in the Drive files, not in this repo). If this guide and the mockups disagree, this guide wins. If something isn't covered here, follow the approved rules at the top, then keep it plain: thin lines and navy.
 
 ## 1. Rules that always apply
-- Dark navy background. Teal is the only accent, and it stays rare (see 2).
-- Corner radius is 4px for controls and 6px at most for panels. Never pills, never fully rounded shapes.
-- Structure comes from 1px lines only. No drop shadows, glows, gradients, bubbles or rounded tiles.
+- Dark navy `#0b1a2e` background, lighter navy cards, and teal accents.
+- Buttons are fully round pills, 48px tall (44px minimum). Cards and panels are about 16px with a subtle border. No heavy glows or gradients.
+- Selected states are solid teal with a tick, never blue.
 - Icons are thin line icons only (see 6).
 - Mobile first for iPhone Safari (360, 390 and 430px wide). It must also work on Mac Safari and desktop browsers.
 
@@ -29,7 +41,7 @@ Add these as CSS variables (and as a `portal` colour group in Tailwind if you li
 | `--overlay` | `rgba(0,0,0,.45)` | Dim layer behind the open menu |
 | `--error` | `#ff6b6b` | Errors only (6.3:1). New, not in the mockups. |
 
-Where teal is allowed: the "WORKFORCE" half of the wordmark, the 3px left edge of the status strip, the status value that needs attention (for example an expiring ticket), the open menu's right edge line, the focus ring, the primary button, and the active menu item marker. Nowhere else. Never use it for large fills or body text.
+Where teal is allowed: the "WORKFORCE" half of the wordmark, the primary button (solid `#2ec4b6` with navy text), a selected state (solid teal with a tick), teal accents, and the focus ring. A thin teal line between sections is for the website only. Do not add it to the portal. Never use blue for a selected or focus state.
 
 ## 3. Type
 Font stack: `-apple-system, "Helvetica Neue", Arial, sans-serif` (system font, no web fonts). Weights are 400 and 600 only.
@@ -54,10 +66,10 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 - On screens 768px wide and up, centre the content column at a max width of 480px. Lines stay full-width inside the column. Don't switch to a grid.
 
 ## 5. Radius, lines and dividers
-- `--radius-sm: 4px` for buttons, inputs, the signature pad and the focus ring. `--radius-md: 6px` for dialogs and banners. Lists, rows, the strip, the header and the menu are square (0).
+- Buttons are fully round pills (`9999px`). Cards, panels and menu rows are about 16px. Dialogs are about 16px. Inputs and the signature pad stay at `--radius-sm: 4px` (see 11 and 12). The focus ring is 2px.
 - All lines are 1px solid `--line`. The only exceptions are the strip's 3px teal left edge and the 2px focus ring.
 - A list has a top line and a bottom line on every row. Rows span the full width with no inset.
-- `box-shadow: none` everywhere.
+- `box-shadow: none` everywhere. No heavy glows, gradients or button lift.
 
 ## 6. Icons
 - Inline SVG, `viewBox="0 0 24 24"`, `fill="none"`, `stroke="currentColor"`, `stroke-width="1.3"` (1.5 at most), round caps and joins.
@@ -72,6 +84,7 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 - Behaviour: opens on tap or Enter. Closes on the overlay, Esc, ✕/☰ or after choosing a link. Focus moves into the panel and is trapped there, then returns to ☰ on close. Body scroll locks while it's open. Slide is 200ms ease-out, and there's no animation under `prefers-reduced-motion`.
 
 ## 8. Home: status strip
+Flagged: describes the older flat Home; not current. Marek to decide.
 - Sits under the greeting (13px muted "Good morning" and a 21px white name, padding 18px 22px 10px).
 - One row of 3 equal cells: **Next shift**, **Awaiting sign-off**, **Ticket expiring**. 1px `--line` dividers between cells and below the strip, plus a 3px `--accent` left edge. Cell padding is 12px.
 - Each cell has an 11px muted label, a 14px/600 white value, and an 11px muted sub-line (site, count, days). Example: "Next shift / Mon 7:00am / Example Site, Parramatta".
@@ -81,6 +94,7 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 - At 360px, values may wrap to 2 lines. Never shrink below 11px.
 
 ## 9. List rows
+Flagged: describes the older flat Home; not current. Marek to decide.
 - Full width, 62px tall, padding 0 22px, `display:flex; align-items:center`.
 - Order: 24px icon, 18px gap, 16px label, › on the far right (22px, `--text-faint`).
 - Optional count goes before the ›: plain 13px `--accent` text, for example "2". Never a bubble or a badge.
@@ -89,9 +103,10 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 - Home list order: My shifts, Timesheets, My ID pass, Tickets, Inductions, My details & safety, Help.
 
 ## 10. Buttons
-- Height 48px (44px minimum), radius 4px, 16px/600 text, full width on mobile, auto width (min 160px) from 768px up.
-- **Primary**: `--accent` fill, `--on-accent` text, no border. Use at most one per screen.
-- **Secondary**: transparent, 1px `--field-border`, `--text`.
+- Height 48px (44px minimum), fully round (`9999px`), 16px/600 text, full width on mobile, auto width (min 160px) from 768px up. Flat: no lift and no shadow.
+- **Primary**: solid `#2ec4b6`, navy `#0b1a2e` text, no border. Use at most one per screen.
+- **Secondary**: transparent, 1px `#5d728c` outline, text `#e8edf3`.
+- **Selected**: solid teal with a tick icon. Never blue.
 - **Text button**: no border, `--accent` text, 44px tap height.
 - **Destructive**: transparent, 1px `--error`, `--error` text. Always ask for confirmation.
 - **Disabled**: opacity .4, `cursor:not-allowed`, and still readable.
@@ -131,11 +146,11 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 ## 15. Do and don't
 | Do | Don't |
 |---|---|
-| Full-width rows split by 1px lines | Cards, tiles or bubbles with gaps between them |
-| 4px corners on controls | Pills, `rounded-full`, radius over 6px |
-| Square list rows, strip, header and menu | Drop shadows, glows, blur or gradients |
+| Cards and panels about 16px with a 1px subtle border | Heavy glows, gradients or drop shadows |
+| Fully round pill buttons, 48px tall | Square buttons or blue selected states |
+| Square list rows, strip and header | Drop shadows, glows, blur or gradients |
 | Thin 1.3px stroke SVG icons | Filled, two-tone, emoji or icon-font icons |
-| Teal only in the places listed in 2 | Teal backgrounds, teal body text, several primary buttons |
+| Teal for the primary button, a selected state, the wordmark and the focus ring | Blue selected states, teal body text, or more than one main button |
 | Counts as plain teal numbers | Red dots or count badges in circles |
 | ☰ top-left on every portal screen | A bottom tab bar or floating action buttons |
 | White, thick signature ink | Dark ink on the navy pad |

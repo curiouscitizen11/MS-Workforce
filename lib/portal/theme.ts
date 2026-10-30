@@ -4,20 +4,20 @@ export type PortalTheme = "dark" | "light"
 
 export const THEME = {
   dark: {
-    page: "#0A1A2F",
-    card: "#132B47",
+    page: "#0B1A2E",
+    card: "#152D4A",
     text: "#E8EEF4",
     muted: "#D5E2EF",
-    button: "#33BFAF",
-    buttonText: "#0A2540",
-    accent: "#7DDBC8",
+    button: "#2EC4B6",
+    buttonText: "#0B1A2E",
+    accent: "#2EC4B6",
     okBg: "#14532D",
     okText: "#DCFCE7",
     warnBg: "#78350F",
     warnText: "#FEF3C7",
     badBg: "#7F1D1D",
     badText: "#FEE2E2",
-    border: "#1F6F66",
+    border: "#22354F",
   },
   light: {
     page: "#EEF3F7",

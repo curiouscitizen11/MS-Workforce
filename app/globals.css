@@ -179,25 +179,25 @@ main .page-enter > section.bg-navy:first-of-type::before { display: none; }
 /* Cards lift off the tint */
 /* Portal themes. Public pages do not use .portal-root. Hex values match lib/portal/theme.ts. */
 .portal-root {
-  background: #0a1a2f;
+  background: #0b1a2e;
   color: #e8eef4;
   color-scheme: dark;
 }
 .portal-root[data-theme="dark"] {
-  --p-page: #0a1a2f;
-  --p-card: #132b47;
+  --p-page: #0b1a2e;
+  --p-card: #152d4a;
   --p-text: #e8eef4;
   --p-muted: #d5e2ef;
-  --p-button: #33bfaf;
-  --p-button-text: #0a2540;
-  --p-accent: #7ddbc8;
+  --p-button: #2ec4b6;
+  --p-button-text: #0b1a2e;
+  --p-accent: #2ec4b6;
   --p-ok-bg: #14532d;
   --p-ok-text: #dcfce7;
   --p-warn-bg: #78350f;
   --p-warn-text: #fef3c7;
   --p-bad-bg: #7f1d1d;
   --p-bad-text: #fee2e2;
-  --p-border: #1f6f66;
+  --p-border: #22354f;
   background: var(--p-page);
   color: var(--p-text);
   color-scheme: dark;
@@ -248,18 +248,88 @@ main .page-enter > section.bg-navy:first-of-type::before { display: none; }
 .portal-root[data-theme="dark"] [class*="15803D"] {
   color: #86efac;
 }
-.portal-root[data-theme="dark"] .pill-dark {
-  border-color: var(--p-text);
-  background: var(--p-text);
-  color: var(--p-page);
+.portal-root .pill,
+.portal-root .pill:hover,
+.portal-root .pill:active,
+.portal-root .portal-add,
+.portal-root .portal-yn,
+.portal-root .portal-choice,
+.portal-root .portal-theme {
+  border-radius: 9999px;
+  min-height: 48px;
+  box-shadow: none;
+  transform: none;
 }
-.portal-root[data-theme="dark"] .pill-line-dark {
-  border-color: var(--p-accent);
+.portal-root .pill-teal,
+.portal-root .pill-teal:hover,
+.portal-root .pill-teal:active {
+  background: #2ec4b6;
+  border: 1px solid #2ec4b6;
+  color: #0b1a2e;
+  box-shadow: none;
+  transform: none;
+}
+.portal-root .pill-line,
+.portal-root .pill-line:hover,
+.portal-root .pill-dark,
+.portal-root .pill-dark:hover,
+.portal-root .pill-line-dark,
+.portal-root .pill-line-dark:hover,
+.portal-root .pill-light,
+.portal-root .pill-light:hover,
+.portal-root .portal-add,
+.portal-root .portal-choice,
+.portal-root .portal-yn {
+  background: transparent;
+  border: 1px solid #5d728c;
+  color: #e8edf3;
+  box-shadow: none;
+}
+.portal-root[data-theme="light"] .pill-line,
+.portal-root[data-theme="light"] .pill-line:hover,
+.portal-root[data-theme="light"] .pill-dark,
+.portal-root[data-theme="light"] .pill-dark:hover,
+.portal-root[data-theme="light"] .pill-line-dark,
+.portal-root[data-theme="light"] .pill-line-dark:hover,
+.portal-root[data-theme="light"] .pill-light,
+.portal-root[data-theme="light"] .pill-light:hover,
+.portal-root[data-theme="light"] .portal-add,
+.portal-root[data-theme="light"] .portal-choice,
+.portal-root[data-theme="light"] .portal-yn {
   color: var(--p-text);
+  border-color: #5d728c;
 }
-.portal-root[data-theme="dark"] .pill-line-dark:hover {
-  background: var(--p-accent);
-  color: var(--p-button-text);
+.portal-root .portal-yn,
+.portal-root .portal-theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-weight: 600;
+}
+.portal-root .portal-yn-on,
+.portal-root .portal-theme-on {
+  background: #2ec4b6;
+  border-color: #2ec4b6;
+  color: #0b1a2e;
+}
+.portal-root .portal-yn-on::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  flex: none;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5 9.5 17 19 7.5' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5 9.5 17 19 7.5' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.portal-root .pill:focus-visible,
+.portal-root .portal-add:focus-visible,
+.portal-root .portal-yn:focus-visible,
+.portal-root .portal-choice:focus-visible,
+.portal-root .portal-theme:focus-visible {
+  outline: 2px solid #2ec4b6;
+  outline-offset: 2px;
 }
 .portal-root input[type="date"] {
   display: block;
@@ -292,9 +362,28 @@ main .page-enter > section.bg-navy:first-of-type::before { display: none; }
 .portal-root .portal-chip-do-not-book { background: var(--p-bad-bg); color: var(--p-bad-text); }
 .portal-root .portal-chip-neutral { background: var(--p-card); color: var(--p-text); border: 1px solid var(--p-border); }
 .portal-root .portal-choice {
-  border-color: var(--p-border);
+  border-color: #5d728c;
   background: transparent;
+  color: #e8edf3;
+}
+.portal-root[data-theme="light"] .portal-choice {
   color: var(--p-text);
+}
+.portal-root .portal-panel,
+.portal-root .portal-banner {
+  border-radius: 16px;
+  border: 1px solid var(--p-border, #22354f);
+  background: var(--p-card, #152d4a);
+  color: var(--p-text, #e8edf3);
+}
+.portal-root .portal-panel {
+  padding: 16px;
+}
+.portal-root .portal-banner {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
 }
 .portal-root .portal-tile {
   display: flex;
@@ -302,7 +391,7 @@ main .page-enter > section.bg-navy:first-of-type::before { display: none; }
   flex-direction: column;
   justify-content: space-between;
   gap: 8px;
-  border-radius: 1rem;
+  border-radius: 16px;
   border: 1px solid var(--p-border);
   background: var(--p-card);
   padding: 12px;
@@ -339,7 +428,10 @@ main .page-enter > section.bg-navy:first-of-type::before { display: none; }
   .portal-root .portal-tile:active { transform: none; }
 }
 .portal-root .portal-list {
-  border-top: 1px solid var(--p-border, #22354f);
+  overflow: hidden;
+  border: 1px solid var(--p-border, #22354f);
+  border-radius: 16px;
+  background: var(--p-card, #152d4a);
 }
 .portal-root .portal-list-row {
   display: flex;
@@ -362,7 +454,7 @@ main .page-enter > section.bg-navy:first-of-type::before { display: none; }
   cursor: not-allowed;
 }
 .portal-root .portal-list-row:focus-visible {
-  outline: 2px solid var(--p-button, #33bfaf);
+  outline: 2px solid var(--p-button, #2ec4b6);
   outline-offset: -2px;
 }
 .portal-root .portal-list-label {
@@ -399,8 +491,8 @@ a.portal-list-row {
   margin: 0 0 12px;
   padding: 8px 8px 8px 12px;
   border: 1px solid var(--p-border, #22354f);
-  border-radius: 6px;
-  background: transparent;
+  border-radius: 16px;
+  background: var(--p-card, #152d4a);
 }
 .portal-home-hint p {
   flex: 1;
@@ -425,8 +517,8 @@ a.portal-list-row {
   width: 100%;
   min-height: 48px;
   margin-top: 12px;
-  border: 1px solid var(--p-border, #5d728c);
-  border-radius: 4px;
+  border: 1px solid #5d728c;
+  border-radius: 9999px;
   background: transparent;
   color: var(--p-text, #e8edf3);
   font-size: 16px;
@@ -446,22 +538,23 @@ a.portal-list-row {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: var(--p-page, #0a1a2f);
+  background: var(--p-page, #0b1a2e);
   padding-bottom: 8px;
 }
 .portal-yn {
-  min-height: 44px;
-  border-radius: 4px;
-  border: 1px solid #c5d4e4;
-  background: #0b1a2e;
-  color: #f4f7fb;
-  padding: 8px 12px;
+  min-height: 48px;
+  border-radius: 9999px;
+  border: 1px solid #5d728c;
+  background: transparent;
+  color: #e8edf3;
+  padding: 8px 14px;
   font-size: 14px;
   font-weight: 600;
 }
 .portal-yn-on {
   border-color: #2ec4b6;
-  color: #2ec4b6;
+  background: #2ec4b6;
+  color: #0b1a2e;
 }
 .portal-check {
   appearance: none;
@@ -512,11 +605,11 @@ a.portal-list-row {
   max-height: 75dvh;
   margin-inline: auto;
   overflow: hidden;
-  border: 1px solid #c5d4e4;
+  border: 1px solid var(--p-border, #22354f);
   border-bottom: 0;
-  border-radius: 6px 6px 0 0;
-  background: #0e2240;
-  color: #f4f7fb;
+  border-radius: 16px 16px 0 0;
+  background: var(--p-card, #152d4a);
+  color: var(--p-text, #e8edf3);
   padding: 0;
 }
 .portal-sheet-bar,
@@ -524,7 +617,7 @@ a.portal-list-row {
   flex: none;
   position: sticky;
   z-index: 1;
-  background: #0e2240;
+  background: var(--p-card, #152d4a);
 }
 .portal-sheet-bar {
   top: 0;

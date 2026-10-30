@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { TickIcon } from "@/components/portal/ui"
 import { THEME_COOKIE, type PortalTheme } from "@/lib/portal/theme"
 
 export function ThemeSwitch({ theme }: { theme: PortalTheme }) {
@@ -19,9 +20,10 @@ export function ThemeSwitch({ theme }: { theme: PortalTheme }) {
           key={option}
           type="button"
           aria-pressed={current === option}
-          className={"min-h-12 rounded-xl border px-3 text-sm font-semibold " + (current === option ? "border-transparent bg-[#33BFAF] text-navy" : "portal-choice")}
+          className={"portal-theme " + (current === option ? "portal-theme-on" : "")}
           onClick={() => choose(option)}
         >
+          {current === option ? <TickIcon /> : null}
           {option === "dark" ? "Dark" : "Light"}
         </button>
       ))}

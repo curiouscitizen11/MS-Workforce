@@ -150,7 +150,7 @@ export function TicketBook({
           </button>
         ))}
       </div>
-      <button type="button" className="pill pill-line-dark w-full" data-testid="add-ticket" onClick={() => setPicking(true)}>
+      <button type="button" className={"pill w-full " + (onContinue ? "pill-line-dark" : "pill-teal")} data-testid="add-ticket" onClick={() => setPicking(true)}>
         + Add ticket or training
       </button>
       {onContinue ? (
