@@ -1034,6 +1034,7 @@ export async function respondToOffer(
   }
   const worker = await ctx.store.workers.get(input.workerId)
   if (!worker) return fail("Log in again.")
+  if (worker.status !== "Ready") return fail("Waiting for approval. MS Workforce will call within 2 business days.")
   if (!input.accept) {
     if (input.reason && sensitiveMessage(input.reason)) return fail(SENSITIVE_MESSAGE)
     offer.status = "Declined"
@@ -1100,6 +1101,7 @@ export async function submitTimesheet(
   if (olderThanDays(input.workDate, today, 7)) return fail("Please call MS Workforce on " + MS_PHONE)
   const worker = await ctx.store.workers.get(input.workerId)
   if (!worker) return fail("Log in again.")
+  if (worker.status !== "Ready") return fail("Waiting for approval. MS Workforce will call within 2 business days.")
   if (!onQuarterHour(input.start) || !onQuarterHour(input.finish)) {
     return fail("Use 15-minute steps for start and finish.")
   }
@@ -1333,6 +1335,10 @@ export async function createOffers(
   const created: string[] = []
   const hours = Math.min(Math.max(input.expiresHours || 2, 1), 72)
   for (const worker of chosen) {
+    if (worker.status !== "Ready") {
+      skipped.push(worker.name)
+      continue
+    }
     const check = canAcceptShift({
       tickets: asTicketInputs(worker.tickets),
       jobDate: input.shiftDate,
@@ -1379,7 +1385,10 @@ export async function createOffers(
     created.push(worker.name)
     await audit(ctx, admin.id, "send-offer", offer.id)
   }
-  if (!created.length) return fail("Nobody could be offered this shift. Check the DO NOT BOOK list.")
+  if (!created.length) {
+    if (skipped.length && input.workerIds !== "all") return { ok: true as const, created, skipped }
+    return fail("Nobody could be offered this shift. Check the DO NOT BOOK list.")
+  }
   return { ok: true as const, created, skipped }
 }
 

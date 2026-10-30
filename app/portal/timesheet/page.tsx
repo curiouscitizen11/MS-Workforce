@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { TimesheetForm } from "@/components/portal/TimesheetForm"
+import { WaitingForApproval } from "@/components/portal/Waiting"
 import { Heading } from "@/components/portal/ui"
 import { formatDate, sydneyToday } from "@/lib/portal/dates"
 import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
@@ -11,6 +12,14 @@ export const metadata: Metadata = { title: "Log today's hours" }
 
 export default async function TimesheetPage() {
   const { worker } = await requireUser()
+  if (worker.role !== "admin" && (worker.status === "Applicant" || worker.status === "Onboarding")) {
+    return (
+      <div className="space-y-4">
+        <Heading kicker="Hours" title="Log today's hours" />
+        <WaitingForApproval done={Boolean(worker.onboardingSubmitted)} inductionPassed={Boolean(worker.inductionPassed)} />
+      </div>
+    )
+  }
   const store = await getStore()
   const today = sydneyToday()
   const offers = (await store.offers.all()).filter((offer) => offer.workerId === worker.id && offer.status === "Accepted")

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { TimesheetAdmin } from "@/components/portal/TimesheetAdmin"
+import { WaitingForApproval } from "@/components/portal/Waiting"
 import { DemoBanner, Heading } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
 import { formatDate } from "@/lib/portal/dates"
@@ -16,6 +17,13 @@ export const metadata: Metadata = { title: "Signed hours" }
 
 export default async function SignedTimesheetPage({ params }: { params: { id: string } }) {
   const { worker } = await requireUser()
+  if (worker.role !== "admin" && (worker.status === "Applicant" || worker.status === "Onboarding")) {
+    return (
+      <div className="space-y-4">
+        <WaitingForApproval done={Boolean(worker.onboardingSubmitted)} inductionPassed={Boolean(worker.inductionPassed)} />
+      </div>
+    )
+  }
   const store = await getStore()
   const sheet = await store.timesheets.get(params.id)
   if (!sheet || (worker.role !== "admin" && sheet.workerId !== worker.id)) notFound()

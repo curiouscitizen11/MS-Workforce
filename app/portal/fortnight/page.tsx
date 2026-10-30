@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { WaitingForApproval } from "@/components/portal/Waiting"
 import { Heading } from "@/components/portal/ui"
 import { formatDate, sydneyToday } from "@/lib/portal/dates"
 import { fortnightSummary } from "@/lib/portal/home"
@@ -14,6 +15,14 @@ export const metadata: Metadata = { title: "This fortnight" }
 export default async function FortnightPage() {
   const { worker } = await requireUser()
   if (worker.role !== "worker") redirect("/portal/admin")
+  if (worker.status === "Applicant" || worker.status === "Onboarding") {
+    return (
+      <div className="space-y-4">
+        <Heading kicker="Hours" title="This fortnight" />
+        <WaitingForApproval done={Boolean(worker.onboardingSubmitted)} inductionPassed={Boolean(worker.inductionPassed)} />
+      </div>
+    )
+  }
   const today = sydneyToday()
   const fortnight = fortnightContaining(today)
   const offers = (await (await getStore()).offers.all()).filter((offer) => offer.workerId === worker.id)

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { WaitingForApproval } from "@/components/portal/Waiting"
 import { Heading, StatusChip } from "@/components/portal/ui"
 import {
   cellMarks,
@@ -60,6 +61,14 @@ export default async function OffersPage({ searchParams }: { searchParams: { mon
       <div className="space-y-4">
         <Heading kicker="Shifts" title="Offers and shifts" />
         {list}
+      </div>
+    )
+  }
+  if (worker.status === "Applicant" || worker.status === "Onboarding") {
+    return (
+      <div className="space-y-4">
+        <Heading kicker="Shifts" title="Offers and shifts" />
+        <WaitingForApproval done={Boolean(worker.onboardingSubmitted)} inductionPassed={Boolean(worker.inductionPassed)} />
       </div>
     )
   }

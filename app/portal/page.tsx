@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { WaitingForApproval } from "@/components/portal/Waiting"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import {
   DetailsIcon,
@@ -61,6 +62,7 @@ export default async function DashboardPage() {
   const watchLabels = expiring.map((ticket) => ticket.label)
   if (worker.tickets.whiteCard?.status !== "Yes, I have it") watchLabels.push(TICKET_LABELS.whiteCard)
   const ticketActions = ticketActionCount([...photoLabels, ...watchLabels])
+  const waitingApproval = worker.status === "Applicant" || worker.status === "Onboarding"
 
   return (
     <div className="space-y-4">
@@ -70,7 +72,10 @@ export default async function DashboardPage() {
         <StatusChip level={badgeLevel(check.badge)}>{check.label}</StatusChip>
       </div>
       <p className="text-sm text-navy/70">Pay is fortnightly, on Thursday.</p>
-      {open ? (
+      {waitingApproval ? (
+        <WaitingForApproval home done={Boolean(worker.onboardingSubmitted)} inductionPassed={Boolean(worker.inductionPassed)} />
+      ) : null}
+      {!waitingApproval && open ? (
         <section className="rounded-2xl border border-navy/10 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Shift offer</p>
           <h2 className="mt-1 text-xl font-semibold">{open.roleName}</h2>
@@ -83,7 +88,7 @@ export default async function DashboardPage() {
           </Link>
         </section>
       ) : null}
-      {todayShift ? (
+      {!waitingApproval && todayShift ? (
         <section className="rounded-2xl border border-navy/10 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-600">Today&apos;s shift</p>
           <h2 className="mt-1 text-xl font-semibold">{todayShift.siteName || todayShift.suburb}</h2>
@@ -98,12 +103,12 @@ export default async function DashboardPage() {
             </Link>
           </div>
         </section>
-      ) : afternoon ? (
+      ) : !waitingApproval && afternoon ? (
         <Link href="/portal/timesheet" className="pill pill-line-dark w-full">
           Log today&apos;s hours
         </Link>
       ) : null}
-      {missingSign.length ? (
+      {!waitingApproval && missingSign.length ? (
         <section className="rounded-2xl border border-[#B45309] bg-[#FEF3C7] p-3">
           <h2 className="text-sm font-semibold">Needs a supervisor signature</h2>
           <ul className="mt-2 space-y-2">
@@ -118,19 +123,21 @@ export default async function DashboardPage() {
         </section>
       ) : null}
       <div className="portal-grid">
-        <Tile href="/portal/offers" label="Shifts" count={waiting} countLabel={waiting + " offers waiting"} icon={<ShiftsIcon />} />
-        <Tile href="/portal/timesheet" label="Hours" count={unsigned} countLabel={unsigned + " days not signed"} icon={<HoursIcon />} />
+        {waitingApproval ? null : <Tile href="/portal/offers" label="Shifts" count={waiting} countLabel={waiting + " offers waiting"} icon={<ShiftsIcon />} />}
+        {waitingApproval ? null : <Tile href="/portal/timesheet" label="Hours" count={unsigned} countLabel={unsigned + " days not signed"} icon={<HoursIcon />} />}
         <Tile href="/portal/pass" label="Site pass" icon={<PassIcon />} />
         <Tile href="/portal/tickets" label="Tickets & training" count={ticketActions} countLabel={ticketActions + " needing action"} icon={<TicketsIcon />} />
         <Tile href="/portal/inductions" label="Inductions" count={todos} countLabel={todos + " to do"} icon={<InductionIcon />} />
         <Tile href="/portal/me" label="My details" icon={<DetailsIcon />} />
         <Tile href="/portal/help" label="Help" icon={<HelpIcon />} />
       </div>
-      <Link href="/portal/fortnight" className="flex min-h-12 items-center justify-between gap-3 rounded-2xl border border-navy/10 bg-white px-4 py-3 text-sm font-semibold">
-        <span>{fortnightSummary(offers, sheets, worker.id, today).text}</span>
-        <span aria-hidden="true">›</span>
-      </Link>
-      {latest?.status === "Approved" ? (
+      {waitingApproval ? null : (
+        <Link href="/portal/fortnight" className="flex min-h-12 items-center justify-between gap-3 rounded-2xl border border-navy/10 bg-white px-4 py-3 text-sm font-semibold">
+          <span>{fortnightSummary(offers, sheets, worker.id, today).text}</span>
+          <span aria-hidden="true">›</span>
+        </Link>
+      )}
+      {!waitingApproval && latest?.status === "Approved" ? (
         <Link href={"/portal/timesheet/" + latest.id} className="block rounded-2xl border border-navy/10 bg-white p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Signed hours</p>
           <p className="mt-1 font-semibold">
@@ -153,13 +160,10 @@ export default async function DashboardPage() {
           </ul>
         </section>
       ) : null}
-      {!worker.onboardingSubmitted && worker.status !== "Applicant" ? (
+      {!waitingApproval && !worker.onboardingSubmitted && worker.status !== "Applicant" ? (
         <Link href="/portal/onboarding" className="pill pill-dark w-full">
           Finish onboarding
         </Link>
-      ) : null}
-      {worker.status === "Applicant" ? (
-        <p className="text-sm leading-relaxed">MS Workforce will call you within 2 business days. You can log in any time.</p>
       ) : null}
     </div>
   )

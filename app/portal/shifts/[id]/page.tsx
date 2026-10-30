@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { WaitingForApproval } from "@/components/portal/Waiting"
 import { Heading, StatusChip } from "@/components/portal/ui"
 import { formatDate, formatTime } from "@/lib/portal/dates"
 import { adminMobile } from "@/lib/portal/config"
@@ -11,6 +12,13 @@ export const metadata: Metadata = { title: "Shift" }
 
 export default async function ShiftPage({ params }: { params: { id: string } }) {
   const { worker } = await requireUser()
+  if (worker.role !== "admin" && (worker.status === "Applicant" || worker.status === "Onboarding")) {
+    return (
+      <div className="space-y-4">
+        <WaitingForApproval done={Boolean(worker.onboardingSubmitted)} inductionPassed={Boolean(worker.inductionPassed)} />
+      </div>
+    )
+  }
   const offer = await (await getStore()).offers.get(params.id)
   if (!offer || (worker.role !== "admin" && offer.workerId !== worker.id)) notFound()
   if (offer.status !== "Accepted") notFound()

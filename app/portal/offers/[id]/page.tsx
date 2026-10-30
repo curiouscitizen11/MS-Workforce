@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { OfferActions } from "@/components/portal/OfferActions"
+import { WaitingForApproval } from "@/components/portal/Waiting"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
 import { asTicketInputs, canAcceptShift } from "@/lib/portal/compliance"
@@ -13,6 +14,13 @@ export const metadata: Metadata = { title: "Shift offer" }
 
 export default async function OfferPage({ params }: { params: { id: string } }) {
   const { worker } = await requireUser()
+  if (worker.role !== "admin" && (worker.status === "Applicant" || worker.status === "Onboarding")) {
+    return (
+      <div className="space-y-4">
+        <WaitingForApproval done={Boolean(worker.onboardingSubmitted)} inductionPassed={Boolean(worker.inductionPassed)} />
+      </div>
+    )
+  }
   const store = await getStore()
   const offer = await store.offers.get(params.id)
   if (!offer || (worker.role !== "admin" && offer.workerId !== worker.id)) notFound()
