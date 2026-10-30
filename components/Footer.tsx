@@ -5,7 +5,7 @@ const links = [
   { name: "Site cleans", href: "/site-cleans-demolition-support" },
   { name: "Greater Sydney", href: "/labour-hire-greater-sydney" },
   { name: "Builders", href: "/clients" },
-  { name: "Apply for work", href: "/candidates" },
+  { name: "Apply for work", href: "/portal/join" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
   { name: "Privacy", href: "/privacy" },

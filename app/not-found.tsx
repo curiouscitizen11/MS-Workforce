@@ -23,7 +23,7 @@ export default function NotFound() {
           <Link href="/clients" className="pill pill-line w-full sm:w-auto">
             For builders
           </Link>
-          <Link href="/candidates" className="pill pill-line w-full sm:w-auto">
+          <Link href="/portal/join" className="pill pill-line w-full sm:w-auto">
             Apply for work
           </Link>
         </div>

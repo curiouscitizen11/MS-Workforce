@@ -2,7 +2,7 @@ import ContactButtons from "@/components/ContactButtons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
-import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, socialMeta } from "@/components/site";
+import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageDescription =
   "Request construction labour or ask a question. Builders email hello@msworkforce.au, workers email jobs@msworkforce.au. Greater Sydney sites.";
@@ -56,7 +56,7 @@ export default function ContactPage() {
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
-              href={BOOK_LABOUR_URL}
+              href="/portal/book-labour"
               target="_blank"
               rel="noopener noreferrer"
               className="pill pill-teal w-full sm:w-auto"

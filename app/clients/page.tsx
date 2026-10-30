@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, socialMeta } from "@/components/site";
+import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageDescription =
   "How MS Workforce supplies construction labour to Sydney builders: send the brief, we match screened labour, simple weekly invoicing. FAQ included.";
@@ -87,7 +87,7 @@ export default function ClientsPage() {
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
-              href={BOOK_LABOUR_URL}
+              href="/portal/book-labour"
               target="_blank"
               rel="noopener noreferrer"
               className="pill pill-teal w-full sm:w-auto"
@@ -170,7 +170,7 @@ export default function ClientsPage() {
           </p>
           <div className="mt-10 flex flex-col items-start gap-6">
             <a
-              href={BOOK_LABOUR_URL}
+              href="/portal/book-labour"
               target="_blank"
               rel="noopener noreferrer"
               className="pill pill-teal w-full sm:w-auto"

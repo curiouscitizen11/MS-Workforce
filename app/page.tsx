@@ -1,7 +1,7 @@
 import PhotoSection from "@/components/PhotoSection";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
-import { REQUEST_LABOUR_HREF, BOOK_LABOUR_URL } from "@/components/site";
+import { REQUEST_LABOUR_HREF } from "@/components/site";
 
 const roles: { icon: IconName; title: string; body: string }[] = [
   {
@@ -75,7 +75,7 @@ export default function HomePage() {
             <div>
               <p className="mb-2 text-sm font-semibold text-white">Builders and site managers</p>
               <a
-                href={BOOK_LABOUR_URL}
+                href="/portal/book-labour"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="pill pill-teal w-full"
@@ -86,7 +86,7 @@ export default function HomePage() {
             </div>
             <div>
               <p className="mb-2 text-sm font-semibold text-white">Looking for work</p>
-              <Link href="/candidates#register" className="pill pill-line w-full">
+              <Link href="/portal/join" className="pill pill-line w-full">
                 Apply for work
               </Link>
             </div>
@@ -163,7 +163,7 @@ export default function HomePage() {
           </ol>
           <div className="mt-12 flex flex-col gap-3 sm:flex-row">
             <a
-              href={BOOK_LABOUR_URL}
+              href="/portal/book-labour"
               target="_blank"
               rel="noopener noreferrer"
               className="pill pill-teal w-full sm:w-auto"
@@ -213,7 +213,7 @@ export default function HomePage() {
           </h2>
           <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
             <a
-              href={BOOK_LABOUR_URL}
+              href="/portal/book-labour"
               target="_blank"
               rel="noopener noreferrer"
               className="pill pill-teal w-full sm:w-auto"
@@ -221,7 +221,7 @@ export default function HomePage() {
               Book labour
               <span className="sr-only"> (form opens in a new tab)</span>
             </a>
-            <Link href="/candidates" className="pill pill-line w-full sm:w-auto">
+            <Link href="/portal/join" className="pill pill-line w-full sm:w-auto">
               Apply for work
             </Link>
           </div>
