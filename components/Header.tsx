@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BOOK_LABOUR_URL } from "@/components/site";
 
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/services" },
   { name: "Builders", href: "/clients" },
-  { name: "Apply for work", href: "/candidates" },
+  { name: "Apply for work", href: "/portal/join" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
@@ -99,7 +98,7 @@ export default function Header() {
             );
           })}
           <a
-            href={BOOK_LABOUR_URL}
+            href="/portal/book-labour"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden min-h-11 items-center rounded-full bg-teal-400 px-5 text-sm font-semibold text-navy transition hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
@@ -148,7 +147,7 @@ export default function Header() {
             })}
           </ul>
           <a
-            href={BOOK_LABOUR_URL}
+            href="/portal/book-labour"
             target="_blank"
             rel="noopener noreferrer"
             className="pill pill-teal mt-8 w-full"

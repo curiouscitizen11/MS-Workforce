@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
-import { BOOK_LABOUR_URL, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
+import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageTitle = "Labourers in Sydney for Builders | MS Workforce";
 const pageDescription =
@@ -63,7 +63,7 @@ export default function LabourersSydneyPage() {
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
-              href={BOOK_LABOUR_URL}
+              href="/portal/book-labour"
               target="_blank"
               rel="noopener noreferrer"
               className="pill pill-teal w-full sm:w-auto"
