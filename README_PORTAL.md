@@ -90,6 +90,8 @@ Use a **test copy** of your HQ workspace first. Do not point the portal at the l
 
 Workers are matched by mobile number. A second apply with the same mobile updates the same person. It does not create a second Notion row.
 
+The Workers database has a text field called **Site inductions**. When a worker has any, the portal sends one line, for example `Harbour St (2026-10-02); Brookvale frame (2026-10-09)`. A name with no date is sent as the name only. An empty list sends nothing. That column already exists on the HQ Workers database. A TEST copy needs the same column. If it is missing, the sync skips that field and still saves the rest of the worker.
+
 Passport numbers and ticket photos never go to Notion. Visa and VEVO notes stay in the admin screen only.
 
 **Shift offers** is a new database. It does not exist yet. The plan is in `lib/portal/notion/shift-offers.mjs`. To print that plan without changing Notion:

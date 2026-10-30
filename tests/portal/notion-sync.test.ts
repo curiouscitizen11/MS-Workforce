@@ -8,7 +8,7 @@ import {
   workerNotionProperties,
   writeNotionProperties,
 } from "@/lib/portal/notion/map"
-import { processOutbox, type Ctx } from "@/lib/portal/services"
+import { processOutbox, saveSiteInduction, type Ctx } from "@/lib/portal/services"
 import { createNotify } from "@/lib/portal/notify"
 import { createMemoryStore } from "@/lib/portal/store"
 import type { Timesheet } from "@/lib/portal/types"
@@ -95,6 +95,21 @@ describe("Notion fields Elon still needs to add", () => {
     expect(workerTyped["Driver card number"]).toEqual({ rich_text: [{ type: "text", text: { content: "DLCARD1" } }] })
     expect(workerTyped["Driver licence issued"]).toEqual({ date: { start: "2020-02-02" } })
     expect(workerTyped["White card issued"]).toEqual({ date: { start: "2019-01-01" } })
+    expect(workerProps["Site inductions"]).toBeUndefined()
+    worker.siteInductions = [
+      { name: "Harbour St", doneOn: "2026-10-02" },
+      { name: "Brookvale frame", doneOn: "2026-10-09" },
+      { name: "New site" },
+    ]
+    expect(workerNotionProperties(worker)["Site inductions"]).toBe(
+      "Harbour St (2026-10-02); Brookvale frame (2026-10-09); New site",
+    )
+    expect(() =>
+      workerNotionProperties({
+        ...worker,
+        siteInductions: [{ name: "Harbour St", doneOn: "2026-10-02" }, { name: "bank account" }],
+      }),
+    ).toThrow(/tax, bank or super/)
     expect(JSON.stringify(workerProps)).not.toContain("HT-22")
     expect(JSON.stringify(workerProps).toLowerCase()).not.toMatch(/passport|tfn|tax file|\bbank\b|superannuation/)
     expect(() => assertNotionPayloadSafe({ "Supervisor name": "Alex Stone" })).not.toThrow()
@@ -128,6 +143,27 @@ describe("Notion fields Elon still needs to add", () => {
     }))
     expect(rejected.ok).toBe(false)
     if (!rejected.ok) expect(rejected.message).toMatch(/multi_select/)
+
+    const sentSites: string[][] = []
+    const sitesOk = await writeNotionProperties(
+      { "Site inductions": "Harbour St (2026-10-02)", Name: "Sam Lee" },
+      async (properties) => {
+        sentSites.push(Object.keys(properties))
+        if ("Site inductions" in properties) return { ok: false, message: "Site inductions is not a property that exists." }
+        return { ok: true }
+      },
+    )
+    expect(sitesOk).toEqual({ ok: true })
+    expect(sentSites.at(-1)).toEqual(["Name"])
+  })
+
+  it("queues Site inductions when one is saved", async () => {
+    const { ctx } = harness()
+    const saved = await saveSiteInduction(ctx, "w-sam", { name: "Harbour St", done: true })
+    expect(saved.ok).toBe(true)
+    const queued = (await ctx.store.outbox.all()).filter((item) => item.kind === "workers").at(-1)
+    const properties = (queued?.payload as { properties?: Record<string, unknown> }).properties
+    expect(properties?.["Site inductions"]).toBe("Harbour St (2026-10-17)")
   })
 
   it("still syncs a timesheet when Notion is missing the new columns", async () => {

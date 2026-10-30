@@ -34,6 +34,7 @@ const FREE_TEXT = new Set([
   "Tasks",
   "Medical notes",
   "Work history",
+  "Site inductions",
 ])
 
 export class NotionPayloadError extends Error {}
@@ -70,6 +71,18 @@ function choice(value: string | undefined, allowed: readonly string[]): string |
     throw new NotionPayloadError("'" + value + "' is not an existing Notion option.")
   }
   return value
+}
+
+function siteInductionsLine(worker: Worker): string | undefined {
+  const line = (worker.siteInductions || [])
+    .map((item) => {
+      const name = item.name.trim()
+      if (!name) return ""
+      return item.doneOn ? name + " (" + item.doneOn + ")" : name
+    })
+    .filter(Boolean)
+    .join("; ")
+  return line || undefined
 }
 
 function nextTicketExpiry(worker: Worker): string | undefined {
@@ -182,6 +195,7 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "Terms signed", worker.termsSignedOn)
   put(props, "Form status", worker.formStatus)
   put(props, "Induction passed", worker.inductionPassed)
+  put(props, "Site inductions", siteInductionsLine(worker))
   if (typeof worker.inductionScore === "number") props["Induction score"] = worker.inductionScore
   put(props, "Induction version", worker.inductionVersion)
   props["Tickets verified"] = Boolean(worker.ticketsVerified)
