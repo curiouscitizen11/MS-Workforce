@@ -5,16 +5,14 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { logOut } from "@/app/portal/actions"
 
-type Item = { href: string; label: string; icon: "home" | "shifts" | "hours" | "me" | "tickets" | "inductions" | "preferences" }
+type Item = { href: string; label: string; icon: "home" | "shifts" | "hours" | "me" | "tickets" | "inductions" | "safety" | "preferences" | "help" }
 
 const workerItems: Item[] = [
-  { href: "/portal", label: "Home", icon: "home" },
-  { href: "/portal/offers", label: "Shifts", icon: "shifts" },
-  { href: "/portal/timesheet", label: "Hours", icon: "hours" },
-  { href: "/portal/me", label: "Me", icon: "me" },
   { href: "/portal/tickets", label: "Tickets & training", icon: "tickets" },
   { href: "/portal/inductions", label: "Inductions", icon: "inductions" },
+  { href: "/portal/me#safety", label: "Safety info", icon: "safety" },
   { href: "/portal/me#preferences", label: "Preferences", icon: "preferences" },
+  { href: "/portal/help", label: "Help / contact MS Workforce", icon: "help" },
 ]
 
 const adminItems: Item[] = [
@@ -67,7 +65,7 @@ export function PortalMenuPanel({
             Close
           </button>
         </div>
-        <nav aria-label="Main">
+        <nav aria-label="Main" className="portal-menu-list">
           {items.map((item) => (
             <Link
               key={item.href}
@@ -240,11 +238,28 @@ function RowIcon({ name }: { name: Item["icon"] | "logout" }) {
       </svg>
     )
   }
+  if (name === "safety") {
+    return (
+      <svg {...common}>
+        <path d="M12 4 5 7v5c0 4 3 6.5 7 8 4-1.5 7-4 7-8V7z" />
+        <path d="M12 9v4M12 16.5h.01" />
+      </svg>
+    )
+  }
   if (name === "preferences") {
     return (
       <svg {...common}>
         <circle cx="12" cy="12" r="3" />
         <path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.5 6.5l1.5 1.5M16 16l1.5 1.5M17.5 6.5 16 8M8 16l-1.5 1.5" />
+      </svg>
+    )
+  }
+  if (name === "help") {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8" />
+        <path d="M9.5 9.5a2.5 2.5 0 0 1 4.2 1.8c0 1.4-1.7 1.7-1.7 3.2" />
+        <path d="M12 17.5h.01" />
       </svg>
     )
   }

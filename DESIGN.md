@@ -79,9 +79,12 @@ Inputs are always 16px or larger, so iPhone Safari doesn't zoom in. Use sentence
 
 ## 7. Header and ☰ menu
 - Header: 56px tall, `--bg`, 1px `--line` bottom border, sticky at the top. The ☰ button is on the left (44 x 44px tap area, 26px icon, `aria-label="Menu"`, `aria-expanded`). The "MS WORKFORCE" wordmark is centred. Nothing goes on the right unless a batch asks for it.
-- Menu: a side panel that slides in from the left, 290px wide (max 85vw), under the header. Background `--surface`, 1px `--accent` right edge, `--overlay` behind it. The top block reads "Signed in as" (13px muted) plus the name (17px white), with a `--line` underneath. Then come the menu rows (54px, icon, label, ›), with Log out last.
-- The current page has a 3px teal left edge on its row. Don't use a filled background for it.
-- Behaviour: opens on tap or Enter. Closes on the overlay, Esc, ✕/☰ or after choosing a link. Focus moves into the panel and is trapped there, then returns to ☰ on close. Body scroll locks while it's open. Slide is 200ms ease-out, and there's no animation under `prefers-reduced-motion`.
+- Menu: a side panel that slides in from the left, 290px wide (max 85vw), under the header. The edge against the screen stays flush. The other corners are about 16px. Background is the page navy, with a 1px subtle border and `--overlay` behind it. The top block reads "Signed in as" (13px muted) plus the name (17px white), with a `--line` underneath.
+- Each row is a tile: about 16px radius, lighter navy fill, 1px subtle border, 8px gap, at least 52px tall, with an icon, a label and ›. Log out is last.
+- Worker rows are the extras only, in this order: Tickets & training, Inductions, Safety info, Preferences, Help / contact MS Workforce, Log out. Home, Shifts, Hours and Me stay on the bottom bar, so they are not in the ☰.
+- Admin rows keep their current entries (Home, Shifts, Hours, Me, Preferences, Log out) and use the same tile look.
+- The current page has a light teal fill (about 16% teal), bold text, and `aria-current="page"`.
+- Behaviour: opens on tap or Enter. Closes on the overlay, Esc, Close/☰ or after choosing a link. Focus moves into the panel and is trapped there, then returns to ☰ on close. Body scroll locks while it's open. Slide is 200ms ease-out, and there's no animation under `prefers-reduced-motion`.
 
 ## 8. Home: status strip
 Flagged: describes the older flat Home; not current. Marek to decide.
