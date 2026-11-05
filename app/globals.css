@@ -194,6 +194,13 @@ body:has(.portal-root) .site-chrome-main {
   background: #0b1a2e;
   color: #e8eef4;
   color-scheme: dark;
+  font-size: 16px;
+  line-height: 1.6;
+}
+@media (min-width: 768px) {
+  .portal-root {
+    font-size: 17px;
+  }
 }
 .portal-root[data-theme="dark"] {
   --p-page: #0b1a2e;
@@ -383,19 +390,47 @@ body:has(.portal-root) .site-chrome-main {
 }
 .portal-root .portal-panel,
 .portal-root .portal-banner {
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid var(--p-border, #22354f);
   background: var(--p-card, #152d4a);
   color: var(--p-text, #e8edf3);
 }
 .portal-root .portal-panel {
-  padding: 16px;
+  padding: 20px;
+}
+@media (min-width: 768px) {
+  .portal-root .portal-panel {
+    padding: 24px;
+  }
+}
+.portal-root[data-theme="dark"] .portal-panel {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
 }
 .portal-root .portal-banner {
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.portal-root .pill {
+  height: 48px;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 1.45;
+}
+.portal-root h1 {
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+@media (min-width: 768px) {
+  .portal-root h1 { font-size: 48px; }
+}
+.portal-root .kicker {
+  font-size: 14px;
+  line-height: 1.5;
 }
 .portal-root .portal-tile {
   display: flex;

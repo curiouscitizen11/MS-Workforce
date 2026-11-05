@@ -11,6 +11,7 @@ import Link from "next/link"
 export const metadata: Metadata = { title: "Shift" }
 
 export default async function ShiftPage({ params }: { params: { id: string } }) {
+  const { id } = await Promise.resolve(params)
   const { worker } = await requireUser()
   if (worker.role !== "admin" && (worker.status === "Applicant" || worker.status === "Onboarding")) {
     return (
@@ -19,7 +20,7 @@ export default async function ShiftPage({ params }: { params: { id: string } }) 
       </div>
     )
   }
-  const offer = await (await getStore()).offers.get(params.id)
+  const offer = await (await getStore()).offers.get(id)
   if (!offer || (worker.role !== "admin" && offer.workerId !== worker.id)) notFound()
   if (offer.status !== "Accepted") notFound()
   const maps = offer.address ? "https://maps.google.com/?q=" + encodeURIComponent(offer.address) : ""

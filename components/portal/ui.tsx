@@ -46,8 +46,8 @@ export function Heading({ kicker, title, text }: { kicker: string; title: string
   return (
     <header>
       <p className="kicker text-teal-600">{kicker}</p>
-      <h1 className="mt-1 text-[1.65rem] font-semibold leading-tight tracking-tight">{title}</h1>
-      {text ? <p className="mt-2 text-sm leading-relaxed text-navy/80">{text}</p> : null}
+      <h1 className="mt-2 text-[32px] font-bold leading-[1.1] tracking-tight md:text-5xl">{title}</h1>
+      {text ? <p className="mt-4 max-w-prose text-base font-normal leading-[1.6] text-navy/80 md:text-[17px]">{text}</p> : null}
     </header>
   )
 }
@@ -74,7 +74,7 @@ export function DemoBanner({ mock }: { mock: boolean }) {
 }
 
 export const fieldClass =
-  "portal-field mt-1 w-full min-h-12 rounded-2xl border border-navy/20 bg-white px-3 text-base text-navy outline-none ring-teal-300 focus:border-teal-600 focus:ring-2"
+  "portal-field mt-2 w-full min-h-12 rounded-2xl border border-navy/20 bg-white px-3 text-base text-navy outline-none ring-teal-300 focus:border-teal-600 focus:ring-2"
 
 export function Field({
   label,
@@ -83,7 +83,7 @@ export function Field({
   const id = props.id || props.name
   return (
     <label className="block" htmlFor={id}>
-      <span className="text-sm font-semibold">{label}</span>
+      <span className="text-sm font-medium leading-[1.5]">{label}</span>
       <input id={id} className={fieldClass} {...props} />
     </label>
   )

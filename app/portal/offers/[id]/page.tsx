@@ -13,6 +13,7 @@ import { notFound } from "next/navigation"
 export const metadata: Metadata = { title: "Shift offer" }
 
 export default async function OfferPage({ params }: { params: { id: string } }) {
+  const { id } = await Promise.resolve(params)
   const { worker } = await requireUser()
   if (worker.role !== "admin" && (worker.status === "Applicant" || worker.status === "Onboarding")) {
     return (
@@ -22,7 +23,7 @@ export default async function OfferPage({ params }: { params: { id: string } }) 
     )
   }
   const store = await getStore()
-  const offer = await store.offers.get(params.id)
+  const offer = await store.offers.get(id)
   if (!offer || (worker.role !== "admin" && offer.workerId !== worker.id)) notFound()
   const owner = worker.role === "admin" ? await store.workers.get(offer.workerId) : worker
   const check = owner

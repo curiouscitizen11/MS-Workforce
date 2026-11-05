@@ -112,7 +112,7 @@ function TicketCheckCard({ workerId, item }: { workerId: string; item: TicketChe
         </p>
       ) : null}
       {saved ? <p className="text-sm font-semibold text-[#15803D]">{saved}</p> : null}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <button className="pill pill-teal w-full" disabled={pending || !item.ready}>
           {pending ? "Saving" : "Matches the photo"}
         </button>

@@ -35,6 +35,7 @@ function TimesheetMark({ mark }: { mark: SheetMark }) {
 }
 
 export default async function OffersPage({ searchParams }: { searchParams: { month?: string; day?: string } }) {
+  const query = await Promise.resolve(searchParams)
   const { worker } = await requireUser()
   const offers = (await (await getStore()).offers.all())
     .filter((offer) => worker.role === "admin" || offer.workerId === worker.id)
@@ -74,7 +75,7 @@ export default async function OffersPage({ searchParams }: { searchParams: { mon
   }
 
   const sheets = (await (await getStore()).timesheets.all()).filter((sheet) => sheet.workerId === worker.id)
-  const view = resolveView(searchParams.month, searchParams.day)
+  const view = resolveView(query.month, query.day)
   const cells = monthCells(view.month)
   const selected = view.day ? dayEntries(offers, sheets, worker.id, view.day, view.today) : []
   return (

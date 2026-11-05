@@ -18,7 +18,7 @@ export function HeadshotReview({ id, name, url }: { id: string; name: string; ur
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={url} alt={"Headshot of " + name} className="mx-auto h-36 w-36 rounded-full object-cover" />
       <p className="text-sm">Waiting for a check</p>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <button
           type="button"
           className="pill pill-teal w-full"

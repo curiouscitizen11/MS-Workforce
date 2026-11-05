@@ -16,6 +16,7 @@ import { notFound } from "next/navigation"
 export const metadata: Metadata = { title: "Signed hours" }
 
 export default async function SignedTimesheetPage({ params }: { params: { id: string } }) {
+  const { id } = await Promise.resolve(params)
   const { worker } = await requireUser()
   if (worker.role !== "admin" && (worker.status === "Applicant" || worker.status === "Onboarding")) {
     return (
@@ -25,7 +26,7 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
     )
   }
   const store = await getStore()
-  const sheet = await store.timesheets.get(params.id)
+  const sheet = await store.timesheets.get(id)
   if (!sheet || (worker.role !== "admin" && sheet.workerId !== worker.id)) notFound()
   const mine = (await store.timesheets.all()).filter(
     (item) => item.workerId === sheet.workerId && item.status === "Approved" && item.payFortnight === sheet.payFortnight,

@@ -84,7 +84,7 @@ export function BookLabourForm() {
       <Field label="Suburb" name="suburb" value={suburb} onChange={(event) => setSuburb(event.target.value)} required />
       <fieldset>
         <legend className="text-sm font-semibold">What roles do you need?</legend>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap gap-3">
           {BOOK_ROLES.map((role) => {
             const on = roles.includes(role)
             return (

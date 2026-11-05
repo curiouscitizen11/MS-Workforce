@@ -11,6 +11,7 @@ import { redirect } from "next/navigation"
 export const metadata: Metadata = { title: "Use your mobile" }
 
 export default async function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
+  const query = await Promise.resolve(searchParams)
   const current = await readSession()
   if (current) redirect(portalHome(current.worker.role))
   const store = await getStore()
@@ -28,7 +29,7 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
     <div className="space-y-4">
       <DemoBanner mock={isMock()} />
       <Heading kicker="Log in" title="Use your mobile" text="We'll text a 6-digit code. No password." />
-      {searchParams.error ? <p className="text-sm font-semibold text-[#B91C1C]">That login link has expired. Request a new one.</p> : null}
+      {query.error ? <p className="text-sm font-semibold text-[#B91C1C]">That login link has expired. Request a new one.</p> : null}
       <LoginForm mock={isMock()} demos={demos} initialMobile={await readMobileCookie()} />
       <p className="text-sm">
         New here?{" "}

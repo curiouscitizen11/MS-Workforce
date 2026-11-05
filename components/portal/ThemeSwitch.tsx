@@ -14,7 +14,7 @@ export function ThemeSwitch({ theme }: { theme: PortalTheme }) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2" role="group" aria-label="Appearance">
+    <div className="grid grid-cols-2 gap-3" role="group" aria-label="Appearance">
       {(["dark", "light"] as const).map((option) => (
         <button
           key={option}

@@ -148,7 +148,7 @@ function Question({
   return (
     <fieldset>
       <legend className="text-sm font-semibold">{legend}</legend>
-      <div className="mt-2 grid grid-cols-2 gap-2">
+      <div className="mt-2 grid grid-cols-2 gap-3">
         <Yn pressed={choice === "No"} onClick={() => onChoose("No")}>
           No
         </Yn>

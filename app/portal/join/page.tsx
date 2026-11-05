@@ -6,8 +6,9 @@ import { formatAuMobile } from "@/lib/portal/phone"
 
 export const metadata: Metadata = { title: "Join MS Workforce" }
 
-export default function JoinPage({ searchParams }: { searchParams: { invite?: string | string[] } }) {
-  const raw = searchParams.invite
+export default async function JoinPage({ searchParams }: { searchParams: { invite?: string | string[] } }) {
+  const query = await Promise.resolve(searchParams)
+  const raw = query.invite
   const token = Array.isArray(raw) ? raw[0] : raw || ""
   const invite = token ? readInviteToken(token) : null
   const ready = invite?.ok ? invite : null

@@ -70,7 +70,7 @@ export function HeadshotForm({ onDone }: { onDone?: () => void }) {
       ) : (
         <div className="mx-auto flex h-36 w-36 items-center justify-center rounded-full bg-white text-sm font-semibold">Preview</div>
       )}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <label className="pill pill-teal w-full">
           Take a photo
           <input type="file" accept="image/*" capture="user" className="sr-only" onChange={(event) => onPick(event.target.files, event.target)} />

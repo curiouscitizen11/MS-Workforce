@@ -5,9 +5,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default function PublicJoinRedirect({ searchParams }: { searchParams: { invite?: string | string[] } }) {
-  const raw = searchParams.invite
+export default async function PublicJoinRedirect({ searchParams }: { searchParams: { invite?: string | string[] } }) {
+  const query = await Promise.resolve(searchParams)
+  const raw = query.invite
   const invite = Array.isArray(raw) ? raw[0] : raw
-  const query = invite ? "?invite=" + encodeURIComponent(invite) : ""
-  redirect("/portal/join" + query)
+  const suffix = invite ? "?invite=" + encodeURIComponent(invite) : ""
+  redirect("/portal/join" + suffix)
 }

@@ -58,7 +58,7 @@ export default async function PortalLayout({ children }: { children: React.React
           )}
         </div>
       </header>
-      <div className="mx-auto w-full max-w-xl px-4 pb-28 pt-4">
+      <div className="mx-auto w-full max-w-xl px-5 pb-28 pt-4 md:px-8">
         <AddHomeHint />
         {children}
       </div>

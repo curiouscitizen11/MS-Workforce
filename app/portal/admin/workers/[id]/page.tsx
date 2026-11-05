@@ -17,9 +17,10 @@ import { notFound } from "next/navigation"
 export const metadata: Metadata = { title: "Worker" }
 
 export default async function AdminWorkerPage({ params }: { params: { id: string } }) {
+  const { id } = await Promise.resolve(params)
   await requireAdmin()
   const store = await getStore()
-  const worker = await store.workers.get(params.id)
+  const worker = await store.workers.get(id)
   if (!worker || worker.role === "admin") notFound()
   const today = sydneyToday()
   const check = complianceFor(worker, today)

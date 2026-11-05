@@ -121,7 +121,7 @@ export function ApplyForm() {
         <>
           <fieldset>
             <legend className="text-sm font-semibold">Roles you want</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-3">
               {ROLES.map((role) => {
                 const on = roles.includes(role)
                 return (

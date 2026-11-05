@@ -482,7 +482,7 @@ export function TimesheetForm({
           </label>
           <fieldset>
             <legend className="text-sm font-semibold">Were you injured, or was there an incident or near miss today?</legend>
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="mt-2 grid grid-cols-2 gap-3">
               <button type="button" className={chip(incident === false)} onClick={() => setIncident(false)}>
                 No
               </button>
@@ -548,7 +548,7 @@ export function TimesheetForm({
           </label>
           <fieldset>
             <legend className="text-sm font-semibold">Role</legend>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-3">
               {SUPERVISOR_ROLES.map((item) => (
                 <button key={item} type="button" className={chip(role === item)} onClick={() => setRole(item)}>
                   {item}
