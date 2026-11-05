@@ -61,10 +61,10 @@ const standards = [
 export default function HomePage() {
   return (
     <>
-      <section className="flex screen items-center bg-navy text-white">
-        <div className="wrap py-14 sm:py-24 lg:py-28">
+      <section className="bg-navy text-white">
+        <div className="wrap section-pad">
           <span aria-hidden="true" className="block h-1 w-12 rounded-full bg-teal" />
-          <p className="kicker mt-6 text-teal">Construction labour hire · Greater Sydney</p>
+          <p className="kicker mt-6 text-teal">Construction labour hire across Greater Sydney</p>
           <h1 className="display mt-4">Construction labour, on site when you need them.</h1>
           <p className="lede mt-6 text-body">
             MS Workforce supplies general labourers, trade assistants and site
@@ -73,7 +73,7 @@ export default function HomePage() {
           </p>
           <div className="mt-8 grid gap-6 sm:max-w-xl sm:grid-cols-2 sm:gap-4">
             <div>
-              <p className="mb-2 text-sm font-semibold text-white">Builders and site managers</p>
+              <p className="mb-3 text-small font-semibold text-[#fafafa]">Builders and site managers</p>
               <a
                 href={BOOK_LABOUR_URL}
                 target="_blank"
@@ -85,7 +85,7 @@ export default function HomePage() {
               </a>
             </div>
             <div>
-              <p className="mb-2 text-sm font-semibold text-white">Looking for work</p>
+              <p className="mb-3 text-small font-semibold text-[#fafafa]">Looking for work</p>
               <Link href="/candidates#register" className="pill pill-line w-full">
                 Apply for work
               </Link>
@@ -100,20 +100,16 @@ export default function HomePage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">What we supply</p>
-          <h2 className="display mt-4">Labour for every stage of the build.</h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+          <h2 className="section-title mt-4">Labour for every stage of the build.</h2>
+          <ul className="card-grid mt-8 md:mt-10">
             {roles.map((item) => (
               <li key={item.title} className="num-card">
                 <Icon name={item.icon} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xl font-bold tracking-tight sm:text-3xl">
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 max-w-xl text-base leading-relaxed text-body sm:text-lg">
-                    {item.body}
-                  </p>
+                  <h3 className="card-title">{item.title}</h3>
+                  <p className="copy mt-3">{item.body}</p>
                 </div>
               </li>
             ))}
@@ -127,15 +123,15 @@ export default function HomePage() {
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Ways to book</p>
-          <h2 className="display mt-4">From one day to the whole job.</h2>
-          <ul className="mt-8 grid sm:mt-10 gap-3 sm:grid-cols-2">
+          <h2 className="section-title mt-4">From one day to the whole job.</h2>
+          <ul className="card-grid mt-8 sm:grid-cols-2 md:mt-10">
             {supply.map((item) => (
-              <li key={item.title} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">
+              <li key={item.title} className="card">
                 <Icon name={item.icon} />
-                <h3 className="mt-4 text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
-                <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                <h3 className="card-title mt-4">{item.title}</h3>
+                <p className="copy mt-2">{item.body}</p>
               </li>
             ))}
           </ul>
@@ -143,21 +139,18 @@ export default function HomePage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">How it works</p>
-          <h2 className="display mt-4">Three steps. Brief in, crew on site.</h2>
-          <ol className="mt-8 grid gap-3 sm:mt-10 md:grid-cols-3 md:gap-5">
+          <h2 className="section-title mt-4">Three steps. Brief in, crew on site.</h2>
+          <ol className="card-grid mt-8 md:mt-10 md:grid-cols-3">
             {steps.map((step, index) => (
-              <li
-                key={step.title}
-                className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7"
-              >
+              <li key={step.title} className="card">
                 <div className="flex items-center gap-3">
                   <Icon name={step.icon} />
                   <span className="kicker text-teal">Step {index + 1}</span>
                 </div>
-                <h3 className="mt-5 text-xl font-bold tracking-tight sm:text-2xl">{step.title}</h3>
-                <p className="mt-2 text-base leading-relaxed text-body">{step.body}</p>
+                <h3 className="card-title mt-5">{step.title}</h3>
+                <p className="copy mt-2">{step.body}</p>
               </li>
             ))}
           </ol>
@@ -179,14 +172,14 @@ export default function HomePage() {
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Our standard</p>
-          <h2 className="display mt-4">The same standard on every start.</h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+          <h2 className="section-title mt-4">The same standard on every start.</h2>
+          <ul className="card-grid mt-8 md:mt-10">
             {standards.map((item) => (
-              <li key={item} className="flex gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-5 sm:p-7">
+              <li key={item} className="card flex items-start gap-4 md:gap-6">
                 <Icon name="check" small className="mt-0.5" />
-                <p className="text-xl font-semibold leading-snug tracking-tight sm:text-3xl">{item}</p>
+                <p className="card-title">{item}</p>
               </li>
             ))}
           </ul>
@@ -194,9 +187,9 @@ export default function HomePage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Where we work</p>
-          <h2 className="display mt-4">Construction labour across Sydney.</h2>
+          <h2 className="section-title mt-4">Construction labour across Sydney.</h2>
           <p className="lede mt-5 text-body">
             We supply construction labour to building sites across Sydney,
             from the CBD and the suburbs to Western Sydney.
@@ -207,8 +200,8 @@ export default function HomePage() {
       <PhotoSection />
 
       <section className="bg-navy text-white">
-        <div className="wrap py-14 text-center sm:py-20 lg:py-24">
-          <h2 className="mx-auto max-w-2xl text-balance text-3xl font-bold tracking-tight sm:text-[2.5rem] sm:leading-[1.1]">
+        <div className="wrap section-pad text-center">
+          <h2 className="section-title mx-auto text-center">
             Need labour on site, or looking for work?
           </h2>
           <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">

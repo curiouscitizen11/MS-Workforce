@@ -6,15 +6,15 @@ import { SITE_URL } from "@/components/site";
 // whenever a page's content is edited. The dates are fixed on purpose: using today's date
 // for every page would tell search engines everything changed on every deploy.
 const pages: { route: string; lastModified: string }[] = [
-  { route: "", lastModified: "2026-10-25" },
-  { route: "/services", lastModified: "2026-10-25" },
+  { route: "", lastModified: "2026-11-05" },
+  { route: "/services", lastModified: "2026-11-05" },
   { route: "/labourers-sydney", lastModified: "2026-10-25" },
-  { route: "/site-cleans-demolition-support", lastModified: "2026-10-25" },
-  { route: "/labour-hire-greater-sydney", lastModified: "2026-10-25" },
-  { route: "/clients", lastModified: "2026-10-25" },
-  { route: "/candidates", lastModified: "2026-10-25" },
+  { route: "/site-cleans-demolition-support", lastModified: "2026-11-05" },
+  { route: "/labour-hire-greater-sydney", lastModified: "2026-11-05" },
+  { route: "/clients", lastModified: "2026-11-05" },
+  { route: "/candidates", lastModified: "2026-11-05" },
   { route: "/about", lastModified: "2026-10-25" },
-  { route: "/contact", lastModified: "2026-10-23" },
+  { route: "/contact", lastModified: "2026-11-05" },
   { route: "/privacy", lastModified: "2026-10-23" },
 ];
 

@@ -7,6 +7,18 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Option B (Balanced). Phone size, then md: for desktop. Weights live on the component classes.
+      fontSize: {
+        h1: ["2rem", { lineHeight: "1.1", letterSpacing: "-0.025em" }],
+        "h1-desktop": ["3rem", { lineHeight: "1.1", letterSpacing: "-0.025em" }],
+        h2: ["1.5rem", { lineHeight: "1.2" }],
+        "h2-desktop": ["2.25rem", { lineHeight: "1.2" }],
+        h3: ["1.125rem", { lineHeight: "1.35" }],
+        "h3-desktop": ["1.25rem", { lineHeight: "1.35" }],
+        copy: ["1rem", { lineHeight: "1.6" }],
+        "copy-desktop": ["1.0625rem", { lineHeight: "1.6" }],
+        small: ["0.875rem", { lineHeight: "1.5" }],
+      },
       colors: {
         navy: {
           DEFAULT: "#0b1a2e",

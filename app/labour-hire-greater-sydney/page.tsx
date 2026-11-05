@@ -26,7 +26,7 @@ const supply: { icon: IconName; title: string; body: string }[] = [
 const faqs = [
   {
     q: "Which areas do you cover?",
-    a: "Greater Sydney. We supply building sites from the CBD and the suburbs out to Western Sydney.",
+    a: "Across Greater Sydney. We supply building sites from the CBD and the suburbs out to Western Sydney.",
   },
   {
     q: "How much notice do you need?",
@@ -56,7 +56,7 @@ export default function GreaterSydneyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Greater Sydney</p>
           <h1 className="display mt-4">Construction labour across Greater Sydney.</h1>
           <p className="lede mt-5 text-body">
@@ -82,20 +82,20 @@ export default function GreaterSydneyPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">What we supply on site</h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+        <div className="wrap section-pad">
+          <h2 className="section-title">What we supply on site</h2>
+          <ul className="card-grid mt-8 md:mt-10">
             {supply.map((item) => (
               <li key={item.title} className="num-card">
                 <Icon name={item.icon} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                  <h3 className="card-title">{item.title}</h3>
+                  <p className="copy mt-2">{item.body}</p>
                 </div>
               </li>
             ))}
           </ul>
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
+          <p className="copy mt-8">
             Labour is booked by the day, as short-notice cover, or on an
             ongoing, project-based basis. We match workers we have screened
             ourselves to the job.
@@ -104,15 +104,15 @@ export default function GreaterSydneyPage() {
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <div className="wrap section-pad">
+          <h2 className="section-title">
             Questions about Greater Sydney coverage
           </h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+          <ul className="card-grid mt-8 md:mt-10">
             {faqs.map((item) => (
-              <li key={item.q} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">
-                <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.q}</h3>
-                <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">{item.a}</p>
+              <li key={item.q} className="card">
+                <h3 className="card-title">{item.q}</h3>
+                <p className="copy mt-3">{item.a}</p>
               </li>
             ))}
           </ul>
@@ -120,9 +120,9 @@ export default function GreaterSydneyPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Need labour on site?</h2>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
+        <div className="wrap section-pad">
+          <h2 className="section-title">Need labour on site?</h2>
+          <p className="copy mt-4">
             Send us the brief and we will tell you straight away whether we can fill it.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
