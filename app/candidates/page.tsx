@@ -5,7 +5,7 @@ import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, socialMeta } from "@/co
 import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/tickets";
 
 const pageDescription =
-  "Looking for construction labouring work in Greater Sydney? Register with MS Workforce for general labouring, trade assistant and site support work.";
+  "Looking for construction labouring work across Greater Sydney? Register with MS Workforce for general labouring, trade assistant and site support work.";
 
 export const metadata: Metadata = {
   title: "Construction Jobs in Sydney",
@@ -45,28 +45,52 @@ const expect = [
   "Someone who picks up your message when something is not right on site.",
 ];
 
+const ticketGroups: { title: string; titles: string[] }[] = [
+  { title: "White Card", titles: ["White Card"] },
+  {
+    title: "Heights and confined spaces",
+    titles: ["Work safely at heights", "Enter and work in confined spaces"],
+  },
+  {
+    title: "Asbestos removal",
+    titles: [
+      "Asbestos removal: Class B (non-friable)",
+      "Asbestos removal: Class A (friable)",
+    ],
+  },
+  { title: "First aid and CPR", titles: ["First aid and CPR"] },
+];
+
 const formUrl = WORKER_FORM_URL;
 
-function TicketCard({ ticket }: { ticket: Ticket }) {
+function pickTickets(titles: string[]) {
+  return titles.map((title) => {
+    const ticket = tickets.find((item) => item.title === title);
+    if (!ticket) throw new Error("Missing ticket: " + title);
+    return ticket;
+  });
+}
+
+function TicketCard({ ticket, showTitle = true }: { ticket: Ticket; showTitle?: boolean }) {
   return (
-    <li className="flex flex-col rounded-2xl border border-navy-line bg-navy-card p-6 sm:p-8">
-      <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{ticket.title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-body">{ticket.code}</p>
-      {ticket.note ? <p className="mt-3 text-sm leading-relaxed text-body">{ticket.note}</p> : null}
-      <ul className="mt-5 flex-1 border-b border-navy-line">
+    <li className="card flex flex-col">
+      {showTitle ? <h3 className="card-title">{ticket.title}</h3> : null}
+      <p className={showTitle ? "mt-2 text-small text-body" : "text-small text-body"}>{ticket.code}</p>
+      {ticket.note ? <p className="mt-3 text-small text-body">{ticket.note}</p> : null}
+      <ul className="mt-5 flex-1 border-b border-white/10">
         {ticket.providers.map((provider) => (
-          <li key={provider.href} className="border-t border-navy-line py-4">
+          <li key={provider.href} className="border-t border-white/10 py-3">
             <a
               href={provider.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center font-medium text-white underline decoration-teal/50 underline-offset-4 hover:decoration-teal"
+              className="inline-flex min-h-11 items-center font-medium text-[#fafafa] underline decoration-teal/50 underline-offset-4 hover:decoration-teal"
             >
               {provider.name}
               {provider.label ? ": " + provider.label : ""}
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
-            <p className="mt-1 text-sm text-body">
+            <p className="mt-1 text-small text-body">
               {provider.location} · RTO {provider.rto} ·{" "}
               <span className="font-medium text-body">{provider.price}</span>
             </p>
@@ -74,14 +98,14 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
         ))}
       </ul>
       {ticket.official ? (
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-3">
           {ticket.official.map((link) => (
             <a
               key={link.href}
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center text-sm font-medium text-teal-300 underline decoration-teal/40 underline-offset-4"
+              className="inline-flex min-h-11 items-center text-small font-medium text-teal-300 underline decoration-teal/40 underline-offset-4"
             >
               {link.label}
               <span className="sr-only"> (opens in a new tab)</span>
@@ -93,20 +117,34 @@ function TicketCard({ ticket }: { ticket: Ticket }) {
   );
 }
 
+function TicketGroup({ title, items }: { title: string; items: Ticket[] }) {
+  const showCardTitle = !(items.length === 1 && items[0].title === title);
+  return (
+    <div className="mt-12 border-t border-white/10 pt-10 md:mt-16 md:pt-12">
+      <h2 className="section-title">{title}</h2>
+      <ul className={"card-grid mt-6" + (items.length > 1 ? " md:grid-cols-2" : " max-w-3xl")}>
+        {items.map((ticket) => (
+          <TicketCard key={ticket.title} ticket={ticket} showTitle={showCardTitle} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function CandidatesPage() {
   return (
     <>
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">For workers</p>
           <h1 className="display mt-4">Construction work across Greater Sydney.</h1>
-          <p className="lede mt-5 text-body">
+          <p className="lede mt-5">
             We place general labourers, trade assistants and site support
             workers with builders across Sydney. Register once through the
             employee portal and we will contact you when work suits your skills
             and location.
           </p>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href={formUrl} className="pill pill-teal w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
               Apply for work
               <span className="sr-only"> (employee portal opens in a new tab)</span>
@@ -115,10 +153,10 @@ export default function CandidatesPage() {
               Email us
             </a>
           </div>
-          <p className="mt-2">
+          <p className="mt-3">
             <a
               href="#tickets"
-              className="inline-flex min-h-11 items-center text-base font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white"
+              className="inline-flex min-h-12 items-center text-base font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white"
             >
               Get your tickets
             </a>
@@ -127,18 +165,16 @@ export default function CandidatesPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">The work</p>
-          <h2 className="display mt-4">Labouring, trade assistant and site support work.</h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+          <h2 className="section-title mt-4">Labouring, trade assistant and site support work.</h2>
+          <ul className="card-grid mt-8 md:mt-10">
             {work.map((item) => (
               <li key={item.title} className="num-card">
                 <Icon name={item.icon} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">{item.title}</h3>
-                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
-                    {item.body}
-                  </p>
+                  <h3 className="card-title">{item.title}</h3>
+                  <p className="copy mt-3">{item.body}</p>
                 </div>
               </li>
             ))}
@@ -147,16 +183,16 @@ export default function CandidatesPage() {
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">What we look for</p>
-          <h2 className="display mt-4">Reliable people who take the work seriously.</h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+          <h2 className="section-title mt-4">Reliable people who take the work seriously.</h2>
+          <ul className="card-grid mt-8 md:mt-10">
             {lookFor.map((item) => (
               <li key={item.title} className="num-card">
                 <Icon name={item.icon} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                  <h3 className="card-title">{item.title}</h3>
+                  <p className="copy mt-2">{item.body}</p>
                 </div>
               </li>
             ))}
@@ -165,81 +201,80 @@ export default function CandidatesPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">What you can expect</p>
-          <h2 className="display mt-4">Looked after on every job.</h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+          <h2 className="section-title mt-4">Looked after on every job.</h2>
+          <ul className="card-grid mt-8 md:mt-10">
             {expect.map((item) => (
-              <li key={item} className="flex gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-5 sm:p-7">
+              <li key={item} className="card flex items-start gap-4 md:gap-6">
                 <Icon name="check" small className="mt-0.5" />
-                <p className="text-xl font-semibold leading-snug tracking-tight sm:text-2xl">{item}</p>
+                <p className="card-title">{item}</p>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      <section id="tickets" className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+      <section id="tickets" className="scroll-mt-14 bg-navy text-white">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Get your tickets</p>
-          <h2 className="display mt-4">Missing a ticket? Here&apos;s where to get it in Sydney.</h2>
-          <p className="lede mt-5 text-body">
+          <h2 className="section-title mt-4">Missing a ticket? Here&apos;s where to get it in Sydney.</h2>
+          <p className="lede mt-5">
             More tickets mean more sites you can work on. These registered
             training providers run the courses across Sydney. Most take a day or two.
           </p>
-          <ul className="mt-8 grid sm:mt-10 gap-5 md:grid-cols-2">
-            {tickets.map((ticket) => (
-              <TicketCard key={ticket.title} ticket={ticket} />
-            ))}
-          </ul>
-          <h3 className="kicker mt-16 text-body">Useful extras</h3>
-          <ul className="mt-6 grid gap-5 md:grid-cols-2">
-            {extras.map((ticket) => (
-              <TicketCard key={ticket.title} ticket={ticket} />
-            ))}
-          </ul>
-          <div className="mt-10 max-w-3xl space-y-2 text-sm leading-relaxed text-body">
-            <p>
-              Prices are as listed by each provider in {PRICES_CHECKED} and may
-              be subject to change. Check with the provider before booking.
-            </p>
-            <p>
-              Links go to independent registered training providers. MS
-              Workforce isn&apos;t affiliated with them; check dates and
-              requirements with the provider.
-            </p>
+
+          {ticketGroups.map((group) => (
+            <TicketGroup key={group.title} title={group.title} items={pickTickets(group.titles)} />
+          ))}
+
+          <TicketGroup title="Useful extras" items={extras} />
+
+          <div className="mt-12 border-t border-white/10 pt-10 md:mt-16 md:pt-12">
+            <h2 className="section-title">Prices and providers</h2>
+            <div className="mt-5 space-y-3">
+              <p className="copy">
+                Prices are as listed by each provider in {PRICES_CHECKED} and may
+                be subject to change. Check with the provider before booking.
+              </p>
+              <p className="copy">
+                Links go to independent registered training providers. MS
+                Workforce isn&apos;t affiliated with them; check dates and
+                requirements with the provider.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="register" className="scroll-mt-14 bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+      <section id="register" className="scroll-mt-14 bg-navy-alt text-white">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">How to register</p>
-          <h2 className="display mt-4">Register through the employee portal.</h2>
-          <p className="lede mt-5 text-body">
+          <h2 className="section-title mt-4">Register through the employee portal.</h2>
+          <p className="lede mt-5">
             The employee portal is where you submit your details and documents.
             It takes a few minutes. We only ask whether you hold a White Card
             and other tickets; we sight the cards themselves before any
             placement. If you have a question first, email us.
           </p>
-          <div className="mt-10 flex flex-col items-start gap-4">
+          <div className="mt-8 flex flex-col items-start gap-3">
             <a
               href={formUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center text-lg font-medium text-teal-300 underline decoration-teal-300/40 underline-offset-4 sm:text-2xl"
+              className="inline-flex min-h-12 items-center text-base font-semibold text-teal-300 underline decoration-teal-300/40 underline-offset-4"
             >
               Open the employee portal
             </a>
             <a
               href={WORK_ENQUIRY_HREF}
-              className="inline-flex min-h-11 items-center text-lg font-medium text-white underline decoration-white/30 underline-offset-4 sm:text-2xl break-all"
+              className="inline-flex min-h-12 items-center break-all text-base font-semibold text-[#fafafa] underline decoration-white/30 underline-offset-4"
             >
               {JOBS_EMAIL}
             </a>
             <Link
               href="/privacy"
-              className="inline-flex min-h-11 items-center text-sm text-body underline decoration-white/30 underline-offset-4 hover:text-white"
+              className="inline-flex min-h-11 items-center text-small text-body underline decoration-white/30 underline-offset-4 hover:text-white"
             >
               How we handle your information
             </Link>

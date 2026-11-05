@@ -86,7 +86,7 @@ export default function Icon({ name, className = "", small = false }: { name: Ic
     <span
       aria-hidden="true"
       className={
-        "inline-flex flex-none items-center justify-center border border-navy-line bg-navy text-teal " +
+        "inline-flex flex-none items-center justify-center border border-white/10 bg-navy text-teal " +
         (small ? "h-9 w-9 rounded-lg " : "h-11 w-11 rounded-xl ") +
         className
       }
