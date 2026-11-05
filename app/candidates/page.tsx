@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
 import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, socialMeta } from "@/components/site";
-import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/tickets";
+import { tickets, extras, PRICES_CHECKED, type Ticket, type TicketProvider } from "@/components/tickets";
 
 const pageDescription =
   "Looking for construction labouring work across Greater Sydney? Register with MS Workforce for general labouring, trade assistant and site support work.";
@@ -63,22 +63,52 @@ const ticketGroups: { title: string; titles: string[] }[] = [
 
 const formUrl = WORKER_FORM_URL;
 
+const keptProviders: Record<string, (provider: TicketProvider) => boolean> = {
+  "White Card": (provider) =>
+    provider.href === "https://nwcc.edu.au/white-card-nsw/northern-beaches/" ||
+    provider.href === "https://www.tcptraining.com/courses/white-card-course-sydney",
+  "First aid and CPR": (provider) =>
+    provider.name === "Northern Beaches Community College" ||
+    provider.label === "CPR only (HLTAID009)",
+};
+
+function forPage(ticket: Ticket): Ticket {
+  const keep = keptProviders[ticket.title];
+  if (!keep) return ticket;
+  return { ...ticket, providers: ticket.providers.filter(keep) };
+}
+
 function pickTickets(titles: string[]) {
   return titles.map((title) => {
     const ticket = tickets.find((item) => item.title === title);
     if (!ticket) throw new Error("Missing ticket: " + title);
-    return ticket;
+    return forPage(ticket);
   });
 }
 
-function TicketCard({ ticket, showTitle = true }: { ticket: Ticket; showTitle?: boolean }) {
+const safeworkLinks = [...tickets, ...extras].flatMap((ticket) => ticket.official ?? []);
+
+function TicketCard({
+  ticket,
+  showTitle = true,
+  showCode = true,
+}: {
+  ticket: Ticket;
+  showTitle?: boolean;
+  showCode?: boolean;
+}) {
+  const line = ticket.providers.find((provider) => provider.label === "Supervise asbestos removal");
+  const providers = line ? ticket.providers.filter((provider) => provider !== line) : ticket.providers;
+
   return (
     <li className="card flex flex-col">
       {showTitle ? <h3 className="card-title">{ticket.title}</h3> : null}
-      <p className={showTitle ? "mt-2 text-small text-body" : "text-small text-body"}>{ticket.code}</p>
+      {showCode ? (
+        <p className={showTitle ? "mt-2 text-small text-body" : "text-small text-body"}>{ticket.code}</p>
+      ) : null}
       {ticket.note ? <p className="mt-3 text-small text-body">{ticket.note}</p> : null}
       <ul className="mt-5 flex-1 border-b border-white/10">
-        {ticket.providers.map((provider) => (
+        {providers.map((provider) => (
           <li key={provider.href} className="border-t border-white/10 py-3">
             <a
               href={provider.href}
@@ -97,34 +127,38 @@ function TicketCard({ ticket, showTitle = true }: { ticket: Ticket; showTitle?: 
           </li>
         ))}
       </ul>
-      {ticket.official ? (
-        <div className="mt-4 flex flex-col gap-3">
-          {ticket.official.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center text-small font-medium text-teal-300 underline decoration-teal/40 underline-offset-4"
-            >
-              {link.label}
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          ))}
-        </div>
+      {line ? (
+        <p className="mt-4 flex min-h-11 flex-wrap items-center gap-x-2 text-small text-body">
+          <a
+            href={line.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center font-medium text-teal-300 underline decoration-teal/40 underline-offset-4"
+          >
+            {line.label}
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+          <span>{line.name + ", " + line.location + " · RTO " + line.rto + " · " + line.price}</span>
+        </p>
       ) : null}
     </li>
   );
 }
 
 function TicketGroup({ title, items }: { title: string; items: Ticket[] }) {
-  const showCardTitle = !(items.length === 1 && items[0].title === title);
+  const namedByHeading = items.length === 1 && items[0].title === title;
   return (
     <div className="mt-12 border-t border-white/10 pt-10 md:mt-16 md:pt-12">
       <h2 className="section-title">{title}</h2>
+      {namedByHeading ? <p className="mt-3 max-w-prose text-small text-body">{items[0].code}</p> : null}
       <ul className={"card-grid mt-6" + (items.length > 1 ? " md:grid-cols-2" : " max-w-3xl")}>
         {items.map((ticket) => (
-          <TicketCard key={ticket.title} ticket={ticket} showTitle={showCardTitle} />
+          <TicketCard
+            key={ticket.title}
+            ticket={ticket}
+            showTitle={!namedByHeading}
+            showCode={!namedByHeading}
+          />
         ))}
       </ul>
     </div>
@@ -139,10 +173,8 @@ export default function CandidatesPage() {
           <p className="kicker text-teal">For workers</p>
           <h1 className="display mt-4">Construction work across Greater Sydney.</h1>
           <p className="lede mt-5">
-            We place general labourers, trade assistants and site support
-            workers with builders across Sydney. Register once through the
-            employee portal and we will contact you when work suits your skills
-            and location.
+            Register once through the employee portal and we will contact you
+            when work suits your skills and location.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a href={formUrl} className="pill pill-teal w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
@@ -184,9 +216,9 @@ export default function CandidatesPage() {
 
       <section className="bg-navy text-white">
         <div className="wrap section-pad">
-          <p className="kicker text-teal">What we look for</p>
-          <h2 className="section-title mt-4">Reliable people who take the work seriously.</h2>
-          <ul className="card-grid mt-8 md:mt-10">
+          <h2 className="section-title">Working with us</h2>
+          <p className="card-title mt-8">Reliable people who take the work seriously.</p>
+          <ul className="card-grid mt-4">
             {lookFor.map((item) => (
               <li key={item.title} className="num-card">
                 <Icon name={item.icon} />
@@ -197,14 +229,8 @@ export default function CandidatesPage() {
               </li>
             ))}
           </ul>
-        </div>
-      </section>
-
-      <section className="bg-navy-alt text-white">
-        <div className="wrap section-pad">
-          <p className="kicker text-teal">What you can expect</p>
-          <h2 className="section-title mt-4">Looked after on every job.</h2>
-          <ul className="card-grid mt-8 md:mt-10">
+          <p className="card-title mt-10 md:mt-12">Looked after on every job.</p>
+          <ul className="card-grid mt-4">
             {expect.map((item) => (
               <li key={item} className="card flex items-start gap-4 md:gap-6">
                 <Icon name="check" small className="mt-0.5" />
@@ -228,21 +254,35 @@ export default function CandidatesPage() {
             <TicketGroup key={group.title} title={group.title} items={pickTickets(group.titles)} />
           ))}
 
-          <TicketGroup title="Useful extras" items={extras} />
+          <TicketGroup title="Other tickets" items={extras.map(forPage)} />
+
+          <div className="mt-12 border-t border-white/10 pt-10 md:mt-16 md:pt-12">
+            <h2 className="section-title">Check with SafeWork NSW</h2>
+            <ul className="mt-6 flex max-w-3xl flex-col gap-3">
+              {safeworkLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center text-small font-medium text-teal-300 underline decoration-teal/40 underline-offset-4"
+                  >
+                    {link.label}
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <div className="mt-12 border-t border-white/10 pt-10 md:mt-16 md:pt-12">
             <h2 className="section-title">Prices and providers</h2>
-            <div className="mt-5 space-y-3">
-              <p className="copy">
-                Prices are as listed by each provider in {PRICES_CHECKED} and may
-                be subject to change. Check with the provider before booking.
-              </p>
-              <p className="copy">
-                Links go to independent registered training providers. MS
-                Workforce isn&apos;t affiliated with them; check dates and
-                requirements with the provider.
-              </p>
-            </div>
+            <p className="copy mt-5">
+              Prices are as listed by each provider in {PRICES_CHECKED} and may
+              change, and these links go to independent providers MS Workforce
+              isn&apos;t affiliated with, so check dates and requirements with
+              the provider before booking.
+            </p>
           </div>
         </div>
       </section>
