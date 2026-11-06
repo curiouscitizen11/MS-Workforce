@@ -132,7 +132,7 @@ export default function CandidatesPage() {
       <section className="bg-navy-alt text-white">
         <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Pay</p>
-          <h2 className="display mt-4">Weekly pay, in plain English.</h2>
+          <h2 className="display mt-4">Weekly pay.</h2>
           <div className="mt-5 max-w-2xl space-y-2 text-base leading-relaxed text-body sm:text-lg">
             {WORKER_PAY_LINES.map((line) => (
               <p key={line}>{line}</p>

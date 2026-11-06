@@ -19,7 +19,6 @@ export const RATE_LINES = [
 ] as const;
 
 export const WORKER_PAY_LINES = [
-  "Weekly pay.",
   "Casual employees are paid the relevant Fair Work award rate plus casual loading, plus super.",
   "White Card is required for construction sites.",
 ] as const;
