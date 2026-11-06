@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
+import ReplySla from "@/components/ReplySla";
 import { BOOK_LABOUR_URL, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageTitle = "Construction Labour Hire in Greater Sydney | MS Workforce";
@@ -21,8 +22,7 @@ const supply: { icon: IconName; title: string; body: string }[] = [
   { icon: "package", title: "Materials handling", body: "Receiving deliveries and stacking, protecting and distributing materials around the site." },
 ];
 
-// These questions and answers use wording already on the Builders page. The FAQ structured
-// data below is built from this same list, so it always matches what visitors can read.
+// FAQ structured data below is built from this same list, so it always matches what visitors can read.
 const faqs = [
   {
     q: "Which areas do you cover?",
@@ -30,7 +30,7 @@ const faqs = [
   },
   {
     q: "How much notice do you need?",
-    a: "As much as you can give, but short-notice requests are welcome. We will tell you straight away whether we can fill it. We would rather say no than send the wrong person.",
+    a: "As much as you can give, but short-notice requests are welcome. We will tell you whether we can fill it. We would rather say no than send the wrong person.",
   },
   {
     q: "What do you need from us to get started?",
@@ -78,6 +78,7 @@ export default function GreaterSydneyPage() {
               Email the brief
             </a>
           </div>
+          <ReplySla className="mt-6" />
         </div>
       </section>
 
@@ -123,8 +124,9 @@ export default function GreaterSydneyPage() {
         <div className="wrap py-14 sm:py-20 lg:py-24">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Need labour on site?</h2>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
-            Send us the brief and we will tell you straight away whether we can fill it.
+            Send us the brief and we will tell you whether we can fill it.
           </p>
+          <ReplySla className="mt-4" />
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/services" className="pill pill-line w-full sm:w-auto">
               See all services

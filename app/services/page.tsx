@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
+import ReplySla from "@/components/ReplySla";
 import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageDescription =
@@ -141,6 +142,7 @@ export default function ServicesPage() {
               Where we supply: Greater Sydney
             </Link>
           </div>
+          <ReplySla className="mt-6" />
         </div>
       </section>
     </>
