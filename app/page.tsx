@@ -51,7 +51,7 @@ export default function HomePage() {
         <div className="wrap py-14 sm:py-24 lg:py-28">
           <span aria-hidden="true" className="block h-1 w-12 rounded-full bg-teal" />
           <p className="kicker mt-6 text-teal">Construction labour hire · Greater Sydney</p>
-          <h1 className="display mt-4">Construction labour, on site when you need them.</h1>
+          <h1 className="display mt-4">Construction labour hire across Sydney</h1>
           <p className="lede mt-6 text-body">
             MS Workforce supplies general labourers, trade assistants and site
             support crews to builders across Greater Sydney. From a single day
