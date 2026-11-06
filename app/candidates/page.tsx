@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
+import ReplySla from "@/components/ReplySla";
+import { WORKER_PAY_LINES } from "@/components/publicCopy";
 import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, socialMeta } from "@/components/site";
 import { tickets, extras, PRICES_CHECKED, type Ticket } from "@/components/tickets";
 
@@ -123,10 +125,23 @@ export default function CandidatesPage() {
               Get your tickets
             </a>
           </p>
+          <ReplySla className="mt-4" />
         </div>
       </section>
 
       <section className="bg-navy-alt text-white">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
+          <p className="kicker text-teal">Pay</p>
+          <h2 className="display mt-4">Weekly pay, in plain English.</h2>
+          <div className="mt-5 max-w-2xl space-y-2 text-base leading-relaxed text-body sm:text-lg">
+            {WORKER_PAY_LINES.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-navy text-white">
         <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">The work</p>
           <h2 className="display mt-4">Labouring, trade assistant and site support work.</h2>
@@ -146,7 +161,7 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="bg-navy text-white">
+      <section className="bg-navy-alt text-white">
         <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">What we look for</p>
           <h2 className="display mt-4">Reliable people who take the work seriously.</h2>
@@ -164,7 +179,7 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="bg-navy-alt text-white">
+      <section className="bg-navy text-white">
         <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">What you can expect</p>
           <h2 className="display mt-4">Looked after on every job.</h2>
@@ -244,6 +259,7 @@ export default function CandidatesPage() {
               How we handle your information
             </Link>
           </div>
+          <ReplySla className="mt-6" />
         </div>
       </section>
     </>

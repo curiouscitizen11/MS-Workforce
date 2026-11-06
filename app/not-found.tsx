@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import ReplySla from "@/components/ReplySla";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -27,6 +28,7 @@ export default function NotFound() {
             Apply for work
           </Link>
         </div>
+        <ReplySla className="mt-6" />
       </div>
     </section>
   );

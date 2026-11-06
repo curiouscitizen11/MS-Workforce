@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ReplySla from "@/components/ReplySla";
+import { BOOKING_STEPS, RATE_LINES, REPLY_SLA } from "@/components/publicCopy";
 import { EMAIL, EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, socialMeta } from "@/components/site";
 
 const pageDescription =
@@ -12,49 +14,22 @@ export const metadata: Metadata = {
   ...socialMeta("/clients", "Labour Hire for Builders in Sydney | MS Workforce", pageDescription),
 };
 
-const steps = [
-  {
-    title: "Send the brief",
-    body: "Use the Book labour form or email the site address, start date and time, the roles and numbers you need, how long for, and who the workers report to.",
-  },
-  {
-    title: "We match the right labour",
-    body: "We match workers we have screened ourselves to the job, and confirm PPE, access and site requirements with you before every start.",
-  },
-  {
-    title: "Crew on site",
-    body: "Workers arrive knowing the site, the start time and the site contact. Your team directs the work day to day, and we stay in contact throughout.",
-  },
-  {
-    title: "Simple weekly invoicing",
-    body: "One clear weekly invoice based on approved hours, with rates agreed in writing before the first start.",
-  },
-];
-
 const faqs = [
   {
-    q: "How much notice do you need?",
-    a: "As much as you can give, but short-notice requests are welcome. We will tell you straight away whether we can fill it. We would rather say no than send the wrong person.",
+    q: "What PPE is needed?",
+    a: "A White Card is required on construction sites. Tell us any other tickets, and the gear the site asks for, such as boots, a hard hat and hi-vis.",
   },
   {
-    q: "Can I book someone for a single day?",
-    a: "Yes. We supply day labour, short-notice cover, ongoing supply and project-based crews, so you can book a single day, a few weeks or a full stage of the build.",
+    q: "What if a worker is not the right fit?",
+    a: "Tell us the same day, including a no-show. We will work on a replacement. We do not promise a set replacement time.",
   },
   {
-    q: "What happens if a worker is not the right fit?",
-    a: "Tell us the same day. We will talk it through with you and work on a replacement as a priority.",
+    q: "Can you send someone the same day?",
+    a: "We do not promise same-day dispatch. " + REPLY_SLA,
   },
   {
-    q: "How are rates and invoicing handled?",
-    a: "We quote per role in writing before the first start, based on the work, the hours and the site. You then receive one simple weekly invoice based on approved hours.",
-  },
-  {
-    q: "Which areas do you cover?",
-    a: "All of Sydney. We supply building sites across Sydney, from the CBD and the suburbs out to Western Sydney.",
-  },
-  {
-    q: "What do you need from us to get started?",
-    a: "The site address, start date and time, roles and numbers, expected duration, a site contact, and any PPE, access or parking notes. The Book labour form asks for each of these, or the Email the brief button opens an email with the same prompts filled in.",
+    q: "Who employs the worker?",
+    a: "We supply the labour and look after pay and super for the workers we send. Workers are paid weekly. We confirm any minimum hours when we quote.",
   },
 ];
 
@@ -113,30 +88,34 @@ export default function ClientsPage() {
             </a>
             .
           </p>
+          <ReplySla className="mt-4" />
         </div>
       </section>
 
       <section className="bg-navy-alt text-white">
         <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">How it works</p>
-          <h2 className="display mt-4">Four steps from brief to site.</h2>
+          <h2 className="display mt-4">Three steps before anyone is dispatched.</h2>
           <ol className="mt-8 grid gap-3 sm:mt-10">
-            {steps.map((step, index) => (
-              <li key={step.title} className="num-card">
+            {BOOKING_STEPS.map((step, index) => (
+              <li key={step} className="num-card">
                 <span className="num-badge">{index + 1}</span>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xl font-bold tracking-tight sm:text-3xl">{step.title}</h3>
-                  <p className="mt-3 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
-                    {step.body}
-                  </p>
+                  <h3 className="text-xl font-bold tracking-tight text-balance sm:text-2xl">{step}</h3>
                 </div>
               </li>
             ))}
           </ol>
+          <div id="rate" className="mt-8 max-w-2xl scroll-mt-14 space-y-2 text-base leading-relaxed text-body sm:text-lg">
+            <p className="kicker text-teal">What&apos;s in the rate</p>
+            {RATE_LINES.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="bg-navy text-white">
+      <section id="faq" className="scroll-mt-14 bg-navy text-white">
         <div className="wrap py-14 sm:py-20 lg:py-24">
           <p className="kicker text-teal">Builders FAQ</p>
           <h2 className="display mt-4">Common questions.</h2>
@@ -185,6 +164,7 @@ export default function ClientsPage() {
               How we handle your information
             </Link>
           </div>
+          <ReplySla className="mt-6" />
         </div>
       </section>
     </>
