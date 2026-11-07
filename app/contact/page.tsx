@@ -2,6 +2,7 @@ import ContactButtons from "@/components/ContactButtons";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
+import ReplySla from "@/components/ReplySla";
 import { EMAIL, EMAIL_HREF, JOBS_EMAIL, JOBS_EMAIL_HREF, REQUEST_LABOUR_HREF, BOOK_LABOUR_URL, socialMeta } from "@/components/site";
 
 const pageDescription =
@@ -69,6 +70,7 @@ export default function ContactPage() {
             </a>
           </div>
           <ContactButtons className="mt-3" />
+          <ReplySla className="mt-6" />
           <Link
             href="/privacy"
             className="mt-3 inline-flex min-h-11 items-center text-small text-body underline decoration-white/30 underline-offset-4 hover:text-white"

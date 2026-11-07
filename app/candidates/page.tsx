@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
+import ReplySla from "@/components/ReplySla";
+import { WORKER_PAY_LINES } from "@/components/publicCopy";
 import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, socialMeta } from "@/components/site";
 import { tickets, extras, PRICES_CHECKED, type Ticket, type TicketProvider } from "@/components/tickets";
 
@@ -193,10 +195,23 @@ export default function CandidatesPage() {
               Get your tickets
             </a>
           </p>
+          <ReplySla className="mt-4" />
         </div>
       </section>
 
       <section className="bg-navy-alt text-white">
+        <div className="wrap section-pad">
+          <p className="kicker text-teal">Pay</p>
+          <h2 className="section-title mt-4">Weekly pay.</h2>
+          <div className="mt-5 max-w-prose space-y-2">
+            {WORKER_PAY_LINES.map((line) => (
+              <p key={line} className="copy">{line}</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-navy text-white">
         <div className="wrap section-pad">
           <p className="kicker text-teal">The work</p>
           <h2 className="section-title mt-4">Labouring, trade assistant and site support work.</h2>
@@ -214,7 +229,7 @@ export default function CandidatesPage() {
         </div>
       </section>
 
-      <section className="bg-navy text-white">
+      <section className="bg-navy-alt text-white">
         <div className="wrap section-pad">
           <h2 className="section-title">Working with us</h2>
           <p className="card-title mt-8">Reliable people who take the work seriously.</p>
@@ -319,6 +334,7 @@ export default function CandidatesPage() {
               How we handle your information
             </Link>
           </div>
+          <ReplySla className="mt-6" />
         </div>
       </section>
     </>

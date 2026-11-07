@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import ReplySla from "@/components/ReplySla";
 import { BOOK_LABOUR_URL } from "@/components/site";
 
 const navigation = [
@@ -156,6 +157,7 @@ export default function Header() {
           >
             Book labour
           </a>
+          <ReplySla className="mt-4" />
         </nav>
       ) : null}
     </header>

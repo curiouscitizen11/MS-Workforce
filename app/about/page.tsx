@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
+import ReplySla from "@/components/ReplySla";
 
 const pageDescription =
   "MS Workforce is a construction labour hire business supplying general labourers, trade assistants and site support to builders across Sydney.";
@@ -77,6 +78,7 @@ export default function AboutPage() {
               Contact
             </Link>
           </div>
+          <ReplySla className="mt-6" />
         </div>
       </section>
     </>

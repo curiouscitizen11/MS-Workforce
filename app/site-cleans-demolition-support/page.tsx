@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ReplySla from "@/components/ReplySla";
 import { BOOK_LABOUR_URL, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageTitle = "Site Cleans and Demolition Support | MS Workforce";
@@ -70,6 +71,7 @@ export default function SiteCleansPage() {
               Email the brief
             </a>
           </div>
+          <ReplySla className="mt-6" />
         </div>
       </section>
 
@@ -137,8 +139,9 @@ export default function SiteCleansPage() {
         <div className="wrap section-pad">
           <h2 className="section-title">Need a hand on site?</h2>
           <p className="copy mt-4">
-            Send us the brief and we will tell you straight away whether we can fill it.
+            Send us the brief and we will tell you whether we can fill it.
           </p>
+          <ReplySla className="mt-4" />
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/services" className="pill pill-line w-full sm:w-auto">
               See all services
