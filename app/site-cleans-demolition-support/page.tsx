@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BookLabourLink } from "@/components/PublicActions";
 import ReplySla from "@/components/ReplySla";
 import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
@@ -58,15 +59,7 @@ export default function SiteCleansPage() {
             builder. Book a single day or a crew for the whole stage.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="/portal/book-labour"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pill pill-teal w-full sm:w-auto"
-            >
-              Book labour
-              <span className="sr-only"> (form opens in a new tab)</span>
-            </a>
+            <BookLabourLink className="pill pill-teal w-full sm:w-auto" />
             <a href={REQUEST_LABOUR_HREF} className="link-quiet link-quiet-light w-full sm:w-auto">
               Email the brief
             </a>

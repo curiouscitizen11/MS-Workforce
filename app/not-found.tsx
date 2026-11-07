@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ApplyForWorkLink } from "@/components/PublicActions";
 import ReplySla from "@/components/ReplySla";
 
 export const metadata: Metadata = {
@@ -24,9 +25,7 @@ export default function NotFound() {
           <Link href="/clients" className="pill pill-line w-full sm:w-auto">
             For builders
           </Link>
-          <Link href="/portal/join" className="pill pill-line w-full sm:w-auto">
-            Apply for work
-          </Link>
+          <ApplyForWorkLink className="pill pill-line w-full sm:w-auto" />
         </div>
         <ReplySla className="mt-6" />
       </div>

@@ -5,16 +5,52 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReplySla from "@/components/ReplySla";
 
-const navigation = [
+const pages = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/services" },
   { name: "Builders", href: "/clients" },
-  { name: "Apply for work", href: "/portal/join" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },
 ];
 
-export default function Header() {
+function NavItem({
+  href,
+  className,
+  children,
+  current,
+  onClick,
+  newTab = false,
+}: {
+  href: string
+  className: string
+  children: React.ReactNode
+  current?: boolean
+  onClick?: () => void
+  newTab?: boolean
+}) {
+  const blank = newTab && href.startsWith("/")
+  if (href.startsWith("/") && !blank) {
+    return (
+      <Link href={href} className={className} aria-current={current ? "page" : undefined} onClick={onClick}>
+        {children}
+      </Link>
+    )
+  }
+  return (
+    <a
+      href={href}
+      className={className}
+      onClick={onClick}
+      target={blank ? "_blank" : undefined}
+      rel={blank ? "noopener noreferrer" : undefined}
+    >
+      {children}
+      {blank ? <span className="sr-only"> (form opens in a new tab)</span> : null}
+    </a>
+  )
+}
+
+export default function Header({ applyHref, bookHref }: { applyHref: string; bookHref: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -80,13 +116,13 @@ export default function Header() {
         </div>
 
         <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
-          {navigation.map((item) => {
+          {pages.map((item) => {
             const current = pathname === item.href;
             return (
-              <Link
+              <NavItem
                 key={item.href}
                 href={item.href}
-                aria-current={current ? "page" : undefined}
+                current={current}
                 className={
                   "border-b-2 pb-0.5 text-[13px] font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
                   (current
@@ -95,17 +131,22 @@ export default function Header() {
                 }
               >
                 {item.name}
-              </Link>
+              </NavItem>
             );
           })}
-          <a
-            href="/portal/book-labour"
-            target="_blank"
-            rel="noopener noreferrer"
+          <NavItem
+            href={applyHref}
+            className="border-b-2 border-transparent pb-0.5 text-[13px] font-medium text-white/70 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
+          >
+            Apply for work
+          </NavItem>
+          <NavItem
+            href={bookHref}
+            newTab
             className="hidden min-h-11 items-center rounded-full bg-teal-400 px-5 text-sm font-semibold text-navy transition hover:bg-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal lg:inline-flex"
           >
             Book labour
-          </a>
+          </NavItem>
         </nav>
       </div>
 
@@ -126,36 +167,39 @@ export default function Header() {
           className="fixed bottom-0 left-0 top-[var(--site-header-height)] z-40 w-[88%] max-w-sm overflow-y-auto border-r border-teal-400 bg-[#0e2240] px-6 py-8 text-left md:hidden"
         >
           <ul className="space-y-1">
-            {navigation.map((item) => {
+            {pages.map((item) => {
               const current = pathname === item.href;
               return (
                 <li key={item.href}>
-                  <Link
+                  <NavItem
                     href={item.href}
-                    aria-current={current ? "page" : undefined}
+                    current={current}
+                    onClick={() => setOpen(false)}
                     className={
                       "block rounded-none border-l-[3px] px-3 py-3 text-3xl font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
                       (current
                         ? "border-teal text-white"
                         : "border-transparent text-white/70")
                     }
-                    onClick={() => setOpen(false)}
                   >
                     {item.name}
-                  </Link>
+                  </NavItem>
                 </li>
               );
             })}
+            <li>
+              <NavItem
+                href={applyHref}
+                onClick={() => setOpen(false)}
+                className="block rounded-none border-l-[3px] border-transparent px-3 py-3 text-3xl font-semibold tracking-tight text-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
+              >
+                Apply for work
+              </NavItem>
+            </li>
           </ul>
-          <a
-            href="/portal/book-labour"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="pill pill-teal mt-8 w-full"
-            onClick={() => setOpen(false)}
-          >
+          <NavItem href={bookHref} newTab onClick={() => setOpen(false)} className="pill pill-teal mt-8 w-full">
             Book labour
-          </a>
+          </NavItem>
           <ReplySla className="mt-4" />
         </nav>
       ) : null}

@@ -158,6 +158,8 @@ describe("book labour", () => {
       expect(text).not.toContain(word)
     }
     expect(text).toContain("hello@msworkforce.au")
+    expect(text).toContain("reply_sla")
+    expect(text).not.toContain("same business day")
   })
 
   it("creates a new placements row when Notion is live", async () => {

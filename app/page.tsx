@@ -1,6 +1,7 @@
 import PhotoSection from "@/components/PhotoSection";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
+import { ApplyForWorkLink, BookLabourLink } from "@/components/PublicActions";
 import ReplySla from "@/components/ReplySla";
 import { BOOKING_STEPS } from "@/components/publicCopy";
 import { REQUEST_LABOUR_HREF } from "@/components/site";
@@ -60,21 +61,11 @@ export default function HomePage() {
           <div className="mt-8 grid gap-6 sm:max-w-xl sm:grid-cols-2 sm:gap-4">
             <div>
               <p className="mb-3 text-small font-semibold text-[#fafafa]">Builders and site managers</p>
-              <a
-                href="/portal/book-labour"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pill pill-teal w-full"
-              >
-                Book labour
-                <span className="sr-only"> (form opens in a new tab)</span>
-              </a>
+              <BookLabourLink className="pill pill-teal w-full" />
             </div>
             <div>
               <p className="mb-3 text-small font-semibold text-[#fafafa]">Looking for work</p>
-              <Link href="/portal/join" className="pill pill-line w-full">
-                Apply for work
-              </Link>
+              <ApplyForWorkLink className="pill pill-line w-full" />
             </div>
           </div>
           <p className="mt-4">
@@ -141,15 +132,7 @@ export default function HomePage() {
             ))}
           </ol>
           <div className="mt-12 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="/portal/book-labour"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pill pill-teal w-full sm:w-auto"
-            >
-              Book labour
-              <span className="sr-only"> (form opens in a new tab)</span>
-            </a>
+            <BookLabourLink className="pill pill-teal w-full sm:w-auto" />
             <Link href="/clients#faq" className="pill pill-line w-full sm:w-auto">
               Builders FAQ
             </Link>
@@ -192,18 +175,8 @@ export default function HomePage() {
             Need labour on site, or looking for work?
           </h2>
           <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
-            <a
-              href="/portal/book-labour"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pill pill-teal w-full sm:w-auto"
-            >
-              Book labour
-              <span className="sr-only"> (form opens in a new tab)</span>
-            </a>
-            <Link href="/portal/join" className="pill pill-line w-full sm:w-auto">
-              Apply for work
-            </Link>
+            <BookLabourLink className="pill pill-teal w-full sm:w-auto" />
+            <ApplyForWorkLink className="pill pill-line w-full sm:w-auto" />
           </div>
           <ReplySla className="mx-auto mt-6" />
         </div>

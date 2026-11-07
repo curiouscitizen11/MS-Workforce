@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import SiteChrome from "@/components/SiteChrome";
 import { EMAIL, JOBS_EMAIL, SITE_NAME, SITE_URL, OG_BASE } from "@/components/site";
 import StickyCta from "@/components/StickyCta";
+import { applyForWorkHref, bookLabourHref } from "@/lib/public-links";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -91,7 +92,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}
         />
-        <SiteChrome footer={<Footer />} sticky={<StickyCta />}>
+        <SiteChrome
+          footer={<Footer />}
+          sticky={<StickyCta applyHref={applyForWorkHref()} bookHref={bookLabourHref()} />}
+        >
           {children}
         </SiteChrome>
       </body>

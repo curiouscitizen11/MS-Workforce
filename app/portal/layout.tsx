@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next"
 import Link from "next/link"
 import { cookies } from "next/headers"
+import PortalOpeningSoon from "@/components/PortalOpeningSoon"
 import { AddHomeHint } from "@/components/portal/AddHomeHint"
 import { PortalBottomNav, PortalHeaderSlot } from "@/components/portal/PortalChrome"
+import { portalReachable } from "@/lib/portal/access"
 import { readSession } from "@/lib/portal/session"
 import { THEME_COOKIE, themeFromCookie } from "@/lib/portal/theme"
 
@@ -40,6 +42,15 @@ export const viewport: Viewport = {
 export const dynamic = "force-dynamic"
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
+  if (!portalReachable()) {
+    return (
+      <div className="portal-root min-h-svh" data-theme="dark">
+        <div className="mx-auto w-full max-w-3xl px-5 py-8 md:px-8">
+          <PortalOpeningSoon />
+        </div>
+      </div>
+    )
+  }
   const current = await readSession()
   const home = current?.worker.role === "admin" ? "/portal/admin" : "/portal"
   const theme = themeFromCookie((await cookies()).get(THEME_COOKIE)?.value)

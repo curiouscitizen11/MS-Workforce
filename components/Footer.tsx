@@ -1,18 +1,18 @@
 import Link from "next/link";
-
-const links = [
-  { name: "Services", href: "/services" },
-  { name: "Labourers Sydney", href: "/labourers-sydney" },
-  { name: "Site cleans", href: "/site-cleans-demolition-support" },
-  { name: "Greater Sydney", href: "/labour-hire-greater-sydney" },
-  { name: "Builders", href: "/clients" },
-  { name: "Apply for work", href: "/portal/join" },
-  { name: "About", href: "/about" },
-  { name: "Contact", href: "/contact" },
-  { name: "Privacy", href: "/privacy" },
-];
+import { applyForWorkHref } from "@/lib/public-links";
 
 export default function Footer() {
+  const links = [
+    { name: "Services", href: "/services" },
+    { name: "Labourers Sydney", href: "/labourers-sydney" },
+    { name: "Site cleans", href: "/site-cleans-demolition-support" },
+    { name: "Greater Sydney", href: "/labour-hire-greater-sydney" },
+    { name: "Builders", href: "/clients" },
+    { name: "Apply for work", href: applyForWorkHref() },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
+    { name: "Privacy", href: "/privacy" },
+  ];
   return (
     <footer className="relative z-0 bg-navy text-white">
       <div className="wrap pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-10 md:pb-10">
@@ -35,13 +35,22 @@ export default function Footer() {
             <h2 className="sr-only">Pages</h2>
             <ul className="grid grid-cols-2 gap-x-4 text-small text-white/65 md:grid-cols-4">
               {links.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="flex min-h-11 items-center transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
-                  >
-                    {item.name}
-                  </Link>
+                <li key={item.name}>
+                  {item.href.startsWith("/") ? (
+                    <Link
+                      href={item.href}
+                      className="flex min-h-11 items-center transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
+                    >
+                      {item.name}
+                    </Link>
+                  ) : (
+                    <a
+                      href={item.href}
+                      className="flex min-h-11 items-center transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
+                    >
+                      {item.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

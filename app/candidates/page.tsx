@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Icon, { type IconName } from "@/components/Icons";
+import { ApplyForWorkLink } from "@/components/PublicActions";
 import ReplySla from "@/components/ReplySla";
 import { WORKER_PAY_LINES } from "@/components/publicCopy";
-import { JOBS_EMAIL, WORK_ENQUIRY_HREF, WORKER_FORM_URL, socialMeta } from "@/components/site";
+import { JOBS_EMAIL, WORK_ENQUIRY_HREF, socialMeta } from "@/components/site";
 import { tickets, extras, PRICES_CHECKED, type Ticket, type TicketProvider } from "@/components/tickets";
 
 const pageDescription =
@@ -62,8 +63,6 @@ const ticketGroups: { title: string; titles: string[] }[] = [
   },
   { title: "First aid and CPR", titles: ["First aid and CPR"] },
 ];
-
-const formUrl = WORKER_FORM_URL;
 
 const keptProviders: Record<string, (provider: TicketProvider) => boolean> = {
   "White Card": (provider) =>
@@ -179,10 +178,7 @@ export default function CandidatesPage() {
             when work suits your skills and location.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href="/portal/join" className="pill pill-teal w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
-              Apply for work
-              <span className="sr-only"> (employee portal opens in a new tab)</span>
-            </a>
+            <ApplyForWorkLink className="pill pill-teal w-full sm:w-auto" newTab />
             <a href={WORK_ENQUIRY_HREF} className="link-quiet link-quiet-light w-full sm:w-auto">
               Email us
             </a>
@@ -313,14 +309,12 @@ export default function CandidatesPage() {
             placement. If you have a question first, email us.
           </p>
           <div className="mt-8 flex flex-col items-start gap-3">
-            <a
-              href={formUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <ApplyForWorkLink
+              newTab
               className="inline-flex min-h-12 items-center text-base font-semibold text-teal-300 underline decoration-teal-300/40 underline-offset-4"
             >
               Open the employee portal
-            </a>
+            </ApplyForWorkLink>
             <a
               href={WORK_ENQUIRY_HREF}
               className="inline-flex min-h-12 items-center break-all text-base font-semibold text-[#fafafa] underline decoration-white/30 underline-offset-4"

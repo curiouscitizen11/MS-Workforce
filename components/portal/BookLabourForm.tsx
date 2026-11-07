@@ -4,6 +4,7 @@ import { useState, useTransition } from "react"
 import { sendBookLabour } from "@/app/portal/actions"
 import { BOOK_ROLES, HEARD_OPTIONS } from "@/lib/portal/book-labour"
 import { TickIcon, Field, fieldClass } from "@/components/portal/ui"
+import { REPLY_SLA } from "@/components/publicCopy"
 
 const PRIVACY =
   "We use these details to reply to your request, quote and organise workers. They're stored in our private Notion workspace (USA). We won't share them or add you to a mailing list. Questions or deletion requests: hello@msworkforce.au."
@@ -34,7 +35,7 @@ export function BookLabourForm() {
     return (
       <div className="portal-panel space-y-3">
         <p className="text-sm leading-relaxed">
-          Thanks, {name.trim()}, we&apos;ve got your request. We&apos;ll call you on {phone.trim()} to confirm the details, availability and rates, usually the same business day.
+          Thanks, {name.trim()}, we&apos;ve got your request. We&apos;ll call you on {phone.trim()} to confirm the details, availability and rates. {REPLY_SLA}
         </p>
         <p className="text-sm leading-relaxed">Want to book again or track requests? A client login is coming.</p>
       </div>
