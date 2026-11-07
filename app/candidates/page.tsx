@@ -179,7 +179,7 @@ export default function CandidatesPage() {
             when work suits your skills and location.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a href={formUrl} className="pill pill-teal w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
+            <a href="/portal/join" className="pill pill-teal w-full sm:w-auto" target="_blank" rel="noopener noreferrer">
               Apply for work
               <span className="sr-only"> (employee portal opens in a new tab)</span>
             </a>

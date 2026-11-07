@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BOOK_LABOUR_URL } from "@/components/site";
-
 export default function StickyCta() {
   const [shown, setShown] = useState(false);
 
@@ -38,7 +36,7 @@ export default function StickyCta() {
     >
       <div className="mx-auto grid max-w-md grid-cols-2 gap-3">
         <a
-          href={BOOK_LABOUR_URL}
+          href="/portal/book-labour"
           target="_blank"
           rel="noopener noreferrer"
           className="pill pill-teal w-full px-4"
@@ -46,7 +44,7 @@ export default function StickyCta() {
           Book labour
           <span className="sr-only"> (form opens in a new tab)</span>
         </a>
-        <Link href="/candidates#register" className="pill pill-light w-full px-4">
+        <Link href="/portal/join" className="pill pill-light w-full px-4">
           Apply for work
         </Link>
       </div>
