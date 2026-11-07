@@ -9,7 +9,7 @@ import StickyCta from "@/components/StickyCta";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const description =
-  "Construction labour hire for Greater Sydney builders. General labourers, trade assistants and site cleans, from one day to a whole project.";
+  "Construction labour hire for builders across Greater Sydney. General labourers, trade assistants and site cleans, from one day to a whole project.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

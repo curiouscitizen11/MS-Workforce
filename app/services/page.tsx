@@ -62,7 +62,7 @@ export default function ServicesPage() {
   return (
     <>
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Services</p>
           <h1 className="display mt-4">Construction labour hire across Greater Sydney.</h1>
           <p className="lede mt-5 text-body">
@@ -86,28 +86,28 @@ export default function ServicesPage() {
             (item.dark ? "bg-navy text-white" : "bg-navy-alt text-white")
           }
         >
-          <div className="wrap py-14 sm:py-20 lg:py-24">
+          <div className="wrap section-pad">
             <div className="flex items-center gap-3">
               <Icon name={item.icon} />
               <p className="kicker text-teal">{item.kicker}</p>
             </div>
-            <h2 className="display mt-5">{item.title}</h2>
+            <h2 className="section-title mt-5">{item.title}</h2>
             <p className="lede mt-5 text-body">{item.body}</p>
           </div>
         </section>
       ))}
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Ways to book</p>
-          <h2 className="display mt-4">Short-notice and ongoing supply.</h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+          <h2 className="section-title mt-4">Short-notice and ongoing supply.</h2>
+          <ul className="card-grid mt-8 md:mt-10">
             {supply.map((item) => (
               <li key={item.title} className="num-card">
                 <Icon name={item.icon} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                  <h3 className="card-title">{item.title}</h3>
+                  <p className="copy mt-2">{item.body}</p>
                 </div>
               </li>
             ))}
@@ -116,14 +116,14 @@ export default function ServicesPage() {
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Who we work with</p>
-          <h2 className="display mt-4">Built for builders and trades.</h2>
-          <ul className="mt-8 grid sm:mt-10 gap-3 sm:grid-cols-2">
+          <h2 className="section-title mt-4">Built for builders and trades.</h2>
+          <ul className="card-grid mt-8 sm:grid-cols-2 md:mt-10">
             {sectors.map((item) => (
-              <li key={item} className="num-card items-center text-lg font-bold tracking-tight sm:text-2xl">
+              <li key={item} className="num-card items-center">
                 <Icon name="building" />
-                <span className="min-w-0 flex-1">{item}</span>
+                <span className="card-title min-w-0 flex-1">{item}</span>
               </li>
             ))}
           </ul>
@@ -138,7 +138,7 @@ export default function ServicesPage() {
               More on site cleans and demolition support
             </Link>
             <Link href="/labour-hire-greater-sydney" className="link-quiet link-quiet-light">
-              Where we supply: Greater Sydney
+              Where we supply across Greater Sydney
             </Link>
           </div>
         </div>

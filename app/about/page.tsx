@@ -35,16 +35,16 @@ export default function AboutPage() {
   return (
     <>
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">About</p>
           <h1 className="display mt-4">Why MS Workforce</h1>
-          <div className="mt-8 max-w-2xl space-y-6 text-lg leading-relaxed text-body sm:text-xl">
-            <p>
+          <div className="mt-8 space-y-6">
+            <p className="copy">
               I&apos;ve spent over five years on Sydney construction sites.
               I&apos;ve seen what a good labourer means to a
               builder&apos;s program, and how much a no-show costs.
             </p>
-            <p>
+            <p className="copy">
               I started MS Workforce to supply the kind of workers I&apos;d want
               on my own sites: people who turn up on time, know what they&apos;re
               doing and work safely. When you book with us, you deal with me
@@ -55,16 +55,16 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">How we work</p>
-          <h2 className="display mt-4">Safety, reliability, respect.</h2>
-          <ul className="mt-8 grid gap-3 sm:mt-10">
+          <h2 className="section-title mt-4">Safety, reliability, respect.</h2>
+          <ul className="card-grid mt-8 md:mt-10">
             {values.map((item) => (
               <li key={item.title} className="num-card">
                 <Icon name={item.icon} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{item.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed text-body sm:text-lg">{item.body}</p>
+                  <h3 className="card-title">{item.title}</h3>
+                  <p className="copy mt-2">{item.body}</p>
                 </div>
               </li>
             ))}

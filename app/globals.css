@@ -56,23 +56,31 @@ body {
 
 @layer components {
   .wrap {
-    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
+    @apply mx-auto w-full max-w-6xl px-5 md:px-8;
   }
-  .screen {
-    min-height: calc(100svh - var(--site-header-height));
+  /* Option B section rhythm: 64px phone, 96px desktop. */
+  .section-pad {
+    @apply py-16 md:py-24;
   }
   .kicker {
-    @apply text-[11px] font-medium uppercase tracking-[0.22em];
+    @apply text-small font-medium uppercase tracking-[0.14em];
   }
   .display {
-    @apply max-w-5xl text-balance text-[2.25rem] font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl xl:text-[4.75rem];
+    @apply max-w-4xl text-balance text-h1 font-bold text-[#fafafa] md:text-h1-desktop;
   }
-  .lede {
-    @apply max-w-xl text-lg leading-relaxed text-body sm:text-xl;
+  .section-title {
+    @apply max-w-3xl text-balance text-h2 font-semibold text-[#fafafa] md:text-h2-desktop;
+  }
+  .card-title {
+    @apply text-h3 font-semibold text-[#fafafa] md:text-h3-desktop;
+  }
+  .lede,
+  .copy {
+    @apply max-w-prose text-copy font-normal text-body md:text-copy-desktop;
   }
   /* Buttons: fully round pills, 48px tall, 16px/600, flat, no lift or shadow (colours from the worker portal) */
   .pill {
-    @apply inline-flex min-h-12 items-center justify-center rounded-full border border-transparent px-6 py-3 text-base font-semibold leading-tight transition-colors duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400;
+    @apply inline-flex min-h-12 items-center justify-center rounded-full border border-transparent px-5 py-3 text-base font-semibold leading-tight transition-colors duration-200 ease-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400;
     -webkit-tap-highlight-color: transparent;
   }
   /* Primary: portal accent #2ec4b6 fill, navy text (about 8:1) */
@@ -95,20 +103,30 @@ body {
   }
   /* Quiet secondary action: underlined text link with a 44px tap area */
   .link-quiet {
-    @apply inline-flex min-h-11 items-center justify-center px-2 text-[15px] font-medium underline underline-offset-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400;
+    @apply inline-flex min-h-11 items-center justify-center px-2 text-base font-medium underline underline-offset-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400;
   }
   .link-quiet-light {
     @apply text-teal-400 decoration-teal-400/40 hover:text-teal-300;
   }
+  /* Cards: 12px corners, 1px hairline, small shadow. 20px pad on phones, 24px from md. */
+  .card {
+    @apply rounded-xl border border-white/10 bg-navy-card p-5 shadow-md shadow-black/20 md:p-6;
+  }
+  .card-grid {
+    @apply grid gap-4 md:gap-6;
+  }
   /* Numbered card: teal number badge on the left, content on the right */
   .num-card {
-    @apply flex items-start gap-4 rounded-2xl border border-navy-line bg-navy-card p-5 sm:gap-6 sm:p-7;
+    @apply flex items-start gap-4 rounded-xl border border-white/10 bg-navy-card p-5 shadow-md shadow-black/20 md:gap-6 md:p-6;
   }
   .num-badge {
     @apply inline-flex h-10 w-10 flex-none items-center justify-center rounded-full bg-teal text-base font-bold leading-none text-navy;
   }
+  .card-list {
+    @apply list-disc space-y-2 rounded-xl border border-white/10 bg-navy-card py-5 pl-9 pr-5 text-copy text-body shadow-md shadow-black/20 marker:text-teal md:py-6 md:pr-6 md:text-copy-desktop;
+  }
   .stack-row {
-    @apply grid gap-3 rounded-2xl border border-navy-line bg-navy-card p-5 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:p-7;
+    @apply grid gap-4 rounded-xl border border-white/10 bg-navy-card p-5 shadow-md shadow-black/20 md:grid-cols-12 md:items-baseline md:gap-6 md:p-6;
   }
 }
 
