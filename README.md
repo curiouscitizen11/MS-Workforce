@@ -36,6 +36,10 @@ Open [http://localhost:3000](http://localhost:3000).
 - `/about` – About + Values
 - `/contact` – Contact
 
+## Portal
+
+Worker and admin sign-in, Notion and the go-live checklist are in [README_PORTAL.md](README_PORTAL.md) and [docs/go-live.md](docs/go-live.md).
+
 ## Notes
 - Logo is currently text-based in the header for simplicity. You can replace it with the geometric logo image later.
 - Contact form is currently a simple email prompt (can be upgraded with Formspree, Resend, or similar once ready).

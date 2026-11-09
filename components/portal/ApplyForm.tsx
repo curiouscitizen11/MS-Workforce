@@ -66,7 +66,7 @@ export function ApplyForm() {
             setError("Enter an Australian mobile, like 0400 000 000.")
             return
           }
-          const emailIssue = emailError(emailProblem(email, confirmEmail))
+          const emailIssue = emailError(emailProblem(email, confirmEmail, true))
           if (emailIssue) {
             setError(emailIssue)
             return
@@ -80,7 +80,7 @@ export function ApplyForm() {
           setStep(step + 1)
           return
         }
-        const emailIssue = emailError(emailProblem(email, confirmEmail))
+        const emailIssue = emailError(emailProblem(email, confirmEmail, true))
         if (emailIssue) {
           setError(emailIssue)
           setStep(0)
@@ -112,8 +112,8 @@ export function ApplyForm() {
         <>
           <Field label="Full name" name="name" value={name} onChange={(event) => setName(event.target.value)} required />
           <Field label="Mobile" name="mobile" inputMode="tel" autoComplete="tel" value={mobile} onChange={(event) => setMobile(event.target.value)} required />
-          <Field label="Email (helps if texts fail)" name="email" type="text" inputMode="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
-          <Field label="Confirm email" name="confirmEmail" type="text" inputMode="email" autoComplete="email" value={confirmEmail} onChange={(event) => setConfirmEmail(event.target.value)} />
+          <Field label="Email" name="email" type="text" inputMode="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          <Field label="Confirm email" name="confirmEmail" type="text" inputMode="email" autoComplete="email" value={confirmEmail} onChange={(event) => setConfirmEmail(event.target.value)} required />
           <Field label="Suburb" name="suburb" value={suburb} onChange={(event) => setSuburb(event.target.value)} required />
         </>
       ) : null}

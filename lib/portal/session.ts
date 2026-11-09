@@ -9,6 +9,7 @@ const COOKIE = "msw_portal"
 const PENDING = "msw_admin_pending"
 const OTP = "msw_demo_otp"
 const MOBILE = "msw_mobile"
+const EMAIL = "msw_email"
 const JOIN = "msw_join"
 const JOIN_MS = 30 * 60 * 1000
 
@@ -100,6 +101,14 @@ export async function writeMobileCookie(mobile: string) {
 
 export async function readMobileCookie() {
   return (await cookies()).get(MOBILE)?.value || ""
+}
+
+export async function writeEmailCookie(email: string) {
+  ;(await cookies()).set(EMAIL, email, cookieOptions(365 * 24 * 60 * 60))
+}
+
+export async function readEmailCookie() {
+  return (await cookies()).get(EMAIL)?.value || ""
 }
 
 export async function writeJoinDraft(draft: Omit<JoinDraft, "exp">, nowMs = Date.now()) {

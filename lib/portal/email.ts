@@ -1,5 +1,9 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+export function normaliseEmail(email: string) {
+  return email.trim().toLowerCase()
+}
+
 export function emailProblem(email: string, confirm: string, required = false): "mismatch" | "format" | null {
   const left = email.trim()
   const right = confirm.trim()

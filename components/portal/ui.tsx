@@ -68,7 +68,7 @@ export function DemoBanner({ mock }: { mock: boolean }) {
   if (!mock) return null
   return (
     <p className="portal-banner">
-      Demo mode. Texts, emails and Notion stay on this phone.
+      Demo mode. Nothing leaves this phone.
     </p>
   )
 }

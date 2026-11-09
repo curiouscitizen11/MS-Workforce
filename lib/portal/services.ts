@@ -26,7 +26,8 @@ import {
 } from "@/lib/portal/compliance"
 import { decryptString } from "@/lib/portal/crypto"
 import { createInviteToken, readInviteToken } from "@/lib/portal/invite"
-import { emailError, emailProblem } from "@/lib/portal/email"
+import { emailError, emailProblem, normaliseEmail } from "@/lib/portal/email"
+import { twilioReady } from "@/lib/portal/notify"
 import { WHAT_TO_BRING } from "@/lib/portal/seed"
 import { addDays, daysBetween, formatDate, isMondayInSydney, sydneyParts, sydneyToday } from "@/lib/portal/dates"
 import { deletePrivateBlob, storePrivateBlob } from "@/lib/portal/blob"
@@ -149,11 +150,33 @@ export function loginSms(code: string) {
   return code + " is your MS Workforce code. It expires in 10 minutes.\n\n@www.msworkforce.au #" + code
 }
 
+export function loginEmail(code: string) {
+  return code + " is your MS Workforce code. It expires in 10 minutes."
+}
+
+function textsOpen(ctx: Ctx) {
+  return ctx.mode === "mock" || twilioReady()
+}
+
+async function notifyMobile(ctx: Ctx, person: { mobile: string; email?: string }, body: string, subject: string) {
+  if (textsOpen(ctx)) {
+    await ctx.notify.sms(person.mobile, body)
+    return
+  }
+  if (person.email) await ctx.notify.email({ to: person.email, subject, body })
+}
+
 const ALREADY_JOINED = "Looks like you've already joined. Log in instead."
 
-async function issueOtp(ctx: Ctx, mobile: string, ip: string) {
+async function issueOtp(
+  ctx: Ctx,
+  target: string,
+  channel: "sms" | "email",
+  ip: string,
+  deliver: (code: string) => Promise<void>,
+) {
   const challenges = await ctx.store.challenges.all()
-  const recent = challenges.filter((item) => item.target === mobile && within(item.createdAt, ctx.now, OTP_SEND_WINDOW_MS))
+  const recent = challenges.filter((item) => item.target === target && within(item.createdAt, ctx.now, OTP_SEND_WINDOW_MS))
   if (recent.some((item) => item.lockedUntil && Date.parse(item.lockedUntil) > ctx.now.getTime())) {
     return fail("Too many tries. Wait 15 minutes, then request a new code.", "locked")
   }
@@ -163,16 +186,25 @@ async function issueOtp(ctx: Ctx, mobile: string, ip: string) {
   const code = String(randomInt(0, 1000000)).padStart(6, "0")
   await ctx.store.challenges.save({
     id: newId("otp"),
-    target: mobile,
-    channel: "sms",
+    target,
+    channel,
     codeHash: pepper(code),
     expiresAt: new Date(ctx.now.getTime() + OTP_TTL_MS).toISOString(),
     attempts: 0,
     createdAt: ctx.now.toISOString(),
     ip,
   })
-  await ctx.notify.sms(mobile, loginSms(code), "Login code sent")
+  try {
+    await deliver(code)
+  } catch {
+    return fail("We could not send the code. Try again in a minute.")
+  }
   return { ok: true as const, devCode: ctx.mode === "mock" ? code : undefined }
+}
+
+async function findWorkersByEmail(ctx: Ctx, email: string) {
+  const wanted = normaliseEmail(email)
+  return (await ctx.store.workers.all()).filter((worker) => worker.email?.toLowerCase() === wanted)
 }
 
 async function consumeOtp(ctx: Ctx, mobile: string, code: string) {
@@ -207,7 +239,29 @@ export async function requestOtp(ctx: Ctx, input: { mobile: string; ip: string }
   const worker = await findWorkerByMobile(ctx, mobile)
   if (!worker) return fail("That mobile is not on file. Apply for work first.", "unknown")
   if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
-  return issueOtp(ctx, mobile, input.ip)
+  if (ctx.mode === "live" && !twilioReady()) return fail("Log in with the code we email you.")
+  return issueOtp(ctx, mobile, "sms", input.ip, (code) => ctx.notify.sms(mobile, loginSms(code), "Login code sent"))
+}
+
+async function deliverEmailCode(ctx: Ctx, email: string, code: string) {
+  await ctx.notify.email({
+    to: email,
+    subject: "Your MS Workforce code",
+    body: loginEmail(code),
+    logBody: "Login code sent",
+  })
+}
+
+export async function requestEmailOtp(ctx: Ctx, input: { email: string; ip: string }) {
+  const problem = emailProblem(input.email, input.email, true)
+  if (problem) return fail(emailError(problem))
+  const email = normaliseEmail(input.email)
+  const matches = await findWorkersByEmail(ctx, email)
+  if (matches.length > 1) return fail("Call MS Workforce on " + MS_PHONE + ".")
+  const worker = matches[0]
+  if (!worker) return fail("That email is not on file. Apply for work first.", "unknown")
+  if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  return issueOtp(ctx, email, "email", input.ip, (code) => deliverEmailCode(ctx, email, code))
 }
 
 export async function requestJoinCode(ctx: Ctx, input: { mobile: string; ip: string }) {
@@ -215,7 +269,17 @@ export async function requestJoinCode(ctx: Ctx, input: { mobile: string; ip: str
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
   const worker = await findWorkerByMobile(ctx, mobile)
   if (worker) return fail(ALREADY_JOINED, "exists")
-  return issueOtp(ctx, mobile, input.ip)
+  if (ctx.mode === "live" && !twilioReady()) return fail("Use the email code.")
+  return issueOtp(ctx, mobile, "sms", input.ip, (code) => ctx.notify.sms(mobile, loginSms(code), "Login code sent"))
+}
+
+export async function requestJoinEmail(ctx: Ctx, input: { email: string; ip: string }) {
+  const problem = emailProblem(input.email, input.email, true)
+  if (problem) return fail(emailError(problem))
+  const email = normaliseEmail(input.email)
+  const matches = await findWorkersByEmail(ctx, email)
+  if (matches.length) return fail(ALREADY_JOINED, "exists")
+  return issueOtp(ctx, email, "email", input.ip, (code) => deliverEmailCode(ctx, email, code))
 }
 
 export async function verifyOtp(ctx: Ctx, input: { mobile: string; code: string }) {
@@ -224,6 +288,20 @@ export async function verifyOtp(ctx: Ctx, input: { mobile: string; code: string 
   const consumed = await consumeOtp(ctx, mobile, input.code)
   if (!consumed.ok) return consumed
   const worker = await findWorkerByMobile(ctx, mobile)
+  if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  if (worker.role === "admin") return { ok: true as const, needsTotp: true as const, workerId: worker.id }
+  const session = await openSession(ctx, worker)
+  return { ok: true as const, needsTotp: false as const, session }
+}
+
+export async function verifyEmailOtp(ctx: Ctx, input: { email: string; code: string }) {
+  const problem = emailProblem(input.email, input.email, true)
+  if (problem) return fail(emailError(problem))
+  const email = normaliseEmail(input.email)
+  const consumed = await consumeOtp(ctx, email, input.code)
+  if (!consumed.ok) return consumed
+  const matches = await findWorkersByEmail(ctx, email)
+  const worker = matches.length === 1 ? matches[0] : null
   if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
   if (worker.role === "admin") return { ok: true as const, needsTotp: true as const, workerId: worker.id }
   const session = await openSession(ctx, worker)
@@ -266,7 +344,9 @@ export async function requestMagicLink(ctx: Ctx, input: { email: string; confirm
   if (problem) return fail(emailError(problem))
   const email = input.email.trim().toLowerCase()
   const worker = (await ctx.store.workers.all()).find((item) => item.email?.toLowerCase() === email)
-  if (!worker) return fail("That email is not on file. Try your mobile instead.", "unknown")
+  if (!worker) {
+    return fail(twilioReady() ? "That email is not on file. Try your mobile instead." : "That email is not on file. Apply for work first.", "unknown")
+  }
   if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
   const token = newId("magic") + newId()
   await ctx.store.magics.save({
@@ -300,8 +380,8 @@ export async function consumeMagicLink(ctx: Ctx, token: string) {
 const applySchema = z.object({
   name: z.string().trim().min(2).max(80),
   mobile: z.string(),
-  email: z.string().trim().max(120).optional(),
-  confirmEmail: z.string().trim().max(120).optional(),
+  email: z.string().trim().min(3).max(120),
+  confirmEmail: z.string().trim().min(3).max(120),
   suburb: z.string().trim().min(2).max(80),
   roles: z.array(z.enum(ROLES)).min(1),
   experience: z.string().trim().max(1000).optional(),
@@ -321,8 +401,8 @@ const applySchema = z.object({
 const joinDetailsSchema = z.object({
   name: z.string().trim().min(2).max(80),
   mobile: z.string(),
-  email: z.string().trim().max(120).optional(),
-  confirmEmail: z.string().trim().max(120).optional(),
+  email: z.string().trim().min(3).max(120),
+  confirmEmail: z.string().trim().min(3).max(120),
   suburb: z.string().trim().min(2).max(80),
   postcode: z.string().trim().regex(/^\d{4}$/),
   roles: z.array(z.enum(ROLES)).min(1),
@@ -350,14 +430,18 @@ export async function prepareJoin(ctx: Ctx, input: unknown, ip: string) {
   if (sensitive) return fail(sensitive)
   const mobile = toE164(data.mobile)
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
-  const emailProblemFound = emailProblem(data.email || "", data.confirmEmail || "")
+  if (await findWorkerByMobile(ctx, mobile)) return fail(ALREADY_JOINED, "exists")
+  const emailProblemFound = emailProblem(data.email, data.confirmEmail, true)
   if (emailProblemFound) return fail(emailError(emailProblemFound))
-  const sent = await requestJoinCode(ctx, { mobile, ip })
+  const email = normaliseEmail(data.email)
+  const emailTaken = await findWorkersByEmail(ctx, email)
+  if (emailTaken.length) return fail(ALREADY_JOINED, "exists")
+  const sent = await requestJoinEmail(ctx, { email, ip })
   if (!sent.ok) return sent
   const draft: JoinDetails = {
     name: data.name,
     mobile,
-    email: (data.email || "").trim(),
+    email,
     suburb: data.suburb,
     postcode: data.postcode,
     roles: data.roles,
@@ -386,24 +470,28 @@ export async function makeWorkerInvite(ctx: Ctx, input: unknown) {
   return { ok: true as const, path: "/portal/join?invite=" + encodeURIComponent(token) }
 }
 
-export async function resendJoinCode(ctx: Ctx, mobile: string, ip: string) {
-  return requestJoinCode(ctx, { mobile, ip })
+export async function resendJoinCode(ctx: Ctx, email: string, ip: string) {
+  return requestJoinEmail(ctx, { email, ip })
 }
 
 export async function finishJoin(ctx: Ctx, draft: JoinDetails, code: string) {
   const existing = await findWorkerByMobile(ctx, draft.mobile)
   if (existing) return fail(ALREADY_JOINED, "exists")
-  const consumed = await consumeOtp(ctx, draft.mobile, code)
+  const email = normaliseEmail(draft.email)
+  if (!email) return fail("Enter your email.")
+  const consumed = await consumeOtp(ctx, email, code)
   if (!consumed.ok) return consumed
   const again = await findWorkerByMobile(ctx, draft.mobile)
   if (again) return fail(ALREADY_JOINED, "exists")
+  const emailTaken = await findWorkersByEmail(ctx, email)
+  if (emailTaken.length) return fail(ALREADY_JOINED, "exists")
   const nowIso = ctx.now.toISOString()
   const worker: Worker = {
     id: newId("w"),
     role: "worker",
     name: draft.name,
     mobile: draft.mobile,
-    email: draft.email || undefined,
+    email,
     suburb: draft.suburb,
     postcode: draft.postcode,
     status: "Applicant",
@@ -431,11 +519,13 @@ export async function submitApplication(ctx: Ctx, input: unknown) {
   if (sensitive) return fail(sensitive)
   const mobile = toE164(data.mobile)
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
-  const emailProblemFound = emailProblem(data.email || "", data.confirmEmail || "")
+  const emailProblemFound = emailProblem(data.email, data.confirmEmail, true)
   if (emailProblemFound) return fail(emailError(emailProblemFound))
-  const email = (data.email || "").trim()
+  const email = normaliseEmail(data.email)
   const existing = await findWorkerByMobile(ctx, mobile)
-  if (existing?.role === "admin") return fail("Use the admin login for this mobile.")
+  const emailOwner = (await findWorkersByEmail(ctx, email)).find((worker) => worker.mobile !== mobile)
+  if (emailOwner?.role === "admin" || existing?.role === "admin") return fail("Use the admin login for this mobile.")
+  if (emailOwner) return fail("Looks like you've already applied. Log in instead.", "exists")
   if (existing && existing.status !== "Applicant") {
     return fail("Looks like you've already applied. Log in instead.", "exists")
   }
@@ -464,7 +554,7 @@ export async function submitApplication(ctx: Ctx, input: unknown) {
   }
   worker.name = data.name
   worker.mobile = mobile
-  worker.email = email || worker.email
+  worker.email = email
   worker.suburb = data.suburb
   worker.roles = data.roles
   worker.experience = data.experience
@@ -1226,8 +1316,12 @@ export async function submitTimesheet(
   await enqueue(ctx, "timesheets", timesheetNotionProperties(sheet))
   if (sheet.incident) {
     const alert = worker.name + " reported an incident on " + formatDate(sheet.workDate) + ". " + (sheet.incidentNote || "")
-    await ctx.notify.sms(adminMobile(), alert)
-    await ctx.notify.email({ to: adminEmail(), subject: "Incident — " + worker.name, body: alert })
+    try {
+      if (textsOpen(ctx)) await ctx.notify.sms(adminMobile(), alert)
+      await ctx.notify.email({ to: adminEmail(), subject: "Incident — " + worker.name, body: alert })
+    } catch {
+      // The hours are already saved. A failed alert must not hide them.
+    }
   }
   await audit(ctx, worker.id, "timesheet-signed", sheet.id)
   return { ok: true as const, id: sheet.id, hours: hours.hours, warnings, status: sheet.status, afterCutoff: fortnight.afterCutoff, payDay: fortnight.payDay }
@@ -1404,10 +1498,16 @@ export async function createOffers(
     }
     await ctx.store.offers.save(offer)
     await enqueue(ctx, "shiftOffers", offerNotionProperties(offer, worker.name))
-    await ctx.notify.sms(
-      worker.mobile,
-      "New shift offer: " + formatDate(offer.shiftDate) + ", " + offer.suburb + ", " + offer.startTime + ", " + offer.roleName + ". Log in to the MS Workforce portal to accept or decline.",
-    )
+    try {
+      await notifyMobile(
+        ctx,
+        worker,
+        "New shift offer: " + formatDate(offer.shiftDate) + ", " + offer.suburb + ", " + offer.startTime + ", " + offer.roleName + ". Log in to the MS Workforce portal to accept or decline.",
+        "New shift offer",
+      )
+    } catch {
+      // The offer is already saved. A failed message must not hide it.
+    }
     created.push(worker.name)
     await audit(ctx, admin.id, "send-offer", offer.id)
   }
@@ -1680,7 +1780,7 @@ export async function runReminders(ctx: Ctx) {
         stage === "0"
           ? label + " expires today. Upload the new card in the MS Workforce portal."
           : label + " expires in " + days + " days. Renew it before you are booked."
-      await ctx.notify.sms(worker.mobile, body)
+      if (textsOpen(ctx)) await ctx.notify.sms(worker.mobile, body)
       if (worker.email) await ctx.notify.email({ to: worker.email, subject: label + " expiry", body })
       await ctx.store.reminders.save({ id, workerId: worker.id, ticket: ticket.type, kind: stage, expiry: ticket.expiry, sentAt: ctx.now.toISOString() })
       sent += 1
@@ -1696,7 +1796,7 @@ export async function runReminders(ctx: Ctx) {
         stage === "0"
           ? extra.label + " expires today. Upload the new card in the MS Workforce portal."
           : extra.label + " expires in " + days + " days. Renew it before you are booked."
-      await ctx.notify.sms(worker.mobile, body)
+      if (textsOpen(ctx)) await ctx.notify.sms(worker.mobile, body)
       if (worker.email) await ctx.notify.email({ to: worker.email, subject: extra.label + " expiry", body })
       await ctx.store.reminders.save({ id, workerId: worker.id, ticket: extra.label, kind: stage, expiry: extra.expiry, sentAt: ctx.now.toISOString() })
       sent += 1
@@ -1713,7 +1813,7 @@ export async function runReminders(ctx: Ctx) {
       const id = worker.id + ":timesheet:" + today + ":" + reminder
       if (!(await ctx.store.reminders.get(id))) {
         const body = reminder === "cutoff" ? "Cut-off is 6 pm today" : "Log today's hours before you leave site"
-        await ctx.notify.sms(worker.mobile, body)
+        await notifyMobile(ctx, worker, body, "Today's hours")
         await ctx.store.reminders.save({ id, workerId: worker.id, ticket: "timesheet", kind: reminder, expiry: today, sentAt: ctx.now.toISOString() })
         sent += 1
       }

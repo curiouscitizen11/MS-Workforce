@@ -483,7 +483,7 @@ export type NotificationRecord = {
   to: string
   subject?: string
   body: string
-  status: "sent" | "captured" | "stub"
+  status: "sent" | "captured" | "stub" | "skipped"
 }
 
 export type InductionAttempt = {

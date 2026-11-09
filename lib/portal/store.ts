@@ -149,9 +149,20 @@ export async function getStore(): Promise<Store> {
   if (!globalStore.__mswStore) {
     const { portalMode } = await import("@/lib/portal/config")
     if (portalMode() === "live") {
-      if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required when the portal is live.")
+      const databaseUrl = process.env.DATABASE_URL
+      if (!databaseUrl) throw new Error("DATABASE_URL is required when the portal is live.")
+      const { ensurePortalSchema } = await import("@/lib/portal/db/migrate")
       const { createPostgresStore } = await import("@/lib/portal/db/postgres")
-      globalStore.__mswStore = createPostgresStore(process.env.DATABASE_URL)
+      const { ensureAdminAccount } = await import("@/lib/portal/bootstrap")
+      try {
+        await ensurePortalSchema(databaseUrl)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "database"
+        throw new Error("The portal database is not ready. " + message.replace(/postgres(?:ql)?:\/\/\S+/gi, "[redacted]"))
+      }
+      const store = createPostgresStore(databaseUrl)
+      await ensureAdminAccount(store)
+      globalStore.__mswStore = store
     } else {
       globalStore.__mswStore = createMemoryStore({
         seed: true,
