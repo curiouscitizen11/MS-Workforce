@@ -1,15 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SiteChrome from "@/components/SiteChrome";
 import { EMAIL, JOBS_EMAIL, SITE_NAME, SITE_URL, OG_BASE } from "@/components/site";
 import StickyCta from "@/components/StickyCta";
+import { applyForWorkHref, bookLabourHref } from "@/lib/public-links";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const description =
-  "Construction labour hire for Greater Sydney builders. General labourers, trade assistants and site cleans, from one day to a whole project.";
+  "Construction labour hire for builders across Greater Sydney. General labourers, trade assistants and site cleans, from one day to a whole project.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -91,15 +92,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organisation) }}
         />
-        <Header />
-        <main
-          className="relative z-0"
-          style={{ paddingTop: "var(--site-header-height)" }}
+        <SiteChrome
+          footer={<Footer />}
+          sticky={<StickyCta applyHref={applyForWorkHref()} bookHref={bookLabourHref()} />}
         >
           {children}
-        </main>
-        <Footer />
-        <StickyCta />
+        </SiteChrome>
       </body>
     </html>
   );

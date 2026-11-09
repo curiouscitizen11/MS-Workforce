@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { BOOK_LABOUR_URL } from "@/components/site";
-
-export default function StickyCta() {
+export default function StickyCta({ applyHref, bookHref }: { applyHref: string; bookHref: string }) {
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -38,17 +35,17 @@ export default function StickyCta() {
     >
       <div className="mx-auto grid max-w-md grid-cols-2 gap-3">
         <a
-          href={BOOK_LABOUR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={bookHref}
+          target={bookHref.startsWith("/") ? "_blank" : undefined}
+          rel={bookHref.startsWith("/") ? "noopener noreferrer" : undefined}
           className="pill pill-teal w-full px-4"
         >
           Book labour
-          <span className="sr-only"> (form opens in a new tab)</span>
+          {bookHref.startsWith("/") ? <span className="sr-only"> (form opens in a new tab)</span> : null}
         </a>
-        <Link href="/candidates#register" className="pill pill-light w-full px-4">
+        <a href={applyHref} className="pill pill-light w-full px-4">
           Apply for work
-        </Link>
+        </a>
       </div>
     </div>
   );

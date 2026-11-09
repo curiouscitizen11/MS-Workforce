@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BOOK_LABOUR_URL, REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
+import { BookLabourLink } from "@/components/PublicActions";
+import ReplySla from "@/components/ReplySla";
+import { REQUEST_LABOUR_HREF, socialMeta } from "@/components/site";
 
 const pageTitle = "Site Cleans and Demolition Support | MS Workforce";
 const pageDescription =
@@ -48,7 +50,7 @@ export default function SiteCleansPage() {
   return (
     <>
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Site cleans and demolition support</p>
           <h1 className="display mt-4">Site cleans and demolition support for Sydney builders.</h1>
           <p className="lede mt-5 text-body">
@@ -57,75 +59,68 @@ export default function SiteCleansPage() {
             builder. Book a single day or a crew for the whole stage.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={BOOK_LABOUR_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pill pill-teal w-full sm:w-auto"
-            >
-              Book labour
-              <span className="sr-only"> (form opens in a new tab)</span>
-            </a>
+            <BookLabourLink className="pill pill-teal w-full sm:w-auto" />
             <a href={REQUEST_LABOUR_HREF} className="link-quiet link-quiet-light w-full sm:w-auto">
               Email the brief
             </a>
           </div>
+          <ReplySla className="mt-6" />
         </div>
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Site cleans</h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
+        <div className="wrap section-pad">
+          <h2 className="section-title">Site cleans</h2>
+          <p className="copy mt-4">
             A clean site is safer and keeps the trades moving. We supply
             labourers to keep it that way from the first week to handover.
           </p>
-          <ul className="mt-6 max-w-2xl list-disc space-y-2 rounded-2xl border border-navy-line bg-navy-card py-5 pl-9 pr-5 text-base text-body marker:text-teal sm:text-lg">
+          <ul className="card-list mt-6 max-w-prose">
             {cleans.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
 
-          <h2 className="mt-10 text-3xl font-bold tracking-tight sm:text-4xl">Demolition support</h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
+          <h2 className="section-title mt-12 md:mt-16">Demolition support</h2>
+          <p className="copy mt-4">
             Extra hands for the manual side of demolition and strip-out, so
             your crew can stay on the main task. Your builder or site
             supervisor directs the work and the workers follow your site rules.
           </p>
-          <ul className="mt-6 max-w-2xl list-disc space-y-2 rounded-2xl border border-navy-line bg-navy-card py-5 pl-9 pr-5 text-base text-body marker:text-teal sm:text-lg">
+          <ul className="card-list mt-6 max-w-prose">
             {demolition.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
+          <p className="copy mt-6">
             This is labour only. We do not supply plant or run demolition
             jobs ourselves.
           </p>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
+          <p className="copy mt-4">
             MS Workforce does not carry out asbestos removal itself, but can
-            connect builders with a licensed asbestos removal contractor when
+            connect builders with an asbestos removal contractor when
             a job needs it. Ask us through Book labour or Email the brief.
           </p>
         </div>
       </section>
 
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">How booking works</h2>
+        <div className="wrap section-pad">
+          <h2 className="section-title">How booking works</h2>
           <ol className="mt-8 grid gap-3 sm:mt-10">
             {steps.map((step, index) => (
               <li key={step.title} className="num-card">
                 <span className="num-badge">{index + 1}</span>
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{step.title}</h3>
-                  <p className="mt-2 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
+                  <h3 className="card-title">{step.title}</h3>
+                  <p className="copy mt-2">
                     {step.body}
                   </p>
                 </div>
               </li>
             ))}
           </ol>
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-body sm:text-lg">
+          <p className="copy mt-8">
             Book one day, short-notice cover, ongoing supply or a
             project-based crew. If we can&apos;t fill a request properly, we
             say so rather than send the wrong person.
@@ -134,11 +129,12 @@ export default function SiteCleansPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Need a hand on site?</h2>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-body sm:text-lg">
-            Send us the brief and we will tell you straight away whether we can fill it.
+        <div className="wrap section-pad">
+          <h2 className="section-title">Need a hand on site?</h2>
+          <p className="copy mt-4">
+            Send us the brief and we will tell you whether we can fill it.
           </p>
+          <ReplySla className="mt-4" />
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/services" className="pill pill-line w-full sm:w-auto">
               See all services

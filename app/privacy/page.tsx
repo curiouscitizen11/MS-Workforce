@@ -174,7 +174,7 @@ export default function PrivacyPage() {
   return (
     <>
       <section className="bg-navy text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
+        <div className="wrap section-pad">
           <p className="kicker text-teal">Privacy</p>
           <h1 className="display mt-4">Privacy Policy</h1>
           <p className="lede mt-5 text-body">
@@ -184,17 +184,19 @@ export default function PrivacyPage() {
       </section>
 
       <section className="bg-navy-alt text-white">
-        <div className="wrap py-14 sm:py-20 lg:py-24">
-          <div className="grid max-w-3xl gap-4">
+        <div className="wrap section-pad">
+          <div className="card-grid max-w-3xl">
             {sections.map((s) => (
-              <div key={s.title} className="rounded-2xl border border-navy-line bg-navy-card p-5 sm:p-7">
-                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{s.title}</h2>
-                <div className="mt-4 space-y-4 text-lg leading-relaxed text-body">{s.body}</div>
+              <div key={s.title} className="card">
+                <h2 className="card-title">{s.title}</h2>
+                <div className="copy mt-4 space-y-4">{s.body}</div>
               </div>
             ))}
           </div>
-          <p className="mt-10 text-sm text-body">
-            <Link href="/" className="underline underline-offset-4">Back to home</Link>
+          <p className="mt-10">
+            <Link href="/" className="inline-flex min-h-11 items-center text-small text-body underline underline-offset-4 hover:text-white">
+              Back to home
+            </Link>
           </p>
         </div>
       </section>

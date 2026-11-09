@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ApplyForWorkLink } from "@/components/PublicActions";
+import ReplySla from "@/components/ReplySla";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -9,7 +11,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <section className="bg-navy text-white">
-      <div className="wrap py-14 sm:py-20 lg:py-24">
+      <div className="wrap section-pad">
         <p className="kicker text-teal">404</p>
         <h1 className="display mt-4">This page isn&apos;t on site.</h1>
         <p className="lede mt-5 text-body">
@@ -23,10 +25,9 @@ export default function NotFound() {
           <Link href="/clients" className="pill pill-line w-full sm:w-auto">
             For builders
           </Link>
-          <Link href="/candidates" className="pill pill-line w-full sm:w-auto">
-            Apply for work
-          </Link>
+          <ApplyForWorkLink className="pill pill-line w-full sm:w-auto" />
         </div>
+        <ReplySla className="mt-6" />
       </div>
     </section>
   );
