@@ -59,8 +59,11 @@ export default async function PortalLayout({ children }: { children: React.React
       <header className="portal-header">
         <div className="portal-header-inner">
           {current ? <PortalHeaderSlot name={current.worker.name} role={current.worker.role} /> : <span className="portal-header-side" />}
-          <Link href={current ? home : "/portal/login"} className="portal-wordmark">
-            MS <span>WORKFORCE</span>
+          <Link href={current ? home : "/portal/login"} className="portal-wordmark flex min-h-12 flex-col justify-center">
+            <span className="block text-[19px] font-semibold tracking-tight">
+              MS <span className="text-teal">|</span> WORKFORCE
+            </span>
+            <span className="mt-1 block text-[11px] font-medium tracking-[0.2em] text-body">LABOUR HIRE</span>
           </Link>
           {current ? <span className="portal-header-side" /> : (
             <Link href="/" className="portal-header-site">
@@ -69,7 +72,7 @@ export default async function PortalLayout({ children }: { children: React.React
           )}
         </div>
       </header>
-      <div className="mx-auto w-full max-w-xl px-5 pb-28 pt-4 md:px-8">
+      <div className="mx-auto w-full max-w-3xl px-5 pb-28 pt-8 md:px-8 md:pt-12">
         <AddHomeHint />
         {children}
       </div>
