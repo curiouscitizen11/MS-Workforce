@@ -127,7 +127,7 @@ describe("health questions", () => {
     expect(props["Carries EpiPen"]).toBe("No")
     expect(props["Medical conditions"]).toEqual(["Asthma"])
     expect(props["Medical notes"]).toBe("Condition: uses an inhaler")
-    expect(props["Injury affecting duties"]).toBe("Yes, a current injury")
+    expect(props["Injury affecting duties"]).toBe("Yes \u2013 a current injury")
     expect(props["Tasks affected"]).toEqual(["Lifting or carrying"])
   })
 })

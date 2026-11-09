@@ -4,15 +4,39 @@ import { notionOtherTickets } from "@/lib/portal/ticket-catalogue"
 import { heldLicenceExpiries } from "@/lib/portal/ticket-photos"
 import { sensitiveFindings } from "@/lib/portal/privacy"
 import {
-  EXPERIENCE_LEVELS,
-  FITNESS_OPTIONS,
+  LIVE_ALLERGIES,
+  LIVE_ALLERGY_TYPES,
+  LIVE_ANAPHYLAXIS,
+  LIVE_APPROVER_ROLES,
+  LIVE_CONDITIONS,
+  LIVE_CONSTRUCTION,
+  LIVE_EPIPEN,
+  LIVE_EXPERIENCE,
+  LIVE_FITNESS,
+  LIVE_ID_METHODS,
+  LIVE_INJURY,
+  LIVE_LICENCE_STATES,
+  LIVE_MEDICATION,
+  LIVE_OTHER_TICKETS,
+  LIVE_RELATIONSHIPS,
+  LIVE_ROLES,
+  LIVE_RTW,
+  LIVE_SHARING,
+  LIVE_TASKS,
+  LIVE_TICKET_OPTIONS,
+  LIVE_TRANSPORT,
+  LIVE_VERIFICATION,
+  LIVE_VEVO_METHODS,
+  LIVE_VEVO_RESULTS,
+  LIVE_WORK_AREAS,
+  notionMulti,
+  notionSelect,
+  notionWorkDays,
+  toLiveOption,
+} from "@/lib/portal/notion/live-options"
+import {
   OFFER_STATUSES,
-  RTW_OPTIONS,
-  TICKET_ANSWERS,
   TICKET_LABELS,
-  VEVO_METHODS,
-  VEVO_RESULTS,
-  VERIFICATION_METHODS,
   WORKER_STATUSES,
   type Offer,
   type TicketType,
@@ -96,28 +120,47 @@ function nextTicketExpiry(worker: Worker): string | undefined {
   return dates[0]
 }
 
-function ticketChoice(status: string | undefined) {
-  if (!status) return undefined
-  return choice(status, TICKET_ANSWERS)
+function ticketChoice(status: string | undefined, notes: string[]) {
+  const picked = notionSelect(status, LIVE_TICKET_OPTIONS, "Ticket")
+  if (picked.note) notes.push(picked.note)
+  return picked.value
 }
 
-function rtwChoice(value: string | undefined) {
+function rtwChoice(value: string | undefined, notes: string[]) {
   const mapped = value === "Citizen - passport" ? "Australian citizen" : value === "Visa - VEVO" ? "Visa holder" : value
-  return choice(mapped, RTW_OPTIONS)
+  const picked = notionSelect(mapped, LIVE_RTW, "RTW evidence")
+  if (picked.note) notes.push(picked.note)
+  return picked.value
 }
 
-function fitnessChoice(value: string | undefined) {
+function fitnessChoice(value: string | undefined, notes: string[]) {
   const mapped = value === "Yes" ? "Yes, I can safely do these tasks" : value
-  return choice(mapped, FITNESS_OPTIONS)
+  const picked = notionSelect(mapped, LIVE_FITNESS, "Fitness declaration")
+  if (picked.note) notes.push(picked.note)
+  return picked.value
+}
+
+function one(value: string | undefined, allowed: readonly string[], field: string, notes: string[]) {
+  const picked = notionSelect(value, allowed, field)
+  if (picked.note) notes.push(picked.note)
+  return picked.value
+}
+
+function many(values: string[] | undefined, allowed: readonly string[], field: string, notes: string[]) {
+  const picked = notionMulti(values, allowed, field)
+  if (picked.note) notes.push(picked.note)
+  return picked.values
 }
 
 export function workerNotionProperties(worker: Worker): Record<string, unknown> {
   const props: Record<string, unknown> = {}
+  const notes: string[] = []
   put(props, "Name", worker.name)
   put(props, "Mobile", worker.mobile)
   put(props, "Email", worker.email)
   put(props, "Suburb", worker.suburb)
-  if (worker.roles.length) props["Roles of interest"] = worker.roles
+  const roles = many(worker.roles, LIVE_ROLES, "Roles of interest", notes)
+  if (roles) props["Roles of interest"] = roles
   put(props, "Experience summary", worker.experience)
   props["WhatsApp OK"] = worker.whatsappOk
   put(props, "Status", choice(worker.status, WORKER_STATUSES))
@@ -128,30 +171,34 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "Emergency phone", worker.emergencyPhone)
   put(props, "Preferred name", worker.preferredName)
   put(props, "Postcode", worker.postcode)
-  put(props, "Emergency relationship", worker.emergencyRelationship)
-  put(props, "Experience level", worker.experienceLevel ? choice(worker.experienceLevel, EXPERIENCE_LEVELS) : undefined)
+  put(props, "Emergency relationship", one(worker.emergencyRelationship, LIVE_RELATIONSHIPS, "Emergency relationship", notes))
+  put(props, "Experience level", one(worker.experienceLevel, LIVE_EXPERIENCE, "Experience level", notes))
   put(props, "Work history", worker.workHistory)
   put(props, "Available from", worker.availableFrom)
-  if (worker.workAreas?.length) props["Work areas"] = worker.workAreas
-  if (worker.workDays?.length) props["Work days"] = worker.workDays
-  put(props, "RTW evidence", rtwChoice(worker.rtw))
-  put(props, "Right to work", worker.rightToWork)
+  const areas = many(worker.workAreas, LIVE_WORK_AREAS, "Work areas", notes)
+  if (areas) props["Work areas"] = areas
+  const days = notionWorkDays(worker.workDays)
+  if (days.note) notes.push(days.note)
+  if (days.values) props["Work days"] = days.values
+  put(props, "RTW evidence", rtwChoice(worker.rtw, notes))
+  put(props, "Right to work", one(worker.rightToWork, ["Yes", "No", "Pending"], "Right to work", notes))
   props["VEVO consent"] = Boolean(worker.vevoConsent)
   put(props, "Visa subclass", worker.visaSubclass)
   put(props, "Visa expiry", worker.visaExpiry)
-  put(props, "VEVO method", worker.vevoMethod ? choice(worker.vevoMethod, VEVO_METHODS) : undefined)
-  put(props, "VEVO result", worker.vevoResult ? choice(worker.vevoResult, VEVO_RESULTS) : undefined)
+  put(props, "VEVO method", one(worker.vevoMethod, LIVE_VEVO_METHODS, "VEVO method", notes))
+  put(props, "VEVO result", one(worker.vevoResult, LIVE_VEVO_RESULTS, "VEVO result", notes))
   put(props, "VEVO checked on", worker.vevoCheckedOn)
-  put(props, "White card", ticketChoice(worker.tickets.whiteCard.status))
-  put(props, "Work at heights", ticketChoice(worker.tickets.heights.status))
-  put(props, "Asbestos class A", ticketChoice(worker.tickets.asbestosA.status))
-  put(props, "Asbestos class B", ticketChoice(worker.tickets.asbestosB.status))
-  put(props, "Confined space", ticketChoice(worker.tickets.confinedSpace.status))
-  put(props, "Driver licence", ticketChoice(worker.tickets.driverLicence.status))
-  put(props, "First aid", ticketChoice(worker.tickets.firstAid.status))
+  put(props, "White card", ticketChoice(worker.tickets.whiteCard.status, notes))
+  put(props, "Work at heights", ticketChoice(worker.tickets.heights.status, notes))
+  put(props, "Asbestos class A", ticketChoice(worker.tickets.asbestosA.status, notes))
+  put(props, "Asbestos class B", ticketChoice(worker.tickets.asbestosB.status, notes))
+  put(props, "Confined space", ticketChoice(worker.tickets.confinedSpace.status, notes))
+  put(props, "Driver licence", ticketChoice(worker.tickets.driverLicence.status, notes))
+  put(props, "First aid", ticketChoice(worker.tickets.firstAid.status, notes))
   const extraTickets = notionOtherTickets(worker.otherTicketsHeld)
-  const otherText = [worker.tickets.other.note, extraTickets.custom.join(", ")].filter(Boolean).join(". ")
-  put(props, "Other tickets", otherText || (worker.tickets.other.status === "No" ? undefined : worker.tickets.other.status))
+  const otherStatus = worker.tickets.other.status === "No" ? undefined : toLiveOption(worker.tickets.other.status, "Other tickets")
+  const otherText = [worker.tickets.other.note, extraTickets.custom.join("; ")].filter(Boolean).join(". ")
+  put(props, "Other tickets", otherText || otherStatus)
   put(props, "White card expiry", worker.tickets.whiteCard.expiry)
   put(props, "Work at heights expiry", worker.tickets.heights.expiry)
   put(props, "Asbestos class A expiry", worker.tickets.asbestosA.expiry)
@@ -168,26 +215,30 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "First aid issued", worker.tickets.firstAid.issued)
   put(props, "Driver card number", worker.tickets.driverLicence.cardNumber)
   put(props, "Next ticket expiry", nextTicketExpiry(worker))
-  if (extraTickets.known.length) props["Other tickets held"] = extraTickets.known
-  put(props, "Transport", worker.transport)
-  put(props, "Fitness declaration", fitnessChoice(worker.fitness))
-  put(props, "Construction work in last 2 years", worker.constructionRecent)
-  put(props, "Driver licence state", worker.licenceState)
+  const held = many(extraTickets.known, LIVE_OTHER_TICKETS, "Other tickets held", notes)
+  if (held) props["Other tickets held"] = held
+  put(props, "Transport", one(worker.transport, LIVE_TRANSPORT, "Transport", notes))
+  put(props, "Fitness declaration", fitnessChoice(worker.fitness, notes))
+  put(props, "Construction work in last 2 years", one(worker.constructionRecent, LIVE_CONSTRUCTION, "Construction work in last 2 years", notes))
+  put(props, "Driver licence state", one(worker.licenceState, LIVE_LICENCE_STATES, "Driver licence state", notes))
   if (typeof worker.daConsent === "boolean") props["D&A consent"] = worker.daConsent
   if (typeof worker.declaration === "boolean") props.Declaration = worker.declaration
   if (typeof worker.idSighted === "boolean") props["ID sighted"] = worker.idSighted
-  put(props, "ID sighted method", worker.idSightedMethod)
+  put(props, "ID sighted method", one(worker.idSightedMethod, LIVE_ID_METHODS, "ID sighted method", notes))
   put(props, "ID sighted on", worker.idSightedOn)
-  put(props, "Allergies", worker.allergies)
-  if (worker.allergyTypes?.length) props["Allergy types"] = worker.allergyTypes
-  put(props, "Anaphylaxis risk", worker.anaphylaxis)
-  put(props, "Carries EpiPen", worker.epipen)
-  if (worker.medicalConditions?.length) props["Medical conditions"] = worker.medicalConditions
+  put(props, "Allergies", one(worker.allergies, LIVE_ALLERGIES, "Allergies", notes))
+  const allergyTypes = many(worker.allergyTypes, LIVE_ALLERGY_TYPES, "Allergy types", notes)
+  if (allergyTypes) props["Allergy types"] = allergyTypes
+  put(props, "Anaphylaxis risk", one(worker.anaphylaxis, LIVE_ANAPHYLAXIS, "Anaphylaxis risk", notes))
+  put(props, "Carries EpiPen", one(worker.epipen, LIVE_EPIPEN, "Carries EpiPen", notes))
+  const conditions = many(worker.medicalConditions, LIVE_CONDITIONS, "Medical conditions", notes)
+  if (conditions) props["Medical conditions"] = conditions
   put(props, "Medical notes", worker.medicalNotes)
-  put(props, "Injury affecting duties", worker.injury)
-  if (worker.tasksAffected?.length) props["Tasks affected"] = worker.tasksAffected
-  put(props, "Safety medication", worker.safetyMedication)
-  put(props, "Medical sharing", worker.medicalSharing)
+  put(props, "Injury affecting duties", one(worker.injury, LIVE_INJURY, "Injury affecting duties", notes))
+  const tasksAffected = many(worker.tasksAffected, LIVE_TASKS, "Tasks affected", notes)
+  if (tasksAffected) props["Tasks affected"] = tasksAffected
+  put(props, "Safety medication", one(worker.safetyMedication, LIVE_MEDICATION, "Safety medication", notes))
+  put(props, "Medical sharing", one(worker.medicalSharing, LIVE_SHARING, "Medical sharing", notes))
   props["Health info consent"] = Boolean(worker.healthConsent)
   props["Policies acknowledged"] = Boolean(worker.policiesAck)
   props["Contract accepted in form"] = Boolean(worker.contractAccepted)
@@ -201,9 +252,9 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   props["Tickets verified"] = Boolean(worker.ticketsVerified)
   put(props, "Verified on", worker.verifiedOn)
   put(props, "Verified by", worker.verifiedBy)
-  put(props, "Verification method", worker.verificationMethod ? choice(worker.verificationMethod, VERIFICATION_METHODS) : undefined)
+  put(props, "Verification method", one(worker.verificationMethod, LIVE_VERIFICATION, "Verification method", notes))
   put(props, "Images deleted on", worker.imagesDeletedOn)
-  put(props, "Notes", worker.notes)
+  put(props, "Notes", [worker.notes, ...notes].filter(Boolean).join("\n") || undefined)
   assertNotionPayloadSafe(props)
   return props
 }
@@ -258,7 +309,7 @@ export function timesheetNotionProperties(sheet: Timesheet): Record<string, unkn
   put(props, "Approved by", sheet.supervisorName)
   put(props, "Supervisor name", sheet.supervisorName)
   put(props, "Supervisor email", sheet.supervisorEmail)
-  put(props, "Approver role", sheet.supervisorRole)
+  put(props, "Approver role", notionSelect(sheet.supervisorRole, LIVE_APPROVER_ROLES, "Approver role").value)
   put(props, "Approved at", sheet.approvedAt)
   put(props, "Pay fortnight", sheet.payFortnight)
   props["Signer mismatch"] = Boolean(sheet.signerMismatch)
@@ -287,14 +338,23 @@ const SELECT_FIELDS = new Set([
   "First aid",
   "Transport",
   "Fitness declaration",
-  "Form status",
   "Verification method",
   "Role",
   "Source",
   "Experience level",
   "VEVO method",
-  "Request source",
   "Heard about us",
+  "Emergency relationship",
+  "Construction work in last 2 years",
+  "Driver licence state",
+  "ID sighted method",
+  "Allergies",
+  "Anaphylaxis risk",
+  "Carries EpiPen",
+  "Injury affecting duties",
+  "Safety medication",
+  "Medical sharing",
+  "Approver role",
 ])
 const DATE_FIELDS = new Set([
   "Date of birth",
@@ -342,11 +402,11 @@ export function toNotionProperties(flat: Record<string, unknown>) {
     if (TITLE_FIELDS.has(key)) typed = toNotionApiValue("title", value)
     else if (PHONE_FIELDS.has(key)) typed = toNotionApiValue("phone", value)
     else if (EMAIL_FIELDS.has(key)) typed = toNotionApiValue("email", value)
-    else if (SELECT_FIELDS.has(key)) typed = toNotionApiValue("select", value)
+    else if (SELECT_FIELDS.has(key)) typed = toNotionApiValue("select", typeof value === "string" ? toLiveOption(value, key) : value)
     else if (DATE_FIELDS.has(key)) typed = toNotionApiValue("date", value)
     else if (NUMBER_FIELDS.has(key) || typeof value === "number") typed = toNotionApiValue("number", value)
     else if (typeof value === "boolean") typed = toNotionApiValue("checkbox", value)
-    else if (Array.isArray(value)) typed = toNotionApiValue("multi", value)
+    else if (Array.isArray(value)) typed = toNotionApiValue("multi", value.map((item) => (typeof item === "string" ? toLiveOption(item, key) : item)))
     else typed = toNotionApiValue("text", value)
     if (typed !== undefined) out[key] = typed
   }

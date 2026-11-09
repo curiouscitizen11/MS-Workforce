@@ -107,7 +107,7 @@ Every other column below is written when it has a value. If the column is missin
 | Column | Type | Choices |
 | --- | --- | --- |
 | Suburb | text | |
-| Roles of interest | multi-select | General labourer, Trade assistant, Site clean, Materials handling, Demolition / strip-out, Concrete labourer, Asbestos removal labourer (Class B), Landscaping labourer, Other, please explain |
+| Roles of interest | multi-select | General labourer, Trade assistant, Site clean, Materials handling, Demolition / strip-out, Concrete labourer, Asbestos removal labourer (Class B), Landscaping labourer, Other – please explain |
 | Experience summary | text | |
 | WhatsApp OK | checkbox | |
 | Privacy consent | checkbox | |
@@ -117,21 +117,21 @@ Every other column below is written when it has a value. If the column is missin
 | Emergency phone | phone | |
 | Preferred name | text | |
 | Postcode | text | |
-| Emergency relationship | text | |
-| Experience level | select | No construction experience yet, Under 6 months, 6–12 months, 1–2 years, 3–5 years, More than 5 years, Other, please explain |
+| Emergency relationship | select | Partner or spouse, Parent, Brother or sister, Son or daughter, Other relative, Friend, Housemate, Other – please explain |
+| Experience level | select | No construction experience yet, Under 6 months, 6–12 months, 1–2 years, 3–5 years, More than 5 years, Other – please explain |
 | Work history | text | |
 | Available from | date | |
-| Work areas | multi-select | Northern Beaches, North Shore, Sydney CBD and inner city, Eastern Suburbs, Inner West, Hills District, Parramatta and Western Sydney, South West Sydney, Sutherland Shire and St George, Central Coast, Anywhere in Greater Sydney, Other, please explain |
-| Work days | multi-select | Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday, Short notice OK, Other, please explain |
-| RTW evidence | select | Australian citizen, Permanent resident, New Zealand citizen, Visa holder, Other, please explain |
+| Work areas | multi-select | Northern Beaches, North Shore, Sydney CBD and inner city, Eastern Suburbs, Inner West, Hills District, Parramatta and Western Sydney, South West Sydney, Sutherland Shire and St George, Central Coast, Anywhere in Greater Sydney, Other – please explain |
+| Work days | multi-select | Monday through Sunday, Short notice OK. Individual weekdays are not in this column yet |
+| RTW evidence | select | Australian citizen, Permanent resident, New Zealand citizen, Visa holder, Other |
 | Right to work | select | Yes, No |
 | VEVO consent | checkbox | |
 | Visa subclass | text | |
 | Visa expiry | date | |
-| VEVO method | select | I'll email my VEVO result from the myVEVO app, Show my passport on a video call, Show my passport in person, Other, please explain |
+| VEVO method | select | I'll email my VEVO result from the myVEVO app, Show my passport on a video call, Show my passport in person, Other – please explain |
 | VEVO result | select | Work rights OK, Limited hours, No work rights |
 | VEVO checked on | date | |
-| White card | select | Yes, I have it; No; Booked in for the course |
+| White card | select | Yes – I have it; No; Booked in for the course. The same three are used for the other ticket selects. The screen still says "Yes, I have it" |
 | Work at heights | select | same three answers |
 | Asbestos class A | select | same three answers. The name uses a lowercase c |
 | Asbestos class B | select | same three answers |
@@ -143,32 +143,32 @@ Every other column below is written when it has a value. If the column is missin
 | White card issued, Work at heights issued, Asbestos class A issued, Asbestos class B issued, Confined space issued, Driver licence issued, First aid issued | date | |
 | Driver card number | text | |
 | Next ticket expiry | date | |
-| Other tickets held | multi-select | Asbestos awareness, Silica awareness, Manual handling, Forklift (LF), EWP over 11 m (WP licence), EWP under 11 m (yellow card), Telehandler, Dogging (DG), Basic rigging (RB), Basic scaffolding (SB), Plant ticket (excavator, skid steer, roller), Test and tag, None of these, Other, please explain |
-| Transport | select | Own car, Public transport, Lift / carpool, Motorbike or bicycle, Other, please explain |
-| Fitness declaration | select | Yes, I can safely do these tasks; Yes, with some adjustments (please call me); Not sure, please call me |
-| Construction work in last 2 years | text | |
-| Driver licence state | text | |
+| Other tickets held | multi-select | Asbestos awareness, Silica awareness, Manual handling, Forklift (LF), EWP over 11 m (WP licence), EWP under 11 m (yellow card), Telehandler, Dogging (DG), Basic rigging (RB), Basic scaffolding (SB), Plant ticket (excavator / skid steer / roller), Test and tag, None of these, Other – please explain |
+| Transport | select | Own car, Public transport, Lift / carpool, Motorbike or bicycle, Other – please explain |
+| Fitness declaration | select | Yes – I can safely do these tasks; Yes – with some adjustments (please call me); Not sure – please call me |
+| Construction work in last 2 years | select | Yes, No, Not sure |
+| Driver licence state | select | NSW, VIC, QLD, SA, WA, TAS, ACT, NT, Overseas, Other – please explain |
 | D&A consent | checkbox | |
 | Declaration | checkbox | |
 | ID sighted | checkbox | |
-| ID sighted method | text | |
+| ID sighted method | select | Video call, In person, Service NSW app, Other |
 | ID sighted on | date | |
-| Allergies | text | |
-| Allergy types | multi-select | Bee or wasp stings, Other insect bites, Foods (e.g. nuts, shellfish), Medicines (e.g. penicillin), Latex, Plants or pollen, Dust or chemicals, Other, please explain |
-| Anaphylaxis risk | text | |
-| Carries EpiPen | text | |
-| Medical conditions | multi-select | No, Asthma, Diabetes, Epilepsy or seizures, Heart condition, Fainting or blackouts, Hearing or vision condition that affects safety, I'd rather tell MS Workforce by phone, Other, please explain |
+| Allergies | select | No, Yes, I'd rather tell MS Workforce by phone |
+| Allergy types | multi-select | Bee or wasp stings, Other insect bites, Foods (e.g. nuts or shellfish), Medicines (e.g. penicillin), Latex, Plants or pollen, Dust or chemicals, Other – please explain |
+| Anaphylaxis risk | select | No, Yes, Not sure |
+| Carries EpiPen | select | No, Yes – I always carry it, Yes – but not always |
+| Medical conditions | multi-select | No, Asthma, Diabetes, Epilepsy or seizures, Heart condition, Fainting or blackouts, Hearing or vision condition that affects safety, I'd rather tell MS Workforce by phone, Other – please explain |
 | Medical notes | text | |
-| Injury affecting duties | text | |
-| Tasks affected | multi-select | Lifting or carrying, Bending or kneeling, Ladders or heights, Standing for long periods, Using hand or power tools, Working in heat, Other, please explain |
-| Safety medication | text | |
-| Medical sharing | text | |
+| Injury affecting duties | select | No, Yes – a current injury, Yes – a past injury that still affects me, I'd rather tell MS Workforce by phone |
+| Tasks affected | multi-select | Lifting or carrying, Bending or kneeling, Ladders or heights, Standing for long periods, Using hand or power tools, Working in heat, Other – please explain |
+| Safety medication | select | No, Yes, I'd rather tell MS Workforce by phone |
+| Medical sharing | select | Yes – share it with the site supervisor and first aider, Only in an emergency, Other – please explain |
 | Health info consent | checkbox | |
 | Policies acknowledged | checkbox | |
 | Contract accepted in form | checkbox | |
 | Onboarding submitted | date | |
 | Terms signed | date | |
-| Form status | select | Onboarding complete |
+| Form status | text | For example Onboarding complete |
 | Induction passed | date | |
 | Site inductions | text | One line, for example `Harbour St (2026-10-02); Brookvale frame (2026-10-09)` |
 | Induction score | number | |
@@ -204,7 +204,7 @@ Book labour always adds a new row. It does not update an old one. These columns 
 | Shift | text | |
 | Heard about us | select | Google, Referral / word of mouth, LinkedIn, Facebook / Instagram, Saw a worker or ute on site, Other |
 | Status | select | Enquiry |
-| Request source | select | Website form |
+| Request source | text | Website form |
 
 ### Timesheets — `NOTION_TIMESHEETS_DB`
 
@@ -232,7 +232,7 @@ Draft hours are not sent. Signed hours are.
 | Approved by | text | |
 | Supervisor name | text | |
 | Supervisor email | email | |
-| Approver role | text | |
+| Approver role | select | Site supervisor, Site manager, Foreman / leading hand, Project manager, Owner / director, Office / admin, Other |
 | Approved at | date | |
 | Pay fortnight | text | |
 | Signer mismatch | checkbox | |
