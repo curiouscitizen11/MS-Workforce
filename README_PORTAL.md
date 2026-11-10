@@ -215,7 +215,7 @@ There is no availability calendar. A worker accepts or declines. The street addr
 
 ## Timesheets
 
-The worker types start, finish and break. No GPS. They hand the phone to the supervisor, who signs on the screen. That signature is the approval. There is no builder login and no separate approval link. Signing does not send an email. An incident on the timesheet does email you. On Thursday the site contact gets an email of the signed hours.
+The worker types start, finish and break. No GPS. They hand the phone to the supervisor, who signs on the screen. That signature is the approval. There is no builder login and no separate approval link. Signing does not send an email. An incident on the timesheet does email you. On Thursday morning the site contact gets an email of the signed hours for the week that ended the day before.
 
 ## Going live
 

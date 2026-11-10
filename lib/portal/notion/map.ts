@@ -1,4 +1,5 @@
 import { asTicketInputs, earliestExpiry } from "@/lib/portal/compliance"
+import { parseCalendarDate } from "@/lib/portal/dates"
 import { workDoneText } from "@/lib/portal/work-done"
 import { notionOtherTickets } from "@/lib/portal/ticket-catalogue"
 import { heldLicenceExpiries } from "@/lib/portal/ticket-photos"
@@ -456,7 +457,13 @@ export function toNotionApiValue(type: FieldType, value: unknown) {
   if (type === "email") return { email: String(value) }
   if (type === "select") return { select: { name: String(value) } }
   if (type === "multi") return { multi_select: (Array.isArray(value) ? value : [String(value)]).map((name) => ({ name: String(name) })) }
-  if (type === "date") return { date: { start: String(value) } }
+  if (type === "date") {
+    const text = String(value).trim()
+    if (/^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(text)) return { date: { start: text } }
+    const parsed = parseCalendarDate(text)
+    if (!parsed) return undefined
+    return { date: { start: parsed } }
+  }
   if (type === "checkbox") return { checkbox: Boolean(value) }
   if (type === "number") return { number: Number(value) }
   return undefined

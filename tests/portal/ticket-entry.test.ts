@@ -131,7 +131,8 @@ describe("worker ticket number and expiry", () => {
   it("clears the check when a photo is replaced, and a mismatch does not delete the photos", async () => {
     const ctx = harness()
     await pair(ctx, "heights")
-    expect((await saveTicket(ctx, "w-sam", "heights", { status: "Yes, I have it", number: "HT-30", expiry: "2026-11-16" })).ok).toBe(true)
+    expect((await saveTicket(ctx, "w-sam", "heights", { status: "Yes, I have it", number: "HT-30", expiry: "16/11/2026", issued: "1/10/2026" })).ok).toBe(true)
+    expect((await ctx.store.workers.get("w-sam"))?.tickets.heights).toMatchObject({ expiry: "2026-11-16", issued: "2026-10-01" })
     const marked = await markTicketChecked(ctx, "w-mav", "w-sam", {
       licenceKey: "heights",
       number: "HT-30",

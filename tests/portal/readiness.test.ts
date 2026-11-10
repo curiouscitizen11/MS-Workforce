@@ -129,6 +129,18 @@ describe("readiness", () => {
     expect(rejected.connections.find((entry) => entry.name === "resend")?.detail).toBe("rejected")
   })
 
+  it("accepts a Thursday pay anchor and ignores any other weekday", () => {
+    vi.stubEnv("PORTAL_PAY_ANCHOR", "2026-11-05")
+    expect(inspectConfig().find((entry) => entry.name === "PORTAL_PAY_ANCHOR")).toMatchObject({ ok: true, detail: "Thursday" })
+    vi.stubEnv("PORTAL_PAY_ANCHOR", "2026-11-04")
+    expect(inspectConfig().find((entry) => entry.name === "PORTAL_PAY_ANCHOR")).toMatchObject({
+      ok: false,
+      detail: "needs to be a Thursday, using 2026-11-05",
+    })
+    vi.stubEnv("PORTAL_PAY_ANCHOR", "not-a-date")
+    expect(inspectConfig().find((entry) => entry.name === "PORTAL_PAY_ANCHOR")?.detail).toBe("expected YYYY-MM-DD")
+  })
+
   it("accepts the cron secret and nothing else", () => {
     vi.stubEnv("CRON_SECRET", "d".repeat(40))
     expect(cronAuthorised("Bearer " + "d".repeat(40))).toBe(true)

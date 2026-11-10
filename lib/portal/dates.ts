@@ -21,6 +21,43 @@ export function daysBetween(fromIso: string, toIso: string): number {
   return Math.round((to - from) / 86400000)
 }
 
+/** A real calendar day, as YYYY-MM-DD. Accepts a date picker value or an Australian day/month/year. */
+export function parseCalendarDate(value: string): string | null {
+  const trimmed = value.trim()
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s].*)?$/.exec(trimmed)
+  const local = /^(\d{1,2})[/. -](\d{1,2})[/. -](\d{4})$/.exec(trimmed)
+  const year = iso ? Number(iso[1]) : local ? Number(local[3]) : NaN
+  const month = iso ? Number(iso[2]) : local ? Number(local[2]) : NaN
+  const day = iso ? Number(iso[3]) : local ? Number(local[1]) : NaN
+  if (!year || month < 1 || month > 12 || day < 1 || day > 31) return null
+  if (year < 1900 || year > 2100) return null
+  const date = new Date(Date.UTC(year, month - 1, day))
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null
+  return String(year) + "-" + String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0")
+}
+
+export function isThursday(isoDate: string): boolean {
+  const parsed = parseCalendarDate(isoDate)
+  if (!parsed) return false
+  const [year, month, day] = parsed.split("-").map(Number)
+  return new Date(Date.UTC(year, month - 1, day)).getUTCDay() === 4
+}
+
+export function formatLongDate(isoDate: string): string {
+  const parsed = parseCalendarDate(isoDate)
+  if (!parsed) return isoDate
+  const [year, month, day] = parsed.split("-").map(Number)
+  return new Intl.DateTimeFormat("en-AU", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  })
+    .format(new Date(Date.UTC(year, month - 1, day)))
+    .replace(",", "")
+}
+
 export function formatDate(isoDate: string): string {
   const [year, month, day] = isoDate.split("-").map(Number)
   const date = new Date(Date.UTC(year, month - 1, day))

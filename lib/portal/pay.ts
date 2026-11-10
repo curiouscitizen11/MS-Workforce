@@ -1,4 +1,4 @@
-import { addDays, daysBetween, instantInSydney, sydneyParts } from "@/lib/portal/dates"
+import { addDays, daysBetween, formatLongDate, instantInSydney, isThursday, parseCalendarDate, sydneyParts } from "@/lib/portal/dates"
 
 export const MS_PHONE = "0435 842 164"
 /** A Thursday. Each pay week runs from this weekday to the next Wednesday. */
@@ -13,8 +13,9 @@ export type PayWeek = {
 }
 
 export function payAnchor(): string {
-  const value = process.env.PORTAL_PAY_ANCHOR
-  return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : DEFAULT_PAY_ANCHOR
+  const value = process.env.PORTAL_PAY_ANCHOR?.trim()
+  const parsed = value ? parseCalendarDate(value) : null
+  return parsed && isThursday(parsed) ? parsed : DEFAULT_PAY_ANCHOR
 }
 
 /** The Thursday-to-Wednesday week that contains this date. Pay day is the Thursday after it. */
@@ -43,7 +44,7 @@ export function payWeek(signedAt: Date, anchor = payAnchor()): PayWeek {
 
 export function cutoffMessage(week: PayWeek): string | null {
   if (!week.afterCutoff) return null
-  return "Signed after the cut-off: this will be paid on Thursday " + week.payDay + "."
+  return "Signed after the cut-off: this will be paid on " + formatLongDate(week.payDay) + "."
 }
 
 export function olderThanDays(workDate: string, today: string, days: number): boolean {
@@ -81,6 +82,12 @@ function csv(value: string) {
 
 export function sydneyInstant(isoDate: string, time: string): Date {
   return instantInSydney(isoDate, time)
+}
+
+/** A submitted or approved sheet with a signature has already been logged. */
+export function timesheetIsSigned(sheet: { status?: string; signaturePng?: string }): boolean {
+  if (sheet.status === "Approved") return true
+  return Boolean(sheet.signaturePng)
 }
 
 export function datesInWeek(week: PayWeek): string[] {
