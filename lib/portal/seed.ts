@@ -1,6 +1,6 @@
 import { demoCardPng } from "@/lib/portal/demo-card"
 import { addDays, sydneyToday } from "@/lib/portal/dates"
-import { payFortnight } from "@/lib/portal/pay"
+import { payWeek } from "@/lib/portal/pay"
 import { blankTickets, type Offer, type PortalDocument, type StoredBlob, type Timesheet, type Worker } from "@/lib/portal/types"
 
 export const SEED_VERSION = 5
@@ -282,7 +282,7 @@ export function buildSeed(now = new Date()): SeedData {
     },
   ]
 
-  const paid = payFortnight(now)
+  const paid = payWeek(now)
   const timesheets: Timesheet[] = [
     {
       id: "ts-sam-yest",

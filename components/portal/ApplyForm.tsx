@@ -187,7 +187,7 @@ export function ApplyForm() {
             <input type="checkbox" checked={privacy} onChange={(event) => setPrivacy(event.target.checked)} required />
             I agree to the privacy notice
           </label>
-          <p>Tax, bank and super details are not collected here. Pay is fortnightly, on Thursday, through Xero later.</p>
+          <p>Tax, bank and super details are not collected here. Pay is weekly, on Thursday, through Xero later.</p>
         </div>
       ) : null}
       {error ? (

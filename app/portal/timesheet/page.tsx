@@ -3,7 +3,7 @@ import { TimesheetForm } from "@/components/portal/TimesheetForm"
 import { WaitingForApproval } from "@/components/portal/Waiting"
 import { Heading } from "@/components/portal/ui"
 import { formatDate, sydneyToday } from "@/lib/portal/dates"
-import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
+import { datesInWeek, weekContaining } from "@/lib/portal/pay"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import Link from "next/link"
@@ -24,8 +24,8 @@ export default async function TimesheetPage() {
   const today = sydneyToday()
   const offers = (await store.offers.all()).filter((offer) => offer.workerId === worker.id && offer.status === "Accepted")
   const sheets = (await store.timesheets.all()).filter((sheet) => sheet.workerId === worker.id)
-  const fortnight = fortnightContaining(today)
-  const days = datesInFortnight(fortnight)
+  const week = weekContaining(today)
+  const days = datesInWeek(week)
   return (
     <div className="space-y-4">
       <Heading kicker="Hours" title="Log today's hours" text="Enter the times at the end of the day. No GPS. MS Workforce." />
@@ -62,7 +62,7 @@ export default async function TimesheetPage() {
         }))}
       />
       <section className="rounded-2xl border border-navy/10 bg-white p-3">
-        <h2 className="text-sm font-semibold">This fortnight</h2>
+        <h2 className="text-sm font-semibold">This week</h2>
         <ul className="mt-2 space-y-1">
           {days.map((day) => {
             const sheet = sheets.find((item) => item.workDate === day && item.status !== "Draft")

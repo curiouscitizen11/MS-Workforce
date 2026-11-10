@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { cardsAwaitingCheck, fortnightSummary, inductionTodoCount, offersWaiting, photosAwaitingApproval, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays, waitingForApproval } from "@/lib/portal/home"
+import { cardsAwaitingCheck, inductionTodoCount, offersWaiting, photosAwaitingApproval, shiftsMissingSupervisorSign, ticketActionCount, unsignedWeekDays, waitingForApproval, weekSummary } from "@/lib/portal/home"
 
 describe("home badges", () => {
   it("counts offers, unsigned days and induction to-dos", () => {
@@ -12,7 +12,7 @@ describe("home badges", () => {
     ]
     expect(offersWaiting(offers, "w-sam")).toBe(2)
     const sheets = [{ workerId: "w-sam", workDate: "2026-10-15", status: "Approved" }]
-    expect(unsignedFortnightDays([{ ...offers[2], shiftDate: "2026-10-15" }, offers[2]], sheets, "w-sam", "2026-10-17")).toBe(1)
+    expect(unsignedWeekDays([{ ...offers[2], shiftDate: "2026-10-15" }, offers[2]], sheets, "w-sam", "2026-10-17")).toBe(1)
     expect(inductionTodoCount(false, offers, "w-sam", "2026-10-17")).toBe(1)
     expect(inductionTodoCount(true, offers, "w-sam", "2026-10-17")).toBe(0)
     expect(ticketActionCount(["White card", "White card", "Forklift (LF)"])).toBe(2)
@@ -34,7 +34,7 @@ describe("home badges", () => {
     )
     expect(flagged.map((offer) => offer.id)).toEqual(["offer-old"])
     expect(
-      unsignedFortnightDays(
+      unsignedWeekDays(
         [{ workerId: "w-sam", status: "Accepted", shiftDate: "2026-10-16" }],
         [{ workerId: "w-sam", workDate: "2026-10-16", status: "Submitted", signaturePng: "data:image/png;base64,abc" }],
         "w-sam",
@@ -43,29 +43,29 @@ describe("home badges", () => {
     ).toBe(0)
   })
 
-  it("builds the fortnight summary row", () => {
-    const today = "2026-10-30"
-    expect(fortnightSummary([], [], "w-sam", today).text).toBe("This fortnight: nothing yet")
+  it("builds the week summary row", () => {
+    const today = "2026-11-01"
+    expect(weekSummary([], [], "w-sam", today).text).toBe("This week: nothing yet")
     const accepted = (shiftDate: string) => ({ workerId: "w-sam", status: "Accepted", shiftDate })
-    expect(fortnightSummary([accepted("2026-10-29")], [], "w-sam", today)).toMatchObject({
-      text: "This fortnight: 0.0 h approved · 1 not signed",
+    expect(weekSummary([accepted("2026-10-29")], [], "w-sam", today)).toMatchObject({
+      text: "This week: 0.0 h approved · 1 not signed",
       unsigned: 1,
     })
     expect(
-      fortnightSummary([accepted("2026-10-28"), accepted("2026-10-29"), accepted("2026-10-30")], [], "w-sam", today).text,
-    ).toBe("This fortnight: 0.0 h approved · 3 not signed")
-    const added = fortnightSummary(
-      [accepted("2026-10-27"), accepted("2026-10-28")],
+      weekSummary([accepted("2026-10-29"), accepted("2026-10-30"), accepted("2026-10-31")], [], "w-sam", today).text,
+    ).toBe("This week: 0.0 h approved · 3 not signed")
+    const added = weekSummary(
+      [accepted("2026-10-29"), accepted("2026-10-30")],
       [
-        { workerId: "w-sam", workDate: "2026-10-27", status: "Approved", totalHours: 8 },
-        { workerId: "w-sam", workDate: "2026-10-28", status: "Approved", totalHours: 7.5 },
-        { workerId: "w-sam", workDate: "2026-10-29", status: "Draft", totalHours: 4 },
+        { workerId: "w-sam", workDate: "2026-10-29", status: "Approved", totalHours: 8 },
+        { workerId: "w-sam", workDate: "2026-10-30", status: "Approved", totalHours: 7.5 },
+        { workerId: "w-sam", workDate: "2026-10-31", status: "Draft", totalHours: 4 },
       ],
       "w-sam",
       today,
     )
     expect(added.approvedHours).toBe(15.5)
-    expect(added.text).toBe("This fortnight: 15.5 h approved · all signed")
+    expect(added.text).toBe("This week: 15.5 h approved · all signed")
     expect(added.text).not.toContain("4.0")
   })
 

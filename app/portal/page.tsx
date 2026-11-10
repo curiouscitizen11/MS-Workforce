@@ -15,7 +15,7 @@ import {
 import { isMock } from "@/lib/portal/config"
 import { complianceFor } from "@/lib/portal/services"
 import { formatDate, formatTime, sydneyParts, sydneyToday } from "@/lib/portal/dates"
-import { fortnightSummary, inductionTodoCount, offersWaiting, shiftsMissingSupervisorSign, ticketActionCount, unsignedFortnightDays } from "@/lib/portal/home"
+import { inductionTodoCount, offersWaiting, shiftsMissingSupervisorSign, ticketActionCount, unsignedWeekDays, weekSummary } from "@/lib/portal/home"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { TICKET_LABELS } from "@/lib/portal/types"
@@ -50,7 +50,7 @@ export default async function DashboardPage() {
   const expiring = check.tickets.filter((ticket) => ticket.validity === "expiring" || ticket.validity === "expired" || ticket.validity === "missing")
   const docs = await store.documents.all()
   const waiting = offersWaiting(offers, worker.id)
-  const unsigned = unsignedFortnightDays(offers, sheets, worker.id, today)
+  const unsigned = unsignedWeekDays(offers, sheets, worker.id, today)
   const missingSign = shiftsMissingSupervisorSign(offers, sheets, worker.id, today)
   const todos = inductionTodoCount(Boolean(worker.inductionPassed), offers, worker.id, today)
   const photoLabels = slotsFromWorker(worker)
@@ -71,7 +71,7 @@ export default async function DashboardPage() {
         <Heading kicker="Today" title={"G'day, " + worker.name.split(" ")[0]} />
         <StatusChip level={badgeLevel(check.badge)}>{check.label}</StatusChip>
       </div>
-      <p className="text-sm text-navy/70">Pay is fortnightly, on Thursday.</p>
+      <p className="text-sm text-navy/70">Pay is weekly, on Thursday.</p>
       {waitingApproval ? (
         <WaitingForApproval home done={Boolean(worker.onboardingSubmitted)} inductionPassed={Boolean(worker.inductionPassed)} />
       ) : null}
@@ -132,8 +132,8 @@ export default async function DashboardPage() {
         <Tile href="/portal/help" label="Help" icon={<HelpIcon />} />
       </div>
       {waitingApproval ? null : (
-        <Link href="/portal/fortnight" className="flex min-h-12 items-center justify-between gap-3 rounded-2xl border border-navy/10 bg-white px-4 py-3 text-sm font-semibold">
-          <span>{fortnightSummary(offers, sheets, worker.id, today).text}</span>
+        <Link href="/portal/week" className="flex min-h-12 items-center justify-between gap-3 rounded-2xl border border-navy/10 bg-white px-4 py-3 text-sm font-semibold">
+          <span>{weekSummary(offers, sheets, worker.id, today).text}</span>
           <span aria-hidden="true">›</span>
         </Link>
       )}

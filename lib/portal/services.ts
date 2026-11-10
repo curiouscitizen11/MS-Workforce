@@ -46,7 +46,7 @@ import {
   slotsFromWorker,
 } from "@/lib/portal/ticket-photos"
 import { breakChoiceProblem, formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
-import { MS_PHONE, fortnightContaining, olderThanDays, payFortnight, timesheetReminder } from "@/lib/portal/pay"
+import { MS_PHONE, olderThanDays, payWeek, timesheetReminder, weekContaining } from "@/lib/portal/pay"
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
 import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
@@ -1276,7 +1276,7 @@ export async function submitTimesheet(
   if (hoursChanged && existing?.signaturePng && input.signaturePng === existing.signaturePng) {
     return fail("The supervisor needs to sign these hours again.")
   }
-  const fortnight = existing?.payFortnight ? { label: existing.payFortnight, payDay: existing.payDay || "", afterCutoff: Boolean(existing.afterCutoff) } : payFortnight(ctx.now)
+  const week = existing?.payFortnight ? { label: existing.payFortnight, payDay: existing.payDay || "", afterCutoff: Boolean(existing.afterCutoff) } : payWeek(ctx.now)
   const planned = (offer.timesheetSigner || "").trim().toLowerCase()
   const sheet: Timesheet = {
     id: existing?.id || newId("ts"),
@@ -1303,9 +1303,9 @@ export async function submitTimesheet(
     signaturePng: input.signaturePng,
     signatureIp: input.ip?.slice(0, 80),
     signatureUserAgent: input.userAgent?.slice(0, 180),
-    payFortnight: fortnight.label,
-    payDay: fortnight.payDay,
-    afterCutoff: fortnight.afterCutoff,
+    payFortnight: week.label,
+    payDay: week.payDay,
+    afterCutoff: week.afterCutoff,
     corrected: existing?.corrected || false,
     source: "Portal",
     workerName: worker.name,
@@ -1324,7 +1324,7 @@ export async function submitTimesheet(
     }
   }
   await audit(ctx, worker.id, "timesheet-signed", sheet.id)
-  return { ok: true as const, id: sheet.id, hours: hours.hours, warnings, status: sheet.status, afterCutoff: fortnight.afterCutoff, payDay: fortnight.payDay }
+  return { ok: true as const, id: sheet.id, hours: hours.hours, warnings, status: sheet.status, afterCutoff: week.afterCutoff, payDay: week.payDay }
 }
 
 function timeMinutes(value: string) {
@@ -1820,7 +1820,7 @@ export async function runReminders(ctx: Ctx) {
     }
   }
   if (parts.weekday.startsWith("Thu")) {
-    const closed = fortnightContaining(addDays(today, -1))
+    const closed = weekContaining(addDays(today, -1))
     const signed = sheets.filter((sheet) => sheet.status === "Approved" && sheet.payFortnight === closed.label)
     const bySite = new Map<string, typeof signed>()
     for (const sheet of signed) {
