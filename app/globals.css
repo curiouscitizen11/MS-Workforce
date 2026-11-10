@@ -136,31 +136,10 @@ body {
   --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-@keyframes fade-up {
-  from { opacity: 0; transform: translate3d(0, 20px, 0); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes page-in {
-  from { opacity: 0; transform: translate3d(0, 12px, 0); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes hero-media {
-  from { opacity: 0; transform: scale(1.04); }
-  to { opacity: 1; transform: scale(1); }
-}
+/* Entrance fades used to start at opacity 0, so a new page stayed invisible
+   for about half a second after it had already arrived. Pages stay visible. */
 
-.page-enter { animation: page-in 600ms var(--ease-apple) both; }
-
-/* Hero entrance: first section of each page, staggered */
-main .page-enter > section:first-of-type .wrap > * {
-  animation: fade-up 750ms var(--ease-out-soft) both;
-}
-main .page-enter > section:first-of-type .wrap > :nth-child(2) { animation-delay: 90ms; }
-main .page-enter > section:first-of-type .wrap > :nth-child(3) { animation-delay: 180ms; }
-main .page-enter > section:first-of-type .wrap > :nth-child(n + 4) { animation-delay: 270ms; }
-main .page-enter > section:first-of-type img {
-  animation: hero-media 900ms var(--ease-apple) both;
-}
+.page-enter { animation: none; }
 
 /* Scroll reveals (class added by JS only, so content is visible without JS) */
 .reveal {

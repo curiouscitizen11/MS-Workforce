@@ -3,7 +3,7 @@ import { DemoBanner, Heading } from "@/components/portal/ui"
 import { LoginForm } from "@/components/portal/LoginForm"
 import { isMock } from "@/lib/portal/config"
 import { twilioReady } from "@/lib/portal/notify"
-import { formatAuMobile } from "@/lib/portal/phone"
+import { loginDemos } from "@/lib/portal/login-demos"
 import { readEmailCookie, readMobileCookie, readSession } from "@/lib/portal/session"
 import { portalHome } from "@/lib/portal/home"
 import { getStore } from "@/lib/portal/store"
@@ -15,18 +15,8 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
   const query = await Promise.resolve(searchParams)
   const current = await readSession()
   if (current) redirect(portalHome(current.worker.role))
-  const store = await getStore()
-  const workers = await store.workers.all()
-  const sam = workers.find((worker) => worker.id === "w-sam")
-  const mav = workers.find((worker) => worker.role === "admin")
-  const demos = [sam, mav]
-    .filter((worker): worker is NonNullable<typeof worker> => Boolean(worker))
-    .map((worker) => ({
-      name: worker.name,
-      email: worker.email || "",
-      mobile: formatAuMobile(worker.mobile),
-      hint: worker.role === "admin" ? "Admin, then authenticator code" : "Worker",
-    }))
+  const mock = isMock()
+  const demos = mock ? await loginDemos(await getStore(), true) : []
   const sms = twilioReady()
   return (
     <div className="space-y-4">
