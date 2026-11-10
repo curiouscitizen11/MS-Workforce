@@ -253,6 +253,21 @@ async function probeNotion(fetchImpl: typeof fetch): Promise<ReadinessItem[]> {
   return [notion, ...databases]
 }
 
+/** Resend documents this body for a key that may send but cannot list domains. */
+export function resendSendOnlyResponse(status: number, body: string): boolean {
+  if (status !== 401 && status !== 403) return false
+  let name = ""
+  let message = body
+  try {
+    const parsed = JSON.parse(body) as { name?: unknown; message?: unknown }
+    if (typeof parsed.name === "string") name = parsed.name
+    if (typeof parsed.message === "string") message = parsed.message
+  } catch {
+    name = ""
+  }
+  return name === "restricted_api_key" && /restricted to only send emails/i.test(message)
+}
+
 async function probeResend(fetchImpl: typeof fetch): Promise<ReadinessItem> {
   const key = raw("RESEND_API_KEY")
   if (!key || !raw("EMAIL_FROM")) return item("resend", true, false, false, "not configured")
@@ -261,6 +276,10 @@ async function probeResend(fetchImpl: typeof fetch): Promise<ReadinessItem> {
       headers: { Authorization: "Bearer " + key },
     })
     if (response.ok) return item("resend", true, true, true, "connected")
+    const body = await response.text().catch(() => "")
+    if (resendSendOnlyResponse(response.status, body)) {
+      return item("resend", true, true, true, "send-only key (sending works)")
+    }
     return item("resend", true, true, false, response.status === 401 || response.status === 403 ? "rejected" : "could not connect")
   } catch {
     return item("resend", true, true, false, "could not connect")

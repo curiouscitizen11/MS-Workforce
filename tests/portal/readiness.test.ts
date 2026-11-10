@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { PLACEMENT_PROPERTIES } from "@/lib/portal/book-labour"
 import { PLACEMENT_COLUMN_NAMES } from "@/lib/portal/notion/expected"
-import { buildReadinessReport, cronAuthorised, inspectConfig, notionSchemaGaps } from "@/lib/portal/readiness"
+import { buildReadinessReport, cronAuthorised, inspectConfig, notionSchemaGaps, resendSendOnlyResponse } from "@/lib/portal/readiness"
 import { WORKER_COLUMNS } from "@/lib/portal/notion/expected"
 
 afterEach(() => {
@@ -94,6 +94,39 @@ describe("readiness", () => {
     expect(report.connections.find((entry) => entry.name === "notion")?.detail).toBe("not configured")
     expect(report.connections.find((entry) => entry.name === "resend")?.detail).toBe("not configured")
     expect(JSON.stringify(report)).not.toContain("postgres://")
+  })
+
+  it("treats Resend's sending-only key error as healthy and rejects an invalid key", async () => {
+    const sendOnly = JSON.stringify({
+      statusCode: 401,
+      name: "restricted_api_key",
+      message: "This API key is restricted to only send emails.",
+    })
+    expect(resendSendOnlyResponse(401, sendOnly)).toBe(true)
+    expect(resendSendOnlyResponse(403, sendOnly)).toBe(true)
+    expect(resendSendOnlyResponse(401, JSON.stringify({ statusCode: 401, name: "validation_error", message: "API key is invalid" }))).toBe(false)
+    expect(resendSendOnlyResponse(403, JSON.stringify({ statusCode: 403, name: "restricted_api_key", message: "API key is not active" }))).toBe(false)
+
+    for (const name of SECRET_NAMES) vi.stubEnv(name, "")
+    vi.stubEnv("RESEND_API_KEY", "re_sendonlykeyvalue")
+    vi.stubEnv("EMAIL_FROM", "portal@msworkforce.au")
+    const calls: string[] = []
+    const healthy = await buildReadinessReport(async (url, init) => {
+      calls.push((init?.method || "GET") + " " + String(url))
+      return new Response(sendOnly, { status: 401, headers: { "content-type": "application/json" } })
+    })
+    expect(calls).toEqual(["GET https://api.resend.com/domains"])
+    expect(healthy.connections.find((entry) => entry.name === "resend")).toMatchObject({
+      ok: true,
+      detail: "send-only key (sending works)",
+    })
+    expect(JSON.stringify(healthy)).not.toContain("re_sendonlykeyvalue")
+
+    const rejected = await buildReadinessReport(async () => {
+      return new Response(JSON.stringify({ name: "validation_error", message: "API key is invalid" }), { status: 401 })
+    })
+    expect(rejected.connections.find((entry) => entry.name === "resend")?.ok).toBe(false)
+    expect(rejected.connections.find((entry) => entry.name === "resend")?.detail).toBe("rejected")
   })
 
   it("accepts the cron secret and nothing else", () => {

@@ -303,7 +303,7 @@ Connections:
 
 - **database** — creates `portal_records` if needed, then checks the table is there.
 - **notion** — calls Notion with the token, then opens each database and compares columns and choices.
-- **resend** — calls Resend's domain list with the API key. It does not send an email.
+- **resend** — calls Resend's domain list with the API key. It does not send an email. A sending-only key is healthy: Resend answers that list with `restricted_api_key` and "This API key is restricted to only send emails." An invalid or inactive key still fails.
 
 `ready` is true only when every required line is ok. Optional lines, including Twilio, can be unset.
 
