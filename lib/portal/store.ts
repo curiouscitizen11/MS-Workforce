@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs"
 import { tmpdir } from "os"
 import { dirname, join } from "path"
+import { normaliseTimesheet } from "@/lib/portal/pay"
 import { buildSeed, SEED_VERSION, type SeedData } from "@/lib/portal/seed"
 import type {
   AuditEvent,
@@ -90,11 +91,30 @@ function repoOf<T extends { id: string }>(rows: T[], persist: () => void): Repo<
   }
 }
 
+function timesheetRepo(rows: Timesheet[], persist: () => void): Repo<Timesheet> {
+  const repo = repoOf(rows, persist)
+  return {
+    async all() {
+      return (await repo.all()).map((row) => normaliseTimesheet(row))
+    },
+    async get(id) {
+      const row = await repo.get(id)
+      return row ? normaliseTimesheet(row) : null
+    },
+    async save(row) {
+      await repo.save(normaliseTimesheet(row))
+    },
+    remove(id) {
+      return repo.remove(id)
+    },
+  }
+}
+
 function bind(db: MemoryDb, persist: () => void): Store {
   return {
     workers: repoOf(db.workers, persist),
     offers: repoOf(db.offers, persist),
-    timesheets: repoOf(db.timesheets, persist),
+    timesheets: timesheetRepo(db.timesheets, persist),
     documents: repoOf(db.documents, persist),
     sessions: repoOf(db.sessions, persist),
     challenges: repoOf(db.challenges, persist),

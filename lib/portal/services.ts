@@ -51,7 +51,7 @@ import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
 import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
 import { BOOK_IP_MAX, BOOK_IP_WINDOW_MS, bookAlertBody, checkBookLabour, placementProperties } from "@/lib/portal/book-labour"
-import { assertNotionPayloadSafe, offerNotionProperties, timesheetNotionProperties, toNotionProperties, workerNotionProperties, writeNotionProperties } from "@/lib/portal/notion/map"
+import { assertNotionPayloadSafe, offerNotionProperties, preferPayWeekProperty, timesheetNotionProperties, toNotionProperties, workerNotionProperties, writeNotionProperties } from "@/lib/portal/notion/map"
 import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
 import { acceptedHeldLabel } from "@/lib/portal/ticket-catalogue"
@@ -1295,7 +1295,7 @@ export async function submitTimesheet(
   if (hoursChanged && existing?.signaturePng && input.signaturePng === existing.signaturePng) {
     return fail("The supervisor needs to sign these hours again.")
   }
-  const week = existing?.payFortnight ? { label: existing.payFortnight, payDay: existing.payDay || "", afterCutoff: Boolean(existing.afterCutoff) } : payWeek(ctx.now)
+  const week = existing?.payWeek ? { label: existing.payWeek, payDay: existing.payDay || "", afterCutoff: Boolean(existing.afterCutoff) } : payWeek(ctx.now)
   const planned = (offer.timesheetSigner || "").trim().toLowerCase()
   const sheet: Timesheet = {
     id: existing?.id || newId("ts"),
@@ -1322,7 +1322,7 @@ export async function submitTimesheet(
     signaturePng: input.signaturePng,
     signatureIp: input.ip?.slice(0, 80),
     signatureUserAgent: input.userAgent?.slice(0, 180),
-    payFortnight: week.label,
+    payWeek: week.label,
     payDay: week.payDay,
     afterCutoff: week.afterCutoff,
     corrected: existing?.corrected || false,
@@ -1847,7 +1847,7 @@ export async function runReminders(ctx: Ctx) {
   }
   if (parts.weekday.startsWith("Thu")) {
     const closed = weekContaining(addDays(today, -1))
-    const signed = sheets.filter((sheet) => sheet.status === "Approved" && sheet.payFortnight === closed.label)
+    const signed = sheets.filter((sheet) => sheet.status === "Approved" && sheet.payWeek === closed.label)
     const bySite = new Map<string, typeof signed>()
     for (const sheet of signed) {
       const offer = offers.find((item) => item.id === sheet.offerId)
@@ -1920,7 +1920,7 @@ export async function processOutbox(ctx: Ctx, fetchImpl?: typeof fetch) {
     try {
       const database = databaseId(item.kind)
       if (!database) throw new Error("Notion database id is not set for " + item.kind)
-      const properties = flatProperties(item.payload)
+      const properties = preferPayWeekProperty(flatProperties(item.payload))
       const formatted = toNotionProperties(properties)
       const match = notionMatch(item.kind, item.payload, properties)
       const existing = match ? await findNotionPage(database, match, fetchImpl) : null

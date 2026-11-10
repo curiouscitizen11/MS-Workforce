@@ -160,7 +160,7 @@ describe("weekly pay", () => {
     await store.offers.save(offer)
     const sheet = await store.timesheets.get("ts-sam-yest")
     if (!sheet) throw new Error("missing timesheet")
-    sheet.payFortnight = "2026-11-05 to 2026-11-11"
+    sheet.payWeek = "2026-11-05 to 2026-11-11"
     sheet.payDay = "2026-11-12"
     sheet.status = "Approved"
     await store.timesheets.save(sheet)

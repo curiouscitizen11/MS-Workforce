@@ -1,5 +1,6 @@
 import { asTicketInputs, earliestExpiry } from "@/lib/portal/compliance"
 import { parseCalendarDate } from "@/lib/portal/dates"
+import { PAY_FORTNIGHT_PROPERTY, PAY_WEEK_PROPERTY } from "@/lib/portal/pay"
 import { workDoneText } from "@/lib/portal/work-done"
 import { notionOtherTickets } from "@/lib/portal/ticket-catalogue"
 import { heldLicenceExpiries } from "@/lib/portal/ticket-photos"
@@ -312,7 +313,7 @@ export function timesheetNotionProperties(sheet: Timesheet): Record<string, unkn
   put(props, "Supervisor email", sheet.supervisorEmail)
   put(props, "Approver role", notionSelect(sheet.supervisorRole, LIVE_APPROVER_ROLES, "Approver role").value)
   put(props, "Approved at", sheet.approvedAt)
-  put(props, "Pay fortnight", sheet.payFortnight)
+  put(props, PAY_WEEK_PROPERTY, sheet.payWeek)
   props["Signer mismatch"] = Boolean(sheet.signerMismatch)
   props["Corrected by MS Workforce"] = Boolean(sheet.corrected)
   assertNotionPayloadSafe(props)
@@ -421,6 +422,33 @@ export function unknownNotionProperty(message: string): string | null {
   return name || null
 }
 
+/** Queued rows may still say Pay fortnight. Send Pay week, and drop the old key so only one name is written. */
+export function preferPayWeekProperty(properties: Record<string, unknown>): Record<string, unknown> {
+  const week = properties[PAY_WEEK_PROPERTY]
+  const previous = properties[PAY_FORTNIGHT_PROPERTY]
+  const hasWeek = week !== undefined && week !== null && week !== ""
+  const hasPrevious = previous !== undefined && previous !== null && previous !== ""
+  if (!hasPrevious && hasWeek) return properties
+  if (!hasWeek && !hasPrevious) return properties
+  const next = { ...properties }
+  if (!hasWeek) next[PAY_WEEK_PROPERTY] = previous
+  delete next[PAY_FORTNIGHT_PROPERTY]
+  return next
+}
+
+/** If Pay week is not in this database yet, write the same value to Pay fortnight. */
+export function payWeekPropertyFallback(
+  properties: Record<string, unknown>,
+  message: string,
+): Record<string, unknown> | null {
+  const name = unknownNotionProperty(message)
+  if (name !== PAY_WEEK_PROPERTY || !Object.prototype.hasOwnProperty.call(properties, PAY_WEEK_PROPERTY)) return null
+  if (Object.prototype.hasOwnProperty.call(properties, PAY_FORTNIGHT_PROPERTY)) return null
+  const next: Record<string, unknown> = { ...properties, [PAY_FORTNIGHT_PROPERTY]: properties[PAY_WEEK_PROPERTY] }
+  delete next[PAY_WEEK_PROPERTY]
+  return next
+}
+
 /** Drop one missing column so the rest of the page can still sync. Returns null for any other error. */
 export function withoutUnknownNotionProperty(
   properties: Record<string, unknown>,
@@ -438,10 +466,15 @@ export async function writeNotionProperties(
   write: (properties: Record<string, unknown>) => Promise<{ ok: true } | { ok: false; message: string }>,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   let current = properties
-  const limit = Object.keys(properties).length + 1
+  const limit = Object.keys(properties).length + 2
   for (let attempt = 0; attempt < limit; attempt += 1) {
     const result = await write(current)
     if (result.ok) return { ok: true }
+    const renamed = payWeekPropertyFallback(current, result.message)
+    if (renamed) {
+      current = renamed
+      continue
+    }
     const next = withoutUnknownNotionProperty(current, result.message)
     if (!next) return { ok: false, message: result.message || "Notion write failed" }
     current = next

@@ -234,7 +234,7 @@ Draft hours are not sent. Signed hours are.
 | Supervisor email | email | |
 | Approver role | select | Site supervisor, Site manager, Foreman / leading hand, Project manager, Owner / director, Office / admin, Other |
 | Approved at | date | |
-| Pay fortnight | text | Live column name. The portal writes one pay week, Thursday to Wednesday. |
+| Pay week | text | One pay week, Thursday to Wednesday. Pay fortnight is accepted until you rename that column. |
 | Signer mismatch | checkbox | |
 | Corrected by MS Workforce | checkbox | |
 
