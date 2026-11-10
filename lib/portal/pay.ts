@@ -84,6 +84,17 @@ export function sydneyInstant(isoDate: string, time: string): Date {
   return instantInSydney(isoDate, time)
 }
 
+export const PAY_WEEK_PROPERTY = "Pay week"
+export const PAY_FORTNIGHT_PROPERTY = "Pay fortnight"
+
+/** Rows saved before the rename stored the label as payFortnight. */
+export function normaliseTimesheet<T extends { payWeek?: string; payFortnight?: string }>(sheet: T): Omit<T, "payFortnight"> & { payWeek?: string } {
+  if (!sheet.payFortnight) return sheet
+  const next: Omit<T, "payFortnight"> & { payWeek?: string; payFortnight?: string } = { ...sheet, payWeek: sheet.payWeek || sheet.payFortnight }
+  delete next.payFortnight
+  return next
+}
+
 /** A submitted or approved sheet with a signature has already been logged. */
 export function timesheetIsSigned(sheet: { status?: string; signaturePng?: string }): boolean {
   if (sheet.status === "Approved") return true

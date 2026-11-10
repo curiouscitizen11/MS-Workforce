@@ -10,7 +10,7 @@ export async function GET() {
   }
   const week = payRunWeek(new Date())
   const sheets = (await (await getStore()).timesheets.all()).filter(
-    (sheet) => sheet.status === "Approved" && sheet.payFortnight === week.label,
+    (sheet) => sheet.status === "Approved" && sheet.payWeek === week.label,
   )
   const csv = xeroCsv(
     sheets.map((sheet) => ({

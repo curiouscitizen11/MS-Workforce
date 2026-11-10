@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Pay run" }
 export default async function AdminTimesheetsPage() {
   await requireAdmin()
   const week = payRunWeek(new Date())
-  const sheets = (await (await getStore()).timesheets.all()).filter((sheet) => sheet.payFortnight === week.label)
+  const sheets = (await (await getStore()).timesheets.all()).filter((sheet) => sheet.payWeek === week.label)
   const approved = sheets.filter((sheet) => sheet.status === "Approved")
   const totals = new Map<string, number>()
   for (const sheet of approved) totals.set(sheet.workerName, (totals.get(sheet.workerName) || 0) + sheet.totalHours)

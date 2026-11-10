@@ -304,7 +304,7 @@ export function buildSeed(now = new Date()): SeedData {
       signerMismatch: false,
       signaturePng: DEMO_SIGNATURE,
       approvedAt: nowIso,
-      payFortnight: paid.label,
+      payWeek: paid.label,
       payDay: paid.payDay,
       afterCutoff: paid.afterCutoff,
       source: "Portal",

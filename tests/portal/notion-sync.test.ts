@@ -3,11 +3,14 @@ import {
   assertNotionPayloadSafe,
   timesheetNotionProperties,
   toNotionProperties,
+  payWeekPropertyFallback,
+  preferPayWeekProperty,
   unknownNotionProperty,
   withoutUnknownNotionProperty,
   workerNotionProperties,
   writeNotionProperties,
 } from "@/lib/portal/notion/map"
+import { normaliseTimesheet } from "@/lib/portal/pay"
 import { processOutbox, saveSiteInduction, type Ctx } from "@/lib/portal/services"
 import { createNotify } from "@/lib/portal/notify"
 import { createMemoryStore } from "@/lib/portal/store"
@@ -155,6 +158,39 @@ describe("Notion fields Elon still needs to add", () => {
     )
     expect(sitesOk).toEqual({ ok: true })
     expect(sentSites.at(-1)).toEqual(["Name"])
+
+    const labelled = timesheetNotionProperties({ ...sheet, payWeek: "2026-11-05 to 2026-11-11" })
+    expect(labelled["Pay week"]).toBe("2026-11-05 to 2026-11-11")
+    expect(labelled["Pay fortnight"]).toBeUndefined()
+    expect(preferPayWeekProperty({ "Pay fortnight": "2026-11-05 to 2026-11-11", Entry: "Sam" })).toEqual({
+      "Pay week": "2026-11-05 to 2026-11-11",
+      Entry: "Sam",
+    })
+    expect(normaliseTimesheet({ payFortnight: "2026-10-29 to 2026-11-04" }).payWeek).toBe("2026-10-29 to 2026-11-04")
+    expect("payFortnight" in normaliseTimesheet({ payFortnight: "2026-10-29 to 2026-11-04" })).toBe(false)
+
+    const sentWeek: string[][] = []
+    const weekOk = await writeNotionProperties({ "Pay week": "2026-11-05 to 2026-11-11", Entry: "Sam" }, async (properties) => {
+      sentWeek.push(Object.keys(properties))
+      if ("Pay week" in properties) return { ok: false, message: "Pay week is not a property that exists." }
+      if (!("Pay fortnight" in properties)) return { ok: false, message: "missing fallback" }
+      return { ok: true }
+    })
+    expect(weekOk).toEqual({ ok: true })
+    expect(sentWeek[1]).toContain("Pay fortnight")
+    expect(sentWeek[1]).not.toContain("Pay week")
+    expect(sentWeek[1]).toContain("Entry")
+    expect(payWeekPropertyFallback({ Entry: "Sam" }, "Pay week is not a property that exists.")).toBeNull()
+
+    const droppedWeek: string[][] = []
+    const neither = await writeNotionProperties({ "Pay week": "2026-11-05 to 2026-11-11", Entry: "Sam" }, async (properties) => {
+      droppedWeek.push(Object.keys(properties))
+      if ("Pay week" in properties) return { ok: false, message: "Pay week is not a property that exists." }
+      if ("Pay fortnight" in properties) return { ok: false, message: "Pay fortnight is not a property that exists." }
+      return { ok: true }
+    })
+    expect(neither).toEqual({ ok: true })
+    expect(droppedWeek.at(-1)).toEqual(["Entry"])
   })
 
   it("queues Site inductions when one is saved", async () => {

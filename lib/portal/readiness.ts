@@ -156,24 +156,29 @@ export function inspectConfig(): ReadinessItem[] {
 export function notionSchemaGaps(columns: NotionColumn[], properties: Record<string, RemoteProperty>) {
   const missing: string[] = []
   const problems: string[] = []
+  const notes: string[] = []
   for (const column of columns) {
-    const property = properties[column.name]
-    if (!property) {
+    const direct = properties[column.name]
+    const previous = column.also ? properties[column.also] : undefined
+    const property = direct || previous
+    const foundAs = direct ? column.name : column.also
+    if (!property || !foundAs) {
       missing.push(column.name)
       continue
     }
+    if (!direct && column.also) notes.push(column.name + " is still called " + column.also)
     if (column.written === false) continue
     if (property.type !== column.type) {
-      problems.push(column.name + " is " + (property.type || "unknown") + ", expected " + column.type)
+      problems.push(foundAs + " is " + (property.type || "unknown") + ", expected " + column.type)
       continue
     }
     if (!column.options || (property.type !== "select" && property.type !== "multi_select")) continue
     const have = new Set((property[property.type]?.options || []).map((option) => option.name).filter((name): name is string => Boolean(name)))
     const absent = column.options.filter((name) => !have.has(name))
-    if (absent.length) problems.push(column.name + " missing " + absent.join(", "))
+    if (absent.length) problems.push(foundAs + " missing " + absent.join(", "))
   }
   const coreMissing = columns.filter((column) => column.core && missing.includes(column.name)).map((column) => column.name)
-  return { missing, problems, coreMissing }
+  return { missing, problems, coreMissing, notes }
 }
 
 function clip(parts: string[]) {
@@ -251,6 +256,7 @@ async function probeNotion(fetchImpl: typeof fetch): Promise<ReadinessItem[]> {
             spec.note || "connected",
             gaps.coreMissing.length ? "missing " + gaps.coreMissing.join(", ") : "",
             skipped.length ? "sync skips missing columns: " + skipped.join(", ") : "",
+            gaps.notes.join("; "),
             gaps.problems.join("; "),
           ]),
         ),

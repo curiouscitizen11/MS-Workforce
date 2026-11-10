@@ -397,8 +397,8 @@ export type Timesheet = {
   signatureIp?: string
   signatureUserAgent?: string
   approvedAt?: string
-  /** Pay-week label, Thursday to Wednesday. The Notion column is still named "Pay fortnight". */
-  payFortnight?: string
+  /** Pay-week label, Thursday to Wednesday. */
+  payWeek?: string
   payDay?: string
   afterCutoff?: boolean
   corrected?: boolean

@@ -51,6 +51,8 @@ export type NotionColumn = {
   /** False when the setup script creates the column but the portal never writes it. */
   written?: boolean
   note?: string
+  /** Previous column name. The readiness check accepts it until the database is renamed. */
+  also?: string
 }
 
 function col(name: string, type: NotionColumnType, extra: Partial<NotionColumn> = {}): NotionColumn {
@@ -200,8 +202,7 @@ export const TIMESHEET_COLUMNS: NotionColumn[] = [
   col("Supervisor email", "email"),
   col("Approver role", "select", { options: LIVE_APPROVER_ROLES }),
   col("Approved at", "date"),
-  // Live Notion name. The value is one pay week (Thursday to Wednesday), paid the following Thursday.
-  col("Pay fortnight", "rich_text"),
+  col("Pay week", "rich_text", { also: "Pay fortnight" }),
   col("Signer mismatch", "checkbox"),
   col("Corrected by MS Workforce", "checkbox"),
 ]

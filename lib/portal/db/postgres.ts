@@ -2,7 +2,9 @@ import { neon } from "@neondatabase/serverless"
 import { and, eq } from "drizzle-orm"
 import { drizzle } from "drizzle-orm/neon-http"
 import { portalRecords } from "@/lib/portal/db/schema"
+import { normaliseTimesheet } from "@/lib/portal/pay"
 import type { Repo, Store } from "@/lib/portal/store"
+import type { Timesheet } from "@/lib/portal/types"
 
 export function createPostgresStore(databaseUrl: string): Store {
   const db = drizzle(neon(databaseUrl))
@@ -35,10 +37,28 @@ export function createPostgresStore(databaseUrl: string): Store {
     }
   }
 
+  function timesheets(source: Repo<Timesheet>): Repo<Timesheet> {
+    return {
+      async all() {
+        return (await source.all()).map((row) => normaliseTimesheet(row))
+      },
+      async get(id) {
+        const row = await source.get(id)
+        return row ? normaliseTimesheet(row) : null
+      },
+      async save(row) {
+        await source.save(normaliseTimesheet(row))
+      },
+      remove(id) {
+        return source.remove(id)
+      },
+    }
+  }
+
   return {
     workers: repo("workers"),
     offers: repo("offers"),
-    timesheets: repo("timesheets"),
+    timesheets: timesheets(repo<Timesheet>("timesheets")),
     documents: repo("documents"),
     sessions: repo("sessions"),
     challenges: repo("challenges"),

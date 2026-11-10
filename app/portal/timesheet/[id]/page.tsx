@@ -29,14 +29,14 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
   const sheet = await store.timesheets.get(id)
   if (!sheet || (worker.role !== "admin" && sheet.workerId !== worker.id)) notFound()
   const mine = (await store.timesheets.all()).filter(
-    (item) => item.workerId === sheet.workerId && item.status === "Approved" && item.payFortnight === sheet.payFortnight,
+    (item) => item.workerId === sheet.workerId && item.status === "Approved" && item.payWeek === sheet.payWeek,
   )
   const total = Math.round(mine.reduce((sum, item) => sum + item.totalHours, 0) * 100) / 100
   const late = cutoffMessage({
     start: "",
     end: "",
     payDay: sheet.payDay || "",
-    label: sheet.payFortnight || "",
+    label: sheet.payWeek || "",
     afterCutoff: Boolean(sheet.afterCutoff),
   })
   return (

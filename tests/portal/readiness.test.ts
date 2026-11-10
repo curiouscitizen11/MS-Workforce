@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { PLACEMENT_PROPERTIES } from "@/lib/portal/book-labour"
 import { PLACEMENT_COLUMN_NAMES } from "@/lib/portal/notion/expected"
 import { buildReadinessReport, cronAuthorised, inspectConfig, notionSchemaGaps, resendSendOnlyResponse } from "@/lib/portal/readiness"
-import { WORKER_COLUMNS } from "@/lib/portal/notion/expected"
+import { TIMESHEET_COLUMNS, WORKER_COLUMNS } from "@/lib/portal/notion/expected"
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -78,6 +78,17 @@ describe("readiness", () => {
     expect(gaps.coreMissing).toEqual([])
     expect(gaps.problems.some((problem) => problem.startsWith("Status missing"))).toBe(true)
     expect(gaps.missing).toContain("Suburb")
+    const renamed = notionSchemaGaps(TIMESHEET_COLUMNS, { "Pay fortnight": { type: "rich_text" }, Entry: { type: "title" } })
+    expect(renamed.missing).not.toContain("Pay week")
+    expect(renamed.notes).toContain("Pay week is still called Pay fortnight")
+    expect(renamed.problems).toEqual([])
+    const named = notionSchemaGaps(TIMESHEET_COLUMNS, { "Pay week": { type: "rich_text" } })
+    expect(named.missing).not.toContain("Pay week")
+    expect(named.notes).toEqual([])
+    const absent = notionSchemaGaps(TIMESHEET_COLUMNS, {})
+    expect(absent.missing).toContain("Pay week")
+    const wrong = notionSchemaGaps(TIMESHEET_COLUMNS, { "Pay fortnight": { type: "select" } })
+    expect(wrong.problems.some((problem) => problem.startsWith("Pay fortnight is select"))).toBe(true)
     expect(PLACEMENT_COLUMN_NAMES.slice().sort()).toEqual([...PLACEMENT_PROPERTIES].slice().sort())
   })
 
