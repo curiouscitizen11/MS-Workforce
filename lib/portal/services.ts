@@ -29,7 +29,7 @@ import { createInviteToken, readInviteToken } from "@/lib/portal/invite"
 import { emailError, emailProblem, normaliseEmail } from "@/lib/portal/email"
 import { twilioReady } from "@/lib/portal/notify"
 import { WHAT_TO_BRING } from "@/lib/portal/seed"
-import { addDays, daysBetween, formatDate, isMondayInSydney, sydneyParts, sydneyToday } from "@/lib/portal/dates"
+import { addDays, daysBetween, formatDate, isMondayInSydney, parseCalendarDate, sydneyParts, sydneyToday } from "@/lib/portal/dates"
 import { deletePrivateBlob, storePrivateBlob } from "@/lib/portal/blob"
 import { contentTypeFor, sniffFile, stripJpegExif } from "@/lib/portal/files"
 import {
@@ -46,7 +46,7 @@ import {
   slotsFromWorker,
 } from "@/lib/portal/ticket-photos"
 import { breakChoiceProblem, formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
-import { MS_PHONE, fortnightContaining, olderThanDays, payFortnight, timesheetReminder } from "@/lib/portal/pay"
+import { MS_PHONE, olderThanDays, payWeek, timesheetIsSigned, timesheetReminder, weekContaining } from "@/lib/portal/pay"
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
 import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
@@ -56,7 +56,7 @@ import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
 import { acceptedHeldLabel } from "@/lib/portal/ticket-catalogue"
 import { storedHealthProblem } from "@/lib/portal/health"
-import { asksForExpiry, ticketEntryProblem, ticketNumberProblem, type TicketEntry } from "@/lib/portal/ticket-entry"
+import { storedTicketDates, ticketEntryProblem, ticketNumberProblem, type TicketEntry } from "@/lib/portal/ticket-entry"
 import { workDoneProblem, workDoneText } from "@/lib/portal/work-done"
 import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
@@ -597,7 +597,15 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
     })
     if (healthProblem) return fail(healthProblem)
   }
-  if (typeof patch.dob === "string") worker.dob = patch.dob
+  const dob = readDate(patch.dob, "date of birth", sydneyToday(ctx.now))
+  if ("error" in dob) return fail(dob.error)
+  const visaExpiry = readDate(patch.visaExpiry, "visa expiry")
+  if ("error" in visaExpiry) return fail(visaExpiry.error)
+  const availableFrom = readDate(patch.availableFrom, "start date")
+  if ("error" in availableFrom) return fail(availableFrom.error)
+  if ("value" in dob) worker.dob = dob.value
+  if ("value" in visaExpiry) worker.visaExpiry = visaExpiry.value
+  if ("value" in availableFrom) worker.availableFrom = availableFrom.value
   if (typeof patch.preferredName === "string") worker.preferredName = patch.preferredName
   if (typeof patch.address === "string") worker.address = patch.address
   if (typeof patch.postcode === "string") worker.postcode = patch.postcode
@@ -613,7 +621,6 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
   if (typeof patch.vevoConsent === "boolean") worker.vevoConsent = patch.vevoConsent
   if (typeof patch.vevoMethod === "string") worker.vevoMethod = patch.vevoMethod
   if (typeof patch.visaSubclass === "string") worker.visaSubclass = patch.visaSubclass
-  if (typeof patch.visaExpiry === "string") worker.visaExpiry = patch.visaExpiry
   worker.visaConditions = undefined
   if (Array.isArray(patch.workAreas)) {
     worker.workAreas = patch.workAreas.map(String).filter((area) => (WORK_AREAS as readonly string[]).includes(area))
@@ -621,7 +628,6 @@ export async function saveOnboarding(ctx: Ctx, workerId: string, patch: Record<s
   if (Array.isArray(patch.workDays)) worker.workDays = patch.workDays.map(String)
   if (typeof patch.experienceLevel === "string") worker.experienceLevel = patch.experienceLevel
   if (typeof patch.workHistory === "string") worker.workHistory = patch.workHistory
-  if (typeof patch.availableFrom === "string") worker.availableFrom = patch.availableFrom
   if (typeof patch.constructionRecent === "string") worker.constructionRecent = patch.constructionRecent
   if (typeof patch.transport === "string") worker.transport = patch.transport
   if (typeof patch.fitness === "string") {
@@ -757,6 +763,16 @@ function stringOf(value: unknown) {
   return typeof value === "string" ? value : ""
 }
 
+function readDate(value: unknown, label: string, today?: string): { skip: true } | { value: string } | { error: string } {
+  if (typeof value !== "string") return { skip: true }
+  const trimmed = value.trim()
+  if (!trimmed) return { value: "" }
+  const iso = parseCalendarDate(trimmed)
+  if (!iso) return { error: "Enter a " + label + "." }
+  if (today && iso > today) return { error: "That " + label + " is in the future." }
+  return { value: iso }
+}
+
 function freshTicket(status: string): Ticket {
   return {
     status,
@@ -769,8 +785,9 @@ function withWorkerEntry(previous: Ticket | undefined, status: string, entry: Ti
   const problem = ticketEntryProblem(entry, today, key)
   if (problem) return { ok: false, error: problem }
   const number = (entry.number || "").trim()
-  const expiry = entry.noExpiry || !asksForExpiry(key) ? null : entry.expiry || null
-  const issued = (entry.issued || "").trim() || null
+  const dates = storedTicketDates(entry, key)
+  const expiry = dates.expiry
+  const issued = dates.issued
   const cardNumber = key === "driverLicence" ? (entry.cardNumber || "").trim() : undefined
   const changed =
     !previous?.checkedAt ||
@@ -879,8 +896,9 @@ export async function saveTicketAnswers(
     const entry = input.otherDetails?.[label] || {}
     const previous = worker.licenceChecks?.[label]
     const number = (entry.number || "").trim()
-    const expiry = entry.noExpiry || !asksForExpiry(label) ? null : entry.expiry || null
-    const issued = (entry.issued || "").trim() || null
+    const dates = storedTicketDates(entry, label)
+    const expiry = dates.expiry
+    const issued = dates.issued
     const same = previous?.checkedAt && previous.number === number && (previous.expiry || null) === expiry && (previous.issued || null) === issued
     worker.licenceChecks = {
       ...worker.licenceChecks,
@@ -928,8 +946,9 @@ export async function saveOtherLicences(ctx: Ctx, workerId: string, held: string
     const entry = details[label] || {}
     const previous = worker.licenceChecks?.[label]
     const number = (entry.number || "").trim()
-    const expiry = entry.noExpiry || !asksForExpiry(label) ? null : entry.expiry || null
-    const issued = (entry.issued || "").trim() || null
+    const dates = storedTicketDates(entry, label)
+    const expiry = dates.expiry
+    const issued = dates.issued
     const same = Boolean(previous?.checkedAt) && previous?.number === number && (previous?.expiry || null) === expiry && (previous?.issued || null) === issued
     worker.licenceChecks = { ...worker.licenceChecks, [label]: same && previous ? previous : { number, expiry, issued } }
     if (!same) changed = true
@@ -1276,7 +1295,7 @@ export async function submitTimesheet(
   if (hoursChanged && existing?.signaturePng && input.signaturePng === existing.signaturePng) {
     return fail("The supervisor needs to sign these hours again.")
   }
-  const fortnight = existing?.payFortnight ? { label: existing.payFortnight, payDay: existing.payDay || "", afterCutoff: Boolean(existing.afterCutoff) } : payFortnight(ctx.now)
+  const week = existing?.payFortnight ? { label: existing.payFortnight, payDay: existing.payDay || "", afterCutoff: Boolean(existing.afterCutoff) } : payWeek(ctx.now)
   const planned = (offer.timesheetSigner || "").trim().toLowerCase()
   const sheet: Timesheet = {
     id: existing?.id || newId("ts"),
@@ -1303,9 +1322,9 @@ export async function submitTimesheet(
     signaturePng: input.signaturePng,
     signatureIp: input.ip?.slice(0, 80),
     signatureUserAgent: input.userAgent?.slice(0, 180),
-    payFortnight: fortnight.label,
-    payDay: fortnight.payDay,
-    afterCutoff: fortnight.afterCutoff,
+    payFortnight: week.label,
+    payDay: week.payDay,
+    afterCutoff: week.afterCutoff,
     corrected: existing?.corrected || false,
     source: "Portal",
     workerName: worker.name,
@@ -1324,7 +1343,7 @@ export async function submitTimesheet(
     }
   }
   await audit(ctx, worker.id, "timesheet-signed", sheet.id)
-  return { ok: true as const, id: sheet.id, hours: hours.hours, warnings, status: sheet.status, afterCutoff: fortnight.afterCutoff, payDay: fortnight.payDay }
+  return { ok: true as const, id: sheet.id, hours: hours.hours, warnings, status: sheet.status, afterCutoff: week.afterCutoff, payDay: week.payDay }
 }
 
 function timeMinutes(value: string) {
@@ -1447,7 +1466,8 @@ export async function createOffers(
   if (texts([input.placementRef, input.suburb, input.address, input.highRisk, input.parking, input.bring])) {
     return fail(SENSITIVE_MESSAGE)
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(input.shiftDate)) return fail("Choose a shift date.")
+  const shiftDate = parseCalendarDate(input.shiftDate)
+  if (!shiftDate) return fail("Choose a shift date.")
   const workers = (await ctx.store.workers.all()).filter((worker) => worker.role === "worker")
   const chosen = input.workerIds === "all" ? workers.filter((worker) => worker.status === "Ready") : workers.filter((worker) => input.workerIds.includes(worker.id))
   if (!chosen.length) return fail("Choose at least one worker.")
@@ -1461,7 +1481,7 @@ export async function createOffers(
     }
     const check = canAcceptShift({
       tickets: asTicketInputs(worker.tickets),
-      jobDate: input.shiftDate,
+      jobDate: shiftDate,
       required: input.requiredTickets,
     })
     if (!check.ok && check.code === "do-not-book") {
@@ -1479,7 +1499,7 @@ export async function createOffers(
       siteContact: input.siteContact?.trim(),
       sitePhone: input.sitePhone ? toE164(input.sitePhone) || input.sitePhone : undefined,
       siteEmail: input.siteEmail?.trim(),
-      shiftDate: input.shiftDate,
+      shiftDate,
       startTime: input.startTime,
       expectedHours: Number(input.expectedHours) || 8,
       roleName: input.roleName.trim(),
@@ -1534,8 +1554,8 @@ export async function markTicketChecked(
   if (numberProblem) return fail(numberProblem)
   let expiry: string | null = null
   if (!input.noExpiry) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(input.expiry)) return fail("Enter the expiry date on the card, or tick no expiry date.")
-    expiry = input.expiry
+    expiry = parseCalendarDate(input.expiry)
+    if (!expiry) return fail("Enter the expiry date on the card, or tick no expiry date.")
   }
   const held = isTicketType(input.licenceKey)
     ? worker.tickets[input.licenceKey]?.status === "Yes, I have it"
@@ -1636,7 +1656,11 @@ export async function verifyWorker(
     if (!VERIFICATION_METHODS.includes(patch.verificationMethod as never)) return fail("Choose a verification method from the list.")
     worker.verificationMethod = patch.verificationMethod
   }
-  if (patch.verifiedOn) worker.verifiedOn = patch.verifiedOn
+  if (patch.verifiedOn) {
+    const verifiedOn = parseCalendarDate(patch.verifiedOn)
+    if (!verifiedOn) return fail("Choose the date verified.")
+    worker.verifiedOn = verifiedOn
+  }
   if (patch.verifiedBy) worker.verifiedBy = patch.verifiedBy
   if (typeof patch.ticketsVerified === "boolean") worker.ticketsVerified = patch.ticketsVerified
   if (patch.rightToWork) worker.rightToWork = patch.rightToWork
@@ -1648,7 +1672,9 @@ export async function verifyWorker(
   if (patch.vevoResult) {
     if (!VEVO_RESULTS.includes(patch.vevoResult as never)) return fail("Choose a VEVO result from the list.")
     worker.vevoResult = patch.vevoResult
-    worker.vevoCheckedOn = patch.vevoCheckedOn || sydneyToday(ctx.now)
+    const vevoCheckedOn = patch.vevoCheckedOn ? parseCalendarDate(patch.vevoCheckedOn) : sydneyToday(ctx.now)
+    if (!vevoCheckedOn) return fail("Choose the VEVO check date.")
+    worker.vevoCheckedOn = vevoCheckedOn
     worker.passport = null
     if (patch.vevoResult === "No work rights") worker.rightToWork = "No"
     else worker.rightToWork = "Yes"
@@ -1802,7 +1828,7 @@ export async function runReminders(ctx: Ctx) {
       sent += 1
     }
     const shiftToday = offers.find((offer) => offer.workerId === worker.id && offer.status === "Accepted" && offer.shiftDate === today && !offer.remindersOff)
-    const signedToday = sheets.some((sheet) => sheet.workerId === worker.id && sheet.workDate === today && sheet.status === "Approved")
+    const signedToday = sheets.some((sheet) => sheet.workerId === worker.id && sheet.workDate === today && timesheetIsSigned(sheet))
     const reminder = timesheetReminder({
       now: ctx.now,
       hasShiftToday: Boolean(shiftToday),
@@ -1820,7 +1846,7 @@ export async function runReminders(ctx: Ctx) {
     }
   }
   if (parts.weekday.startsWith("Thu")) {
-    const closed = fortnightContaining(addDays(today, -1))
+    const closed = weekContaining(addDays(today, -1))
     const signed = sheets.filter((sheet) => sheet.status === "Approved" && sheet.payFortnight === closed.label)
     const bySite = new Map<string, typeof signed>()
     for (const sheet of signed) {

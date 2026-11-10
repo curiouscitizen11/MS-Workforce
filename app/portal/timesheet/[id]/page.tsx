@@ -3,7 +3,7 @@ import { TimesheetAdmin } from "@/components/portal/TimesheetAdmin"
 import { WaitingForApproval } from "@/components/portal/Waiting"
 import { DemoBanner, Heading } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
-import { formatDate } from "@/lib/portal/dates"
+import { formatDate, formatLongDate } from "@/lib/portal/dates"
 import { formatBreak, formatHours } from "@/lib/portal/hours"
 import { workerCanEditTimesheet } from "@/lib/portal/timesheet-lock"
 import { workDoneText } from "@/lib/portal/work-done"
@@ -53,8 +53,8 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
         }
         text={sheet.workerName + " · MS Workforce"}
       />
-      <p className="text-sm font-semibold" data-testid="fortnight-total">
-        This fortnight: {formatHours(total)} hours so far · Pay day: Thursday {formatDate(sheet.payDay || "")}
+      <p className="text-sm font-semibold" data-testid="week-total">
+        This week: {formatHours(total)} hours so far · Pay day: {sheet.payDay ? formatLongDate(sheet.payDay) : "Thursday"}
       </p>
       {late ? <p className="rounded-2xl bg-[#FEF3C7] px-3 py-3 text-sm font-semibold text-[#B45309]">{late}</p> : null}
       <dl className="grid grid-cols-3 gap-2 rounded-2xl border border-navy/10 bg-white p-3 text-sm">

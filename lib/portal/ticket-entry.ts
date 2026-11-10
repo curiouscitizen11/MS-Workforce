@@ -1,3 +1,4 @@
+import { parseCalendarDate } from "@/lib/portal/dates"
 import { sensitiveMessage } from "@/lib/portal/privacy"
 
 export type TicketEntry = { number?: string; cardNumber?: string; expiry?: string; issued?: string; noExpiry?: boolean }
@@ -25,9 +26,17 @@ export function ticketNumberProblem(number: string, label = "licence or card num
 function issueDateProblem(issued: string | undefined, today: string): string | null {
   const value = (issued || "").trim()
   if (!value) return null
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return "Enter the issue date."
-  if (value > today) return "The issue date can't be in the future."
+  const iso = parseCalendarDate(value)
+  if (!iso) return "Enter the issue date."
+  if (iso > today) return "The issue date can't be in the future."
   return null
+}
+
+export function storedTicketDates(entry: TicketEntry, key = ""): { expiry: string | null; issued: string | null } {
+  return {
+    issued: parseCalendarDate(entry.issued || ""),
+    expiry: entry.noExpiry || (key && !asksForExpiry(key)) ? null : parseCalendarDate(entry.expiry || ""),
+  }
 }
 
 export function ticketEntryProblem(entry: TicketEntry, today: string, key = ""): string | null {
@@ -41,9 +50,10 @@ export function ticketEntryProblem(entry: TicketEntry, today: string, key = ""):
   if (issuedProblem) return issuedProblem
   if (key && !asksForExpiry(key)) return null
   if (entry.noExpiry) return null
-  if (!entry.expiry || !/^\d{4}-\d{2}-\d{2}$/.test(entry.expiry)) {
+  const expiry = parseCalendarDate(entry.expiry || "")
+  if (!expiry) {
     return "Enter the expiry date, or tick that there is no expiry date on this card."
   }
-  if (entry.expiry < today) return "This ticket has expired. Choose 'Booked in for the course' or call MS Workforce."
+  if (expiry < today) return "This ticket has expired. Choose 'Booked in for the course' or call MS Workforce."
   return null
 }

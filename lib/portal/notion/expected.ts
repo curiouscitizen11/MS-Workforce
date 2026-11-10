@@ -200,6 +200,7 @@ export const TIMESHEET_COLUMNS: NotionColumn[] = [
   col("Supervisor email", "email"),
   col("Approver role", "select", { options: LIVE_APPROVER_ROLES }),
   col("Approved at", "date"),
+  // Live Notion name. The value is one pay week (Thursday to Wednesday), paid the following Thursday.
   col("Pay fortnight", "rich_text"),
   col("Signer mismatch", "checkbox"),
   col("Corrected by MS Workforce", "checkbox"),

@@ -6,7 +6,7 @@ You can try the whole portal on your computer with no accounts. Real emails, Not
 
 The public name stays **MS Workforce**. Do not add a company suffix on the website or in the portal.
 
-Do not ask workers for a tax file number, bank details or super. Those stay in Xero. Pay is fortnightly, on Thursday. The pay fortnight starts on a Thursday. The default is Thursday 5 November 2026. To use another Thursday, set `PORTAL_PAY_ANCHOR` in `.env.local` (see `.env.example`). Signed hours export from Admin → Hours as a Xero CSV.
+Do not ask workers for a tax file number, bank details or super. Those stay in Xero. Pay is weekly, on Thursday. Each pay week starts on a Thursday and ends the next Wednesday. Pay day is the Thursday after that. The default first Thursday is 5 November 2026. To use another Thursday, set `PORTAL_PAY_ANCHOR` in `.env.local` (see `.env.example`). Signed hours export from Admin → Hours as a Xero CSV.
 
 ## Try it first (no accounts)
 
@@ -215,7 +215,7 @@ There is no availability calendar. A worker accepts or declines. The street addr
 
 ## Timesheets
 
-The worker types start, finish and break. No GPS. They hand the phone to the supervisor, who signs on the screen. That signature is the approval. There is no builder login and no separate approval link. Signing does not send an email. An incident on the timesheet does email you. On Thursday the site contact gets an email of the signed hours.
+The worker types start, finish and break. No GPS. They hand the phone to the supervisor, who signs on the screen. That signature is the approval. There is no builder login and no separate approval link. Signing does not send an email. An incident on the timesheet does email you. On Thursday morning the site contact gets an email of the signed hours for the week that ended the day before.
 
 ## Going live
 

@@ -1,3 +1,4 @@
+import { parseCalendarDate } from "@/lib/portal/dates"
 import { emailError, emailProblem } from "@/lib/portal/email"
 
 export const BOOK_ROLES = ["General labourer", "Trade assistant", "Site clean", "Materials handling", "Other"] as const
@@ -64,11 +65,8 @@ export function bookPhoneOk(input: string) {
   return digits.startsWith("04") || /^0[2378]/.test(digits)
 }
 
-function dateOk(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
-  const [year, month, day] = value.split("-").map(Number)
-  const date = new Date(Date.UTC(year, month - 1, day))
-  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+function calendarDate(value: string) {
+  return parseCalendarDate(value)
 }
 
 export function checkBookLabour(
@@ -97,11 +95,11 @@ export function checkBookLabour(
   if (roles.includes("Other") && otherRole.length < 2) return { ok: false, error: "Tell us a bit more about the other role." }
   const workers = Number(raw.workers)
   if (!Number.isInteger(workers) || workers < 1 || workers > 50) return { ok: false, error: "Enter how many workers, from 1 to 50." }
-  const start = text(raw.start, 10)
-  if (!dateOk(start)) return { ok: false, error: "Choose a start date." }
+  const start = calendarDate(text(raw.start, 32)) || ""
+  if (!start) return { ok: false, error: "Choose a start date." }
   const ongoing = raw.ongoing === true
-  const end = ongoing ? "" : text(raw.end, 10)
-  if (!ongoing && !dateOk(end)) return { ok: false, error: "Choose an end date, or tick ongoing." }
+  const end = ongoing ? "" : calendarDate(text(raw.end, 32)) || ""
+  if (!ongoing && !end) return { ok: false, error: "Choose an end date, or tick ongoing." }
   if (!ongoing && end < start) return { ok: false, error: "The end date must be on or after the start date." }
   const shift = text(raw.shift, 200)
   if (shift.length < 2) return { ok: false, error: "Enter the shift and start time." }

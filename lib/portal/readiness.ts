@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "crypto"
 import { neon } from "@neondatabase/serverless"
 import { portalMode } from "@/lib/portal/config"
+import { isThursday, parseCalendarDate } from "@/lib/portal/dates"
 import { ensurePortalSchema } from "@/lib/portal/db/migrate"
 import { NOTION_DATABASES, type NotionColumn, type NotionDatabaseSpec } from "@/lib/portal/notion/expected"
 import { base32Decode } from "@/lib/portal/totp"
@@ -90,6 +91,14 @@ function twilioItems(): ReadinessItem[] {
   })
 }
 
+function payAnchorItem(anchor: string): ReadinessItem {
+  if (!anchor) return item("PORTAL_PAY_ANCHOR", false, false, true, "not set, using 2026-11-05")
+  const parsed = parseCalendarDate(anchor)
+  if (!parsed) return item("PORTAL_PAY_ANCHOR", false, true, false, "expected YYYY-MM-DD")
+  if (!isThursday(parsed)) return item("PORTAL_PAY_ANCHOR", false, true, false, "needs to be a Thursday, using 2026-11-05")
+  return item("PORTAL_PAY_ANCHOR", false, true, true, "Thursday")
+}
+
 export function inspectConfig(): ReadinessItem[] {
   const mode = raw("PORTAL_MODE")
   const site = raw("NEXT_PUBLIC_SITE_URL")
@@ -140,7 +149,7 @@ export function inspectConfig(): ReadinessItem[] {
     item("BLOB_READ_WRITE_TOKEN", false, Boolean(blob), !blob || blob.startsWith("vercel_blob_rw_"), blob ? (blob.startsWith("vercel_blob_rw_") ? "set" : "unexpected shape") : "not set, photos stay in the database"),
     ...twilioItems(),
     item("NEXT_PUBLIC_SITE_URL", true, Boolean(site), siteOk, siteDetail),
-    item("PORTAL_PAY_ANCHOR", false, Boolean(anchor), !anchor || /^\d{4}-\d{2}-\d{2}$/.test(anchor), anchor ? (/^\d{4}-\d{2}-\d{2}$/.test(anchor) ? "date" : "expected YYYY-MM-DD") : "not set, using 2026-11-05"),
+    payAnchorItem(anchor),
   ]
 }
 

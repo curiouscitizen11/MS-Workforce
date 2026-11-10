@@ -6,7 +6,7 @@ import { createMemoryStore } from "@/lib/portal/store"
 import { sydneyToday } from "@/lib/portal/dates"
 import { signedFilePath, stripJpegExif, verifyFileToken } from "@/lib/portal/files"
 import { breakChoiceProblem, formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
-import { payFortnight, sydneyInstant, xeroCsv } from "@/lib/portal/pay"
+import { payRunWeek, payWeek, sydneyInstant, weekContaining, xeroCsv } from "@/lib/portal/pay"
 import { QUESTIONS, scoreAnswers } from "@/lib/portal/induction"
 import { toNotionProperties } from "@/lib/portal/notion/map"
 import { sensitiveFindings } from "@/lib/portal/privacy"
@@ -154,13 +154,18 @@ describe("hours, privacy, induction and file links", () => {
     expect(breakChoiceProblem({ start: "07:00", finish: "10:00", breakMinutes: 0, breakStart: "08:00" })).toBeNull()
   })
 
-  it("keeps 5:59 pm on the cut-off Wednesday and rolls 6:01 pm to the next fortnight", () => {
-    const early = payFortnight(sydneyInstant("2026-11-18", "17:59"))
-    expect(early).toMatchObject({ start: "2026-11-05", end: "2026-11-18", payDay: "2026-11-19", afterCutoff: false })
-    const late = payFortnight(sydneyInstant("2026-11-18", "18:01"))
-    expect(late).toMatchObject({ start: "2026-11-19", end: "2026-12-02", payDay: "2026-12-03", afterCutoff: true })
-    const midweek = payFortnight(sydneyInstant("2026-11-11", "18:01"))
-    expect(midweek).toMatchObject({ start: "2026-11-05", end: "2026-11-18", afterCutoff: false })
+  it("keeps 5:59 pm on the cut-off Wednesday and rolls 6:01 pm to the next week", () => {
+    const early = payWeek(sydneyInstant("2026-11-18", "17:59"))
+    expect(early).toMatchObject({ start: "2026-11-12", end: "2026-11-18", payDay: "2026-11-19", afterCutoff: false })
+    const late = payWeek(sydneyInstant("2026-11-18", "18:01"))
+    expect(late).toMatchObject({ start: "2026-11-19", end: "2026-11-25", payDay: "2026-11-26", afterCutoff: true })
+    const closing = payWeek(sydneyInstant("2026-11-11", "18:01"))
+    expect(closing).toMatchObject({ start: "2026-11-12", end: "2026-11-18", payDay: "2026-11-19", afterCutoff: true })
+    const anchor = weekContaining("2026-11-05")
+    expect(anchor).toMatchObject({ start: "2026-11-05", end: "2026-11-11", payDay: "2026-11-12" })
+    expect(weekContaining("2026-10-30")).toMatchObject({ start: "2026-10-29", end: "2026-11-04", payDay: "2026-11-05" })
+    expect(payRunWeek(sydneyInstant("2026-11-19", "09:00"))).toMatchObject({ start: "2026-11-12", end: "2026-11-18", payDay: "2026-11-19" })
+    expect(payRunWeek(sydneyInstant("2026-11-18", "18:01"))).toMatchObject({ start: "2026-11-12", end: "2026-11-18" })
     const csv = xeroCsv([{ employee: "Sam Lee", date: "2026-11-05", start: "07:00", finish: "15:30", breakMinutes: 30, hours: 8 }])
     expect(csv.split("\n")[0]).toBe("employee,date,start,finish,break,hours")
     expect(csv).toContain("Sam Lee,2026-11-05,07:00,15:30,30,8")

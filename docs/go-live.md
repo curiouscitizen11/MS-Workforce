@@ -48,7 +48,7 @@ Run that once per secret. Each result is 43 characters. Use a different result f
 | `TWILIO_ACCOUNT_SID` | No | Text-message codes. Leave blank for email-only | `AC` plus 32 hex characters | Owner, later, from Twilio |
 | `TWILIO_AUTH_TOKEN` | No | With the other two Twilio values | 32 hex characters | Owner, later |
 | `TWILIO_FROM` | No | The Twilio number | `+` then 8 to 15 digits | Owner, later |
-| `PORTAL_PAY_ANCHOR` | No | First Thursday of the pay calendar | `YYYY-MM-DD`. Blank uses `2026-11-05` | Owner |
+| `PORTAL_PAY_ANCHOR` | No | First Thursday of the weekly pay calendar. Each week runs Thursday to Wednesday and is paid the following Thursday | `YYYY-MM-DD`. Blank uses `2026-11-05` | Owner |
 
 Set all three Twilio values, or none. One or two on their own does not turn texts on.
 
@@ -234,7 +234,7 @@ Draft hours are not sent. Signed hours are.
 | Supervisor email | email | |
 | Approver role | select | Site supervisor, Site manager, Foreman / leading hand, Project manager, Owner / director, Office / admin, Other |
 | Approved at | date | |
-| Pay fortnight | text | |
+| Pay fortnight | text | Live column name. The portal writes one pay week, Thursday to Wednesday. |
 | Signer mismatch | checkbox | |
 | Corrected by MS Workforce | checkbox | |
 

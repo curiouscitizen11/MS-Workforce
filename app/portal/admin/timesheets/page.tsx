@@ -4,7 +4,7 @@ import { Heading, StatusChip } from "@/components/portal/ui"
 import { formatDate } from "@/lib/portal/dates"
 import { formatHours } from "@/lib/portal/hours"
 import { workDoneText } from "@/lib/portal/work-done"
-import { payRunFortnight } from "@/lib/portal/pay"
+import { payRunWeek } from "@/lib/portal/pay"
 import { requireAdmin } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 
@@ -12,14 +12,14 @@ export const metadata: Metadata = { title: "Pay run" }
 
 export default async function AdminTimesheetsPage() {
   await requireAdmin()
-  const fortnight = payRunFortnight(new Date())
-  const sheets = (await (await getStore()).timesheets.all()).filter((sheet) => sheet.payFortnight === fortnight.label)
+  const week = payRunWeek(new Date())
+  const sheets = (await (await getStore()).timesheets.all()).filter((sheet) => sheet.payFortnight === week.label)
   const approved = sheets.filter((sheet) => sheet.status === "Approved")
   const totals = new Map<string, number>()
   for (const sheet of approved) totals.set(sheet.workerName, (totals.get(sheet.workerName) || 0) + sheet.totalHours)
   return (
     <div className="space-y-4">
-      <Heading kicker="Pay run" title={fortnight.label} text="Approved hours only. Pay day Thursday. Overtime stays in Xero." />
+      <Heading kicker="Pay run" title={week.label} text="Approved hours only. Pay day Thursday. Overtime stays in Xero." />
       <ul className="space-y-2">
         {Array.from(totals.entries()).map(([name, hours]) => (
           <li key={name} className="flex items-center justify-between rounded-2xl bg-white px-3 py-3 text-sm font-semibold">

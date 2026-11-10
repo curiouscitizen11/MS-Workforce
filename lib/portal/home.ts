@@ -1,21 +1,21 @@
 import { formatHours } from "@/lib/portal/hours"
-import { datesInFortnight, fortnightContaining } from "@/lib/portal/pay"
+import { datesInWeek, weekContaining } from "@/lib/portal/pay"
 
 type SummaryOffer = { workerId: string; status: string; shiftDate: string }
 type SummarySheet = { workerId: string; workDate: string; status: string; totalHours?: number; signaturePng?: string }
 
-export function fortnightSummary(offers: SummaryOffer[], sheets: SummarySheet[], workerId: string, today: string) {
-  const days = new Set(datesInFortnight(fortnightContaining(today)))
+export function weekSummary(offers: SummaryOffer[], sheets: SummarySheet[], workerId: string, today: string) {
+  const days = new Set(datesInWeek(weekContaining(today)))
   const shifts = offers.filter(
     (offer) => offer.workerId === workerId && days.has(offer.shiftDate) && (offer.status === "Accepted" || offer.status === "Offered"),
   )
   const hours = sheets.filter((sheet) => sheet.workerId === workerId && days.has(sheet.workDate))
   const approvedHours = hours.filter((sheet) => sheet.status === "Approved").reduce((sum, sheet) => sum + (sheet.totalHours || 0), 0)
-  const unsigned = unsignedFortnightDays(offers, sheets, workerId, today)
+  const unsigned = unsignedWeekDays(offers, sheets, workerId, today)
   const empty = shifts.length === 0 && hours.length === 0
   const text = empty
-    ? "This fortnight: nothing yet"
-    : "This fortnight: " + formatHours(approvedHours) + " h approved · " + (unsigned === 0 ? "all signed" : unsigned + " not signed")
+    ? "This week: nothing yet"
+    : "This week: " + formatHours(approvedHours) + " h approved · " + (unsigned === 0 ? "all signed" : unsigned + " not signed")
   return { text, approvedHours, unsigned, empty }
 }
 
@@ -29,13 +29,13 @@ export function offersWaiting(offers: { workerId: string; status: string }[], wo
   return offers.filter((offer) => offer.workerId === workerId && offer.status === "Offered").length
 }
 
-export function unsignedFortnightDays(
+export function unsignedWeekDays(
   offers: { workerId: string; status: string; shiftDate: string }[],
   sheets: { workerId: string; workDate: string; status: string; signaturePng?: string }[],
   workerId: string,
   today: string,
 ) {
-  return datesInFortnight(fortnightContaining(today)).filter((day) => {
+  return datesInWeek(weekContaining(today)).filter((day) => {
     if (day > today) return false
     const worked = offers.some((offer) => offer.workerId === workerId && offer.status === "Accepted" && offer.shiftDate === day)
     if (!worked) return false

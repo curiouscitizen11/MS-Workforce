@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { xeroCsv, payRunFortnight } from "@/lib/portal/pay"
+import { xeroCsv, payRunWeek } from "@/lib/portal/pay"
 import { readSession } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 
@@ -8,9 +8,9 @@ export async function GET() {
   if (!current || current.worker.role !== "admin") {
     return NextResponse.json({ error: "Admin login is required." }, { status: 401 })
   }
-  const fortnight = payRunFortnight(new Date())
+  const week = payRunWeek(new Date())
   const sheets = (await (await getStore()).timesheets.all()).filter(
-    (sheet) => sheet.status === "Approved" && sheet.payFortnight === fortnight.label,
+    (sheet) => sheet.status === "Approved" && sheet.payFortnight === week.label,
   )
   const csv = xeroCsv(
     sheets.map((sheet) => ({
