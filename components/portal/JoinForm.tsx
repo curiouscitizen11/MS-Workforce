@@ -94,7 +94,7 @@ export function JoinForm({
           setError("Enter an Australian mobile, like 0400 000 000.")
           return
         }
-        const emailIssue = emailError(emailProblem(email, confirmEmail))
+        const emailIssue = emailError(emailProblem(email, confirmEmail, true))
         if (emailIssue) {
           setError(emailIssue)
           return
@@ -136,8 +136,8 @@ export function JoinForm({
           {expired ? <p className="portal-banner text-sm">That link has expired. You can still apply</p> : null}
           <Field label="Full name" name="name" value={name} onChange={(event) => setName(event.target.value)} required />
           <Field label="Mobile" name="mobile" inputMode="tel" autoComplete="tel" value={mobile} onChange={(event) => setMobile(event.target.value)} required />
-          <Field label="Email (helps if texts fail)" name="email" type="text" inputMode="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
-          <Field label="Confirm email" name="confirmEmail" type="text" inputMode="email" autoComplete="email" value={confirmEmail} onChange={(event) => setConfirmEmail(event.target.value)} />
+          <Field label="Email" name="email" type="text" inputMode="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          <Field label="Confirm email" name="confirmEmail" type="text" inputMode="email" autoComplete="email" value={confirmEmail} onChange={(event) => setConfirmEmail(event.target.value)} required />
           <Field label="Suburb" name="suburb" value={suburb} onChange={(event) => setSuburb(event.target.value)} required />
           <Field label="Postcode" name="postcode" inputMode="numeric" autoComplete="postal-code" value={postcode} onChange={(event) => setPostcode(event.target.value)} required />
           <fieldset>
@@ -188,7 +188,7 @@ export function JoinForm({
             onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
             required
           />
-          {devCode ? <p className="portal-banner text-sm">Demo code {devCode}</p> : null}
+          {devCode ? <p className="portal-banner text-sm">Demo code {devCode}</p> : <p className="text-sm">We sent a code to your email. It lasts 10 minutes.</p>}
           {error ? (
             <p role="alert" className="text-sm font-semibold text-[#B91C1C]">
               {error}

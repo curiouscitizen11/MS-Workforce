@@ -40,7 +40,7 @@ export function PortalNav({ role }: { role: "worker" | "admin" }) {
                 href={item.href}
                 aria-current={current ? "page" : undefined}
                 className={
-                  "flex min-h-12 items-center justify-center text-[13px] font-semibold " +
+                  "flex min-h-12 items-center justify-center text-small font-semibold " +
                   (current ? "text-teal-600" : "text-navy/70")
                 }
               >

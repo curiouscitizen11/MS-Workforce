@@ -45,9 +45,9 @@ function ChipIcon({ level }: { level: ChipLevel }) {
 export function Heading({ kicker, title, text }: { kicker: string; title: string; text?: string }) {
   return (
     <header>
-      <p className="kicker text-teal-600">{kicker}</p>
-      <h1 className="mt-2 text-[32px] font-bold leading-[1.1] tracking-tight md:text-5xl">{title}</h1>
-      {text ? <p className="mt-4 max-w-prose text-base font-normal leading-[1.6] text-navy/80 md:text-[17px]">{text}</p> : null}
+      <p className="kicker text-teal">{kicker}</p>
+      <h1 className="display mt-2">{title}</h1>
+      {text ? <p className="lede mt-4">{text}</p> : null}
     </header>
   )
 }
@@ -68,13 +68,13 @@ export function DemoBanner({ mock }: { mock: boolean }) {
   if (!mock) return null
   return (
     <p className="portal-banner">
-      Demo mode. Texts, emails and Notion stay on this phone.
+      Demo mode. Nothing leaves this phone.
     </p>
   )
 }
 
 export const fieldClass =
-  "portal-field mt-2 w-full min-h-12 rounded-2xl border border-navy/20 bg-white px-3 text-base text-navy outline-none ring-teal-300 focus:border-teal-600 focus:ring-2"
+  "portal-field mt-2 w-full px-3 outline-none ring-teal focus:border-teal focus:ring-2"
 
 export function Field({
   label,
@@ -83,7 +83,7 @@ export function Field({
   const id = props.id || props.name
   return (
     <label className="block" htmlFor={id}>
-      <span className="text-sm font-medium leading-[1.5]">{label}</span>
+      <span className="text-small font-medium">{label}</span>
       <input id={id} className={fieldClass} {...props} />
     </label>
   )

@@ -4,6 +4,7 @@ import { InviteWorker } from "@/components/portal/InviteWorker"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { HoursIcon, PhotoIcon, ShiftsIcon, TicketsIcon, Tile, WorkersIcon } from "@/components/portal/Tiles"
 import { isMock } from "@/lib/portal/config"
+import { twilioReady } from "@/lib/portal/notify"
 import { complianceFor } from "@/lib/portal/services"
 import { sydneyToday } from "@/lib/portal/dates"
 import { cardsAwaitingCheck, photosAwaitingApproval, waitingForApproval } from "@/lib/portal/home"
@@ -57,7 +58,12 @@ export default async function AdminHomePage() {
         <Tile href="/portal/admin/photos" label="Photos to approve" count={photos} countLabel={photos + " photos to approve"} icon={<PhotoIcon />} />
         <Tile href="#people" label="Workers" count={workers.length} countLabel={workers.length + " workers"} icon={<WorkersIcon />} />
       </div>
-      <InviteWorker />
+      <InviteWorker sms={twilioReady()} />
+      <p className="text-sm">
+        <Link href="/portal/admin/ready" className="font-semibold text-teal-600 underline">
+          Check the portal is ready
+        </Link>
+      </p>
       <section id="people" className="space-y-2">
         {workers.map((worker) => {
           const check = complianceFor(worker, today)

@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "portal:shift-offers": "node scripts/setup-shift-offers.mjs"
+    "portal:shift-offers": "node scripts/setup-shift-offers.mjs",
+    "portal:migrate": "tsx scripts/migrate-portal.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",

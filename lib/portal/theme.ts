@@ -6,8 +6,8 @@ export const THEME = {
   dark: {
     page: "#0B1A2E",
     card: "#152D4A",
-    text: "#E8EEF4",
-    muted: "#D5E2EF",
+    text: "#C9D4E0",
+    muted: "#8FA1B6",
     button: "#2EC4B6",
     buttonText: "#0B1A2E",
     accent: "#2EC4B6",

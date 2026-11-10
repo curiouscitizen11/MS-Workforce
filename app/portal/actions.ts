@@ -8,6 +8,7 @@ import {
   confirmAdminTotp,
   createOffers,
   deleteWorkerImages,
+  requestEmailOtp,
   requestMagicLink,
   finishJoin,
   makeWorkerInvite,
@@ -35,6 +36,7 @@ import {
   correctTimesheet,
   queryTimesheet,
   submitTimesheet,
+  verifyEmailOtp,
   verifyOtp,
   verifyWorker,
   type Ctx,
@@ -51,6 +53,7 @@ import {
   readPendingWorkerId,
   readSession,
   requireAdmin,
+  writeEmailCookie,
   writeJoinDraft,
   writeMobileCookie,
   writeOtpCookie,
@@ -84,9 +87,8 @@ async function restoreDemoOtp() {
   if (!(await store.challenges.get(saved.id))) await store.challenges.save(saved)
 }
 
-async function rememberDemoOtp(mobile: string) {
+async function rememberDemoOtp(target: string) {
   if (!isMock()) return
-  const target = toE164(mobile)
   if (!target) return
   const latest = (await (await getStore()).challenges.all())
     .filter((item) => item.target === target)
@@ -98,7 +100,17 @@ export async function sendLoginCode(mobile: string) {
   const result = await requestOtp(await ctx(), { mobile, ip: await ip() })
   if (result.ok) {
     await writeMobileCookie(mobile)
-    await rememberDemoOtp(mobile)
+    await rememberDemoOtp(toE164(mobile) || "")
+  }
+  return result
+}
+
+export async function sendEmailLoginCode(email: string) {
+  const result = await requestEmailOtp(await ctx(), { email, ip: await ip() })
+  if (result.ok) {
+    const target = email.trim().toLowerCase()
+    await writeEmailCookie(target)
+    await rememberDemoOtp(target)
   }
   return result
 }
@@ -115,7 +127,25 @@ export async function checkLoginCode(mobile: string, code: string) {
   await restoreDemoOtp()
   const result = await verifyOtp(await ctx(), { mobile, code })
   if (!result.ok) {
-    await rememberDemoOtp(mobile)
+    await rememberDemoOtp(toE164(mobile) || "")
+    return result
+  }
+  await clearOtpCookie()
+  if (result.needsTotp) {
+    await writePendingCookie(result.workerId, Date.now())
+    return { ok: true as const, next: "/portal/login/admin" }
+  }
+  await writeSessionCookie(result.session)
+  await clearPendingCookie()
+  refresh()
+  return { ok: true as const, next: result.session.role === "admin" ? "/portal/admin" : "/portal" }
+}
+
+export async function checkEmailLoginCode(email: string, code: string) {
+  await restoreDemoOtp()
+  const result = await verifyEmailOtp(await ctx(), { email, code })
+  if (!result.ok) {
+    await rememberDemoOtp(email.trim().toLowerCase())
     return result
   }
   await clearOtpCookie()
@@ -173,16 +203,17 @@ export async function sendJoinDetails(input: unknown) {
   if (!result.ok) return result
   await writeJoinDraft(result.draft)
   await writeMobileCookie(result.draft.mobile)
-  await rememberDemoOtp(result.draft.mobile)
+  await writeEmailCookie(result.draft.email)
+  await rememberDemoOtp(result.draft.email)
   return { ok: true as const, devCode: result.devCode }
 }
 
 export async function sendJoinCodeAgain() {
   const draft = await readJoinDraft()
   if (!draft) return { ok: false as const, error: "Start again. Your details have expired." }
-  const result = await resendJoinCode(await ctx(), draft.mobile, await ip())
+  const result = await resendJoinCode(await ctx(), draft.email, await ip())
   if (!result.ok) return result
-  await rememberDemoOtp(draft.mobile)
+  await rememberDemoOtp(draft.email)
   return { ok: true as const, devCode: result.devCode }
 }
 
@@ -192,7 +223,7 @@ export async function checkJoinCode(code: string) {
   if (!draft) return { ok: false as const, error: "Start again. Your details have expired." }
   const result = await finishJoin(await ctx(), draft, code)
   if (!result.ok) {
-    await rememberDemoOtp(draft.mobile)
+    await rememberDemoOtp(draft.email)
     return result
   }
   await clearOtpCookie()

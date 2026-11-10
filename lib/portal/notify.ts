@@ -1,7 +1,16 @@
 import { newId } from "@/lib/portal/id"
 import type { Store } from "@/lib/portal/store"
 
-export type EmailMessage = { to: string; subject: string; body: string }
+export type EmailMessage = { to: string; subject: string; body: string; logBody?: string }
+
+/** Text codes stay off until all three Twilio values are set. Email codes do not need them. */
+export function twilioReady(): boolean {
+  return Boolean(process.env.TWILIO_ACCOUNT_SID?.trim() && process.env.TWILIO_AUTH_TOKEN?.trim() && process.env.TWILIO_FROM?.trim())
+}
+
+export function resendReady(): boolean {
+  return Boolean(process.env.RESEND_API_KEY?.trim() && process.env.EMAIL_FROM?.trim())
+}
 
 export type Notify = {
   sms(to: string, body: string, logBody?: string): Promise<void>
@@ -23,10 +32,20 @@ export function createNotify(store: Store, mode: "mock" | "live", fetchImpl: typ
         })
         return
       }
-      const sid = process.env.TWILIO_ACCOUNT_SID
-      const token = process.env.TWILIO_AUTH_TOKEN
-      const from = process.env.TWILIO_FROM
-      if (!sid || !token || !from) throw new Error("SMS is not set up. Add the Twilio keys.")
+      const sid = process.env.TWILIO_ACCOUNT_SID?.trim()
+      const token = process.env.TWILIO_AUTH_TOKEN?.trim()
+      const from = process.env.TWILIO_FROM?.trim()
+      if (!sid || !token || !from) {
+        await store.notifications.save({
+          id: newId("ntf"),
+          at: new Date().toISOString(),
+          channel: "sms",
+          to,
+          body: logBody || "Not sent",
+          status: "skipped",
+        })
+        return
+      }
       const response = await fetchImpl(
         "https://api.twilio.com/2010-04-01/Accounts/" + sid + "/Messages.json",
         {
@@ -56,7 +75,7 @@ export function createNotify(store: Store, mode: "mock" | "live", fetchImpl: typ
           channel: "email",
           to: message.to,
           subject: message.subject,
-          body: message.body,
+          body: message.logBody || message.body,
           status: "captured",
         })
         return
@@ -76,7 +95,7 @@ export function createNotify(store: Store, mode: "mock" | "live", fetchImpl: typ
         channel: "email",
         to: message.to,
         subject: message.subject,
-        body: message.body,
+        body: message.logBody || message.body,
         status: "sent",
       })
     },

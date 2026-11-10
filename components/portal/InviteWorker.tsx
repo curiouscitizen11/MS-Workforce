@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import { makeInviteLink } from "@/app/portal/actions"
 import { Card, Field } from "@/components/portal/ui"
 
-export function InviteWorker() {
+export function InviteWorker({ sms = false }: { sms?: boolean }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [mobile, setMobile] = useState("")
@@ -68,9 +68,14 @@ export function InviteWorker() {
           >
             {copied ? "Copied" : "Copy link"}
           </button>
-          <a className="pill pill-line w-full" href={"sms:?body=" + encodeURIComponent("Join MS Workforce: " + url)}>
-            Text it
+          <a className="pill pill-line w-full" href={"mailto:?subject=" + encodeURIComponent("Join MS Workforce") + "&body=" + encodeURIComponent("Join MS Workforce: " + url)}>
+            Email it
           </a>
+          {sms ? (
+            <a className="pill pill-line w-full" href={"sms:?body=" + encodeURIComponent("Join MS Workforce: " + url)}>
+              Text it
+            </a>
+          ) : null}
         </div>
       ) : null}
     </Card>

@@ -1,8 +1,8 @@
 # Worker portal — setup for Marek
 
-The worker portal lives at `/portal` on the same website as www.msworkforce.au. Workers log in with a text message code. You (Marek) are the only admin.
+The worker portal lives at `/portal` on the same website as www.msworkforce.au. Workers log in with a 6-digit code sent to their email. You (Marek) are the only admin. The full go-live list, including every setting and every Notion column, is in `docs/go-live.md`.
 
-You can try the whole portal on your computer with no accounts. Real texts, emails, Notion and photo storage stay switched off until you follow the steps below.
+You can try the whole portal on your computer with no accounts. Real emails, Notion and photo storage stay switched off until you follow the steps below.
 
 The public name stays **MS Workforce**. Do not add a company suffix on the website or in the portal.
 
@@ -20,12 +20,10 @@ Leave `PORTAL_MODE` unset, or set it to `mock` in `.env.local`. Demo mode never 
 
 A Vercel preview of this branch is also demo mode. It does not need Neon, Twilio, Notion or Blob. It switches to the real accounts only when `PORTAL_MODE` is set to exactly `live`. If that setting is blank, or set to any other word, the portal stays in demo mode even when the database and Notion keys are present.
 
-Demo logins are on the login screen:
+Demo logins are on the login screen. Use the email. The screen shows the demo code. No real email is sent.
 
-- **Sam Lee**, mobile `0400 111 222` — a ready worker with an open shift offer and a signed timesheet.
-- **Marek**, mobile `0400 000 001` — admin. After the text code, the screen shows a second demo authenticator code.
-
-The login screen shows the demo code. No real text is sent.
+- **Sam Lee**, `sam.lee@example.com` — a ready worker with an open shift offer and a signed timesheet.
+- **Marek**, `hello@msworkforce.au` — admin. After the email code, the screen shows a second demo authenticator code.
 
 Other demo people:
 
@@ -47,30 +45,31 @@ Notion stays the record of each worker. Neon only keeps logins, a short cache, a
 1. Go to [neon.tech](https://neon.tech) and create a free project. Name it something like `ms-workforce-portal`.
 2. Copy the connection string. It starts with `postgres://`.
 3. In Vercel, add `DATABASE_URL` with that string.
-4. On your computer, with `DATABASE_URL` set, run the SQL in `drizzle/0001_portal_records.sql` once (Neon’s SQL editor is fine). That creates one table, `portal_records`.
+4. The table `portal_records` is created on the first live request, and also when the readiness check runs. To create it yourself: `DATABASE_URL='postgresql://…' npm run portal:migrate`. Neon's SQL editor can run `drizzle/0001_portal_records.sql` instead. The first live request also creates your admin login from `ADMIN_EMAIL`.
 
-### 2. Twilio (text message login codes)
+### 2. Email (Resend) — this is the login
+
+1. Go to [resend.com](https://resend.com) and create an account.
+2. Add the domain `msworkforce.au` and turn on the DNS records they show you. Whoever manages the domain adds those records. Do not change DNS from this repository.
+3. Create an API key → `RESEND_API_KEY`. It starts with `re_`.
+4. Set `EMAIL_FROM` to `MS Workforce <portal@msworkforce.au>`.
+
+Workers, and you, enter an email. The portal sends a 6-digit code. The code lasts 10 minutes. Five wrong codes lock that email for 15 minutes. An email can ask for 3 codes in 15 minutes.
+
+The same account sends login links, shift messages and ticket reminders. Office alerts go to `hello@msworkforce.au` (`ADMIN_EMAIL`).
+
+Text-message login is optional and comes later. Leave `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` and `TWILIO_FROM` blank. The portal does not mention texts, and it does not error, while they are blank. Set all three later if you want a **Text me a code instead** button. One or two on their own is not enough.
+
+### 3. Twilio (only when you want texts)
 
 1. Go to [twilio.com](https://www.twilio.com) and create an account.
 2. Buy an Australian mobile number that can send SMS.
 3. From the Twilio console, copy:
-   - Account SID → `TWILIO_ACCOUNT_SID`
-   - Auth token → `TWILIO_AUTH_TOKEN`
+   - Account SID → `TWILIO_ACCOUNT_SID` (`AC` plus 32 hex characters)
+   - Auth token → `TWILIO_AUTH_TOKEN` (32 hex characters)
    - The new number, in the form `+61…` → `TWILIO_FROM`
-4. Start in Twilio’s trial if you like. Trial accounts only text numbers you have verified.
 
-Workers enter their mobile. The portal texts a 6-digit code. The code lasts 10 minutes. Five wrong codes lock the phone for 15 minutes. A phone can ask for 3 codes in 15 minutes.
-
-If a worker has no signal, they can ask for an email link instead. That uses the email account below.
-
-### 3. Email (Resend)
-
-1. Go to [resend.com](https://resend.com) and create an account.
-2. Add the domain `msworkforce.au` and turn on the DNS records they show you (ask whoever manages the domain, or do it in Vercel’s domain page).
-3. Create an API key → `RESEND_API_KEY`.
-4. Set `EMAIL_FROM` to a real address on that domain, for example `MS Workforce <hello@msworkforce.au>`.
-
-This sends login links, the email after a supervisor signs a timesheet, and ticket reminders.
+You do not need this for go-live.
 
 ### 4. Notion (the source of truth)
 
@@ -134,23 +133,27 @@ Both photos are deleted 7 days after you mark that card checked. The number, the
 
 ### 6. Your admin login (second code)
 
-Your worker login is a text to `ADMIN_MOBILE` (default `+61400000001` — change this to your real mobile). Then a second code from an authenticator app (Google Authenticator or similar).
+Sign in with `ADMIN_EMAIL` (default `hello@msworkforce.au`). The portal emails a code, then asks for a second code from an authenticator app (Google Authenticator or similar).
 
 1. In the authenticator app, add a new key manually.
-2. Generate a long random base32 secret (the app can do this, or use a password manager).
+2. Use a base32 secret: letters A–Z and digits 2–7, 32 characters is a good length. The app or a password manager can make one.
 3. Put that secret in `ADMIN_TOTP_SECRET`.
-4. Set `ADMIN_EMAIL` to `hello@msworkforce.au` unless you want alerts somewhere else.
+4. Leave `ADMIN_EMAIL` as `hello@msworkforce.au` unless you want alerts somewhere else.
 
-Your admin session lasts 12 hours. A worker’s session lasts 30 days.
+Your admin session lasts 12 hours. A worker’s session lasts 30 days. `ADMIN_MOBILE` is only used if you turn on Twilio later. Set it to your real mobile before the first live request if you want that number stored.
 
-### 7. Three secret strings
+### 7. Four secret strings
 
-In Vercel, add a long random value for each of these. They can be any mix of letters and numbers, at least 32 characters. Use a different value for each.
+In Vercel, add a long random value for each of these. At least 32 characters. Use a different value for each. This prints one:
 
-- `PORTAL_SESSION_SECRET` — signs the login cookie.
-- `PORTAL_ENCRYPTION_KEY` — locks the passport number until you record the VEVO result, or for 14 days, whichever comes first.
-- `PORTAL_SIGNING_SECRET` — signs the short photo links.
-- `CRON_SECRET` — so only Vercel can run the daily jobs.
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+```
+
+- `PORTAL_SESSION_SECRET` — signs the login cookie. The string is the HMAC key. It is not decoded.
+- `PORTAL_ENCRYPTION_KEY` — a passphrase. The portal turns it into a key with scrypt (salt `msw-portal`) and uses that to lock a passport number until you record the VEVO result, or for 14 days, whichever comes first. Do not paste a raw 32-byte key and expect it to be used as-is.
+- `PORTAL_SIGNING_SECRET` — signs the short photo links. Same kind of string as the session secret.
+- `CRON_SECRET` — so only Vercel can run the daily jobs, and so you can open the readiness check. Vercel sends it as `Authorization: Bearer`.
 
 Also set `NEXT_PUBLIC_SITE_URL` to `https://www.msworkforce.au`.
 
@@ -159,7 +162,7 @@ Also set `NEXT_PUBLIC_SITE_URL` to `https://www.msworkforce.au`.
 These addresses do the quiet work. Call them with header `Authorization: Bearer` plus your `CRON_SECRET`.
 
 - `/api/portal/cron/outbox` — sends queued Notion updates.
-- `/api/portal/cron/reminders` — texts workers when a ticket is inside the warning window (60 days for asbestos A/B and first aid, 30 days for other tickets), then again at 14 days, 7 days and on the day. On Mondays it also emails you a list of anyone who is not clear to book.
+- `/api/portal/cron/reminders` — emails workers when a ticket is inside the warning window (60 days for asbestos A/B and first aid, 30 days for other tickets), then again at 14 days, 7 days and on the day. A text is sent as well only when Twilio is set. On Mondays it also emails you a list of anyone who is not clear to book.
 - `/api/portal/cron/purge` — deletes ticket photos 7 days after that card was marked checked, and passport numbers older than 14 days. The number, expiry and check record stay. Each deletion is written to the audit log. `CRON_SECRET` must be set or the live job is refused.
 
 All three jobs are in `vercel.json`, once a day: Notion sync at 07:15 UTC, the photo purge at 16:15 UTC, and reminders at 21:15 UTC. Preview links do not run them. On Vercel’s free plan each job can run only once a day, and it may start any time during that hour. A job every few minutes is not allowed on the free plan, so it was not added. Notion updates wait for the daily sync. A paid plan can run the sync more often. Do not change the plan from here.
@@ -168,7 +171,17 @@ In mock mode these addresses are open and they do not call Notion.
 
 ## Email on file
 
-Apply and the email login link both ask for the email twice. The two answers must match after trimming, and capital letters do not matter. If they differ, the form shows "Emails don't match." and does not send. A badly formed address shows "That email does not look right." Apply can leave both boxes empty. Only one address is saved. Onboarding does not ask for an email.
+Join and apply ask for the email twice. The two answers must match after trimming, and capital letters do not matter. If they differ, the form shows "Emails don't match." and does not send. A badly formed address, or two empty boxes, shows "That email does not look right." Only one address is saved. Onboarding does not ask for an email again. Login uses that address.
+
+## Is it ready?
+
+`docs/go-live.md` lists every setting and every Notion column. After the values are in Vercel, check them without printing the secrets:
+
+```bash
+curl -s -H "Authorization: Bearer $CRON_SECRET" https://www.msworkforce.au/api/portal/ready
+```
+
+That address works while the portal still says opening soon. After you can sign in, the same list is at `/portal/admin/ready`.
 
 ## Licence and ticket questions
 
@@ -202,7 +215,7 @@ There is no availability calendar. A worker accepts or declines. The street addr
 
 ## Timesheets
 
-The worker types start, finish and break. No GPS. They hand the phone to the supervisor, who signs on the screen. That signature is the approval. There is no builder login and no separate approval link. The worker and you both get an email.
+The worker types start, finish and break. No GPS. They hand the phone to the supervisor, who signs on the screen. That signature is the approval. There is no builder login and no separate approval link. Signing does not send an email. An incident on the timesheet does email you. On Thursday the site contact gets an email of the signed hours.
 
 ## Going live
 

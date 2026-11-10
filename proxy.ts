@@ -7,8 +7,9 @@ export function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Daily jobs stay as they are. With no live config they do not call Notion, text or email.
+  // Daily jobs and the readiness check stay open. With no live config they do not call Notion or email.
   if (pathname.startsWith("/api/portal/cron")) return NextResponse.next()
+  if (pathname === "/api/portal/ready") return NextResponse.next()
 
   if (pathname.startsWith("/api/portal")) {
     return NextResponse.json({ error: "Portal opening soon" }, { status: 503 })

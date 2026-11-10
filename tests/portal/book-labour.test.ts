@@ -128,7 +128,7 @@ describe("book labour", () => {
     expect(typed.Start).toEqual({ date: { start: "2026-11-12" } })
     expect(typed.End).toEqual({ date: { start: "2026-11-20" } })
     expect(typed.Status).toEqual({ select: { name: "Enquiry" } })
-    expect(typed["Request source"]).toEqual({ select: { name: "Website form" } })
+    expect(typed["Request source"]).toEqual({ rich_text: [{ type: "text", text: { content: "Website form" } }] })
     expect(typed["Heard about us"]).toEqual({ select: { name: "Google" } })
     expect(typed["Workers needed"]).toEqual({ number: 4 })
     expect(typed["Open ended"]).toEqual({ checkbox: false })
