@@ -170,6 +170,18 @@ export async function readSession(): Promise<{ session: Session; worker: Worker 
   return { session: { ...session, role: worker.role }, worker }
 }
 
+/**
+ * Signed-out visits to the portal home. Uses the same cookie check as readSession,
+ * before any database lookup, so the request can redirect before the Loading screen.
+ * Returns null when the visitor may stay (a current cookie, or any other path).
+ */
+export function portalHomeLoginRedirect(pathname: string, sessionCookie: string | undefined, now = Date.now()): "/portal/login" | null {
+  if (pathname !== "/portal" && pathname !== "/portal/") return null
+  const parsed = unpack<{ id: string; workerId: string; expiresAt: string }>(sessionCookie)
+  if (parsed?.id && parsed.workerId && parsed.expiresAt && Date.parse(parsed.expiresAt) >= now) return null
+  return "/portal/login"
+}
+
 export async function requireUser() {
   const current = await readSession()
   if (!current) redirect("/portal/login")
