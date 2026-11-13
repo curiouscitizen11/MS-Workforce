@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { portalReachable } from "@/lib/portal/access"
+import { portalHomeLoginRedirect } from "@/lib/portal/session"
 
 export function proxy(request: NextRequest) {
-  if (portalReachable()) return NextResponse.next()
+  if (portalReachable()) {
+    const login = portalHomeLoginRedirect(request.nextUrl.pathname, request.cookies.get("msw_portal")?.value)
+    if (login) {
+      const url = request.nextUrl.clone()
+      url.pathname = login
+      url.search = ""
+      return NextResponse.redirect(url)
+    }
+    return NextResponse.next()
+  }
 
   const { pathname } = request.nextUrl
 
