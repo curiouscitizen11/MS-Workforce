@@ -1981,6 +1981,9 @@ function notionMatch(kind: string, payload: Record<string, unknown>, properties:
   if (kind === "timesheets" && typeof properties.Entry === "string") {
     return { property: "Entry", type: "title" as const, value: properties.Entry }
   }
+  if (kind === "placements" && typeof properties.Placement === "string") {
+    return { property: "Placement", type: "title" as const, value: properties.Placement }
+  }
   return null
 }
 
@@ -2020,7 +2023,7 @@ export async function submitBookLabour(ctx: Ctx, input: unknown, ip: string) {
     (item) => item.kind === "placements" && item.payload.ip === ip && within(item.createdAt, ctx.now, BOOK_IP_WINDOW_MS),
   )
   if (recent.length >= BOOK_IP_MAX) return fail("Too many requests from this connection. Try again later.", "rate")
-  const properties = placementProperties(checked.value)
+  const properties = placementProperties(checked.value, newId("lr"))
   try {
     assertNotionPayloadSafe(properties)
   } catch {

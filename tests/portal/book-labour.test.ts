@@ -101,8 +101,8 @@ describe("book labour", () => {
     const queued = (await ctx.store.outbox.all()).find((item) => item.kind === "placements")
     expect(queued?.status).toBe("skipped-mock")
     const properties = (queued?.payload as { properties: Record<string, unknown> }).properties
+    expect(String(properties.Placement)).toMatch(/^Harbour Build – Manly – lr_[0-9a-f]+$/)
     expect(properties).toMatchObject({
-      Placement: "Harbour Build – Manly",
       Client: "Harbour Build",
       "Site contact": "Alex Stone",
       "Site phone": "02 9999 0000",
@@ -122,7 +122,7 @@ describe("book labour", () => {
     })
     expect(Object.keys(properties).sort()).toEqual([...PLACEMENT_PROPERTIES].sort())
     const typed = toNotionProperties(properties)
-    expect(typed.Placement).toEqual({ title: [{ type: "text", text: { content: "Harbour Build – Manly" } }] })
+    expect(typed.Placement).toEqual({ title: [{ type: "text", text: { content: properties.Placement } }] })
     expect(typed["Site email"]).toEqual({ email: "alex.stone@example.com" })
     expect(typed["Site phone"]).toEqual({ phone_number: "02 9999 0000" })
     expect(typed.Start).toEqual({ date: { start: "2026-11-12" } })
@@ -210,8 +210,82 @@ describe("book labour", () => {
         else process.env[key] = value
       }
     }
-    expect(urls.some((url) => url.includes("/query"))).toBe(false)
-    expect(urls.some((url) => url.endsWith("/pages"))).toBe(true)
+    expect(urls.some((url) => url.includes("/query"))).toBe(true)
+    expect(urls.filter((url) => url.endsWith("/pages"))).toHaveLength(1)
     expect((await ctx.store.outbox.get("out-place"))?.status).toBe("sent")
+  })
+
+  it("updates the same Notion page when a labour request is retried", async () => {
+    const { ctx } = harness("live")
+    const properties = placementProperties(
+      {
+        company: "Harbour Build",
+        name: "Alex Stone",
+        phone: "+61400111000",
+        email: "alex.stone@example.com",
+        address: "12 Harbour Street",
+        suburb: "Manly",
+        roles: ["Site clean"],
+        otherRole: "",
+        workers: 2,
+        start: "2026-11-12",
+        ongoing: true,
+        end: "",
+        shift: "Day shift",
+        notes: "",
+        heard: "",
+      },
+      "lr_same",
+    )
+    await ctx.store.outbox.save({
+      id: "out-retry",
+      kind: "placements",
+      payload: { properties, ip: "203.0.113.71" },
+      status: "pending",
+      attempts: 0,
+      nextAttemptAt: NOW.toISOString(),
+      createdAt: NOW.toISOString(),
+    })
+    const calls: string[] = []
+    const previous = {
+      PORTAL_MODE: process.env.PORTAL_MODE,
+      NOTION_TOKEN: process.env.NOTION_TOKEN,
+      NOTION_PLACEMENTS_DB: process.env.NOTION_PLACEMENTS_DB,
+    }
+    process.env.PORTAL_MODE = "live"
+    process.env.NOTION_TOKEN = "test-token"
+    process.env.NOTION_PLACEMENTS_DB = "db-placements"
+    let lookups = 0
+    try {
+      const fetchImpl = async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+        const method = init?.method || "GET"
+        calls.push(method + " " + url)
+        if (url.includes("/query")) {
+          lookups += 1
+          const results = lookups === 1 ? [] : [{ id: "page-existing" }]
+          return new Response(JSON.stringify({ results }), { status: 200 })
+        }
+        if (method === "POST" && url.endsWith("/pages")) {
+          return new Response("lost", { status: 500 })
+        }
+        if (method === "PATCH" && url.endsWith("/pages/page-existing")) {
+          return new Response(JSON.stringify({ id: "page-existing" }), { status: 200 })
+        }
+        return new Response("unexpected", { status: 500 })
+      }
+      await processOutbox(ctx, fetchImpl)
+      expect((await ctx.store.outbox.get("out-retry"))?.status).toBe("pending")
+      ctx.now = new Date(ctx.now.getTime() + 2 * 60 * 1000)
+      await processOutbox(ctx, fetchImpl)
+    } finally {
+      for (const [key, value] of Object.entries(previous)) {
+        if (value === undefined) delete process.env[key]
+        else process.env[key] = value
+      }
+    }
+    expect(calls.filter((call) => call.startsWith("POST") && call.endsWith("/pages"))).toHaveLength(1)
+    expect(calls.some((call) => call === "PATCH https://api.notion.com/v1/pages/page-existing")).toBe(true)
+    expect((await ctx.store.outbox.get("out-retry"))?.status).toBe("sent")
   })
 })
