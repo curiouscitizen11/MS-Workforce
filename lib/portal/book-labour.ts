@@ -130,10 +130,15 @@ export function checkBookLabour(
   }
 }
 
-export function placementProperties(value: BookValue): Record<string, unknown> {
+/** One title per submission. A retry of that same request matches this text in Notion. */
+export function placementRequestTitle(company: string, suburb: string, requestId: string) {
+  return company + " – " + suburb + " – " + requestId
+}
+
+export function placementProperties(value: BookValue, requestId?: string): Record<string, unknown> {
   const details = [value.otherRole ? "Other role: " + value.otherRole : "", value.notes].filter(Boolean).join("\n")
   const properties: Record<string, unknown> = {
-    Placement: value.company + " – " + value.suburb,
+    Placement: requestId ? placementRequestTitle(value.company, value.suburb, requestId) : value.company + " – " + value.suburb,
     Client: value.company,
     "Site contact": value.name,
     "Site phone": value.phone,
