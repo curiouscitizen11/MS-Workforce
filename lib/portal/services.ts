@@ -45,7 +45,7 @@ import {
   requiredPhotoSlots,
   slotsFromWorker,
 } from "@/lib/portal/ticket-photos"
-import { breakChoiceProblem, formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
+import { breakChoiceProblem, formatHours, hoursSignStamp, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
 import { MS_PHONE, olderThanDays, payWeek, timesheetIsSigned, timesheetReminder, weekContaining } from "@/lib/portal/pay"
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
@@ -1222,6 +1222,7 @@ export async function submitTimesheet(
     supervisorRole: string
     supervisorConfirmed: boolean
     signaturePng: string
+    signedHours?: string
     ip?: string
     userAgent?: string
   },
@@ -1286,6 +1287,10 @@ export async function submitTimesheet(
     return fail("These hours are approved for pay. Call MS Workforce on " + MS_PHONE + ".")
   }
   const nextBreakStart = breakMinutes === 0 ? "" : input.breakStart?.trim() || ""
+  const stamp = hoursSignStamp({ start: input.start, finish: input.finish, breakMinutes, breakStart: nextBreakStart })
+  if (!input.signedHours || input.signedHours !== stamp) {
+    return fail("The signature does not match these hours. Sign again.")
+  }
   const hoursChanged =
     !existing ||
     existing.start !== input.start ||

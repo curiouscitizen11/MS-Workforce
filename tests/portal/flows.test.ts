@@ -212,6 +212,7 @@ describe("portal flows", () => {
       supervisorRole: "Site supervisor",
       supervisorConfirmed: true,
       signaturePng: "data:image/png;base64,abc",
+      signedHours: "07:00|15:30|30|12:00",
     })
     expect(result.ok).toBe(true)
     if (!result.ok) return
@@ -257,6 +258,7 @@ describe("portal flows", () => {
       supervisorRole: "Site supervisor",
       supervisorConfirmed: true,
       signaturePng: "data:image/png;base64,def",
+      signedHours: "07:00|15:30|30|12:15",
     })
     expect(resigned.ok).toBe(true)
     expect((await ctx.store.timesheets.get(result.id))?.supervisorName).toBe("Alex Stone")
