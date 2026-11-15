@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { checkAdminCode, checkEmailLoginCode, checkLoginCode, sendEmailLoginCode, sendLoginCode, sendMagicLink } from "@/app/portal/actions"
-import { Field, fieldClass } from "@/components/portal/ui"
+import { Field, Heading, fieldClass } from "@/components/portal/ui"
 import { emailError, emailProblem } from "@/lib/portal/email"
 
 type Step = "email" | "code" | "link" | "mobile"
@@ -118,6 +118,17 @@ export function LoginForm({
         })
       }}
     >
+      <Heading
+        kicker="Log in"
+        title={step === "code" ? (channel === "sms" ? "Check your phone" : "Check your email") : step === "link" ? "Email me a link" : "Use your email"}
+        text={
+          step === "code"
+            ? channel === "sms"
+              ? "Enter the 6-digit code from the text."
+              : "Enter the 6-digit code we emailed you."
+            : "We'll email a 6-digit code. No password."
+        }
+      />
       {step === "email" || step === "link" ? (
         <Field
           label="Email"

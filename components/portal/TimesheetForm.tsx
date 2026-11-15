@@ -597,8 +597,5 @@ export function TimesheetForm({
 }
 
 function chip(on: boolean) {
-  return (
-    "min-h-12 rounded-full border px-3 text-sm font-semibold " +
-    (on ? "border-teal-600 bg-teal-600 text-white" : "border-navy/15 bg-white text-navy")
-  )
+  return "portal-yn min-h-12 " + (on ? "portal-yn-on" : "")
 }

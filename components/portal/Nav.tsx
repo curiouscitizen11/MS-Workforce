@@ -14,7 +14,7 @@ const workerItems = [
 
 const adminItems = [
   { href: "/portal/admin", label: "Home" },
-  { href: "/portal/admin/offers", label: "Offers" },
+  { href: "/portal/admin/offers", label: "Shifts" },
   { href: "/portal/admin/timesheets", label: "Hours" },
   { href: "/portal/me", label: "Me" },
 ]
@@ -31,7 +31,7 @@ export function PortalNav({ role }: { role: "worker" | "admin" }) {
       className="portal-nav fixed inset-x-0 bottom-0 z-40"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="mx-auto grid max-w-xl grid-cols-4">
+      <ul className="mx-auto grid max-w-[480px] grid-cols-4">
         {items.map((item) => {
           const current = item.href === "/portal" || item.href === "/portal/admin" ? pathname === item.href : pathname.startsWith(item.href)
           return (

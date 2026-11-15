@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { uploadHeadshot } from "@/app/portal/actions"
 import { prepareHeadshot } from "@/components/portal/prepare-headshot"
-import { HEADSHOT_CONSENT, HEADSHOT_GUIDANCE } from "@/lib/portal/headshot"
+import { HEADSHOT_CONSENT } from "@/lib/portal/headshot"
 
 export function HeadshotForm({ onDone }: { onDone?: () => void }) {
   const router = useRouter()
@@ -62,7 +62,6 @@ export function HeadshotForm({ onDone }: { onDone?: () => void }) {
         })
       }}
     >
-      <p className="text-sm leading-relaxed">{HEADSHOT_GUIDANCE}</p>
       {preview ? (
         // The preview is a local crop, not a stored photo.
         // eslint-disable-next-line @next/next/no-img-element
@@ -94,7 +93,7 @@ export function HeadshotForm({ onDone }: { onDone?: () => void }) {
           {error}
         </p>
       ) : null}
-      <button className="pill pill-teal w-full" disabled={pending || !file || !consent}>
+      <button className="pill pill-line-dark w-full" disabled={pending || !file || !consent}>
         {pending ? "Saving" : "Save photo"}
       </button>
       {onDone ? (

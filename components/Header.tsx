@@ -164,7 +164,7 @@ export default function Header({ applyHref, bookHref }: { applyHref: string; boo
         <nav
           id="mobile-nav"
           aria-label="Mobile"
-          className="fixed bottom-0 left-0 top-[var(--site-header-height)] z-40 w-[88%] max-w-sm overflow-y-auto border-r border-teal-400 bg-[#0e2240] px-6 py-8 text-left md:hidden"
+          className="fixed bottom-0 left-0 top-[var(--site-header-height)] z-40 w-[88%] max-w-sm overflow-y-auto border-r border-[#22354f] bg-[#0e2240] px-6 py-8 text-left md:hidden"
         >
           <ul className="space-y-1">
             {pages.map((item) => {
@@ -176,7 +176,7 @@ export default function Header({ applyHref, bookHref }: { applyHref: string; boo
                     current={current}
                     onClick={() => setOpen(false)}
                     className={
-                      "block rounded-none border-l-[3px] px-3 py-3 text-3xl font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
+                      "block rounded-none border-l-[3px] px-3 py-3 text-base font-semibold tracking-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
                       (current
                         ? "border-teal text-white"
                         : "border-transparent text-white/70")
@@ -191,7 +191,7 @@ export default function Header({ applyHref, bookHref }: { applyHref: string; boo
               <NavItem
                 href={applyHref}
                 onClick={() => setOpen(false)}
-                className="block rounded-none border-l-[3px] border-transparent px-3 py-3 text-3xl font-semibold tracking-tight text-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
+                className="block rounded-none border-l-[3px] border-transparent px-3 py-3 text-base font-semibold tracking-tight text-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
               >
                 Apply for work
               </NavItem>

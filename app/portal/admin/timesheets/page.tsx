@@ -19,7 +19,7 @@ export default async function AdminTimesheetsPage() {
   for (const sheet of approved) totals.set(sheet.workerName, (totals.get(sheet.workerName) || 0) + sheet.totalHours)
   return (
     <div className="space-y-4">
-      <Heading kicker="Pay run" title={week.label} text="Approved hours only. Pay day Thursday. Overtime stays in Xero." />
+      <Heading kicker="Pay run" title={formatDate(week.start) + " to " + formatDate(week.end)} text="Approved hours only. Pay day Thursday. Overtime stays in Xero." />
       <ul className="space-y-2">
         {Array.from(totals.entries()).map(([name, hours]) => (
           <li key={name} className="flex items-center justify-between rounded-2xl bg-white px-3 py-3 text-sm font-semibold">

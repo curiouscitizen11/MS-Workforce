@@ -45,7 +45,7 @@ export default async function PortalLayout({ children }: { children: React.React
   if (!portalReachable()) {
     return (
       <div className="portal-root min-h-svh" data-theme="dark">
-        <div className="mx-auto w-full max-w-3xl px-5 py-8 md:px-8">
+        <div className="mx-auto w-full max-w-[480px] px-5 py-8 md:px-8">
           <PortalOpeningSoon />
         </div>
       </div>
@@ -72,7 +72,7 @@ export default async function PortalLayout({ children }: { children: React.React
           )}
         </div>
       </header>
-      <div className="mx-auto w-full max-w-3xl px-5 pb-28 pt-8 md:px-8 md:pt-12">
+      <div className="mx-auto w-full max-w-[480px] px-5 pb-28 pt-8 md:px-8 md:pt-12">
         <AddHomeHint />
         {children}
       </div>
