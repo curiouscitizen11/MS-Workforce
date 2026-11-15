@@ -77,6 +77,13 @@ export function paidHours(
 
 export type HoursWarning = { level: "warn" | "confirm"; message: string }
 
+/** Ties a signature to the hours it was drawn for. */
+export function hoursSignStamp(input: { start: string; finish: string; breakMinutes: number; breakStart?: string }) {
+  const minutes = Number(input.breakMinutes)
+  const breakStart = minutes === 0 ? "" : (input.breakStart || "").trim()
+  return input.start + "|" + input.finish + "|" + String(minutes) + "|" + breakStart
+}
+
 export function onQuarterHour(value: string): boolean {
   const minutes = parseTime(value)
   return minutes !== null && minutes % 15 === 0

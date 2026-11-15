@@ -28,7 +28,7 @@ export default async function TimesheetPage() {
   const days = datesInWeek(week)
   return (
     <div className="space-y-4">
-      <Heading kicker="Hours" title="Log today's hours" text="Enter the times at the end of the day. No GPS. MS Workforce." />
+      <Heading kicker="Hours" title="Log today's hours" text="Enter your times at the end of the day." />
       <TimesheetForm
         today={today}
         workerName={worker.name}

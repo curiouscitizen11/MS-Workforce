@@ -414,6 +414,7 @@ export async function lodgeTimesheet(input: {
   supervisorRole: string
   supervisorConfirmed: boolean
   signaturePng: string
+  signedHours?: string
 }) {
   const current = await readSession()
   if (!current) return { ok: false as const, error: "Log in again." }
