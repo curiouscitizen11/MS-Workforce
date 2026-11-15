@@ -696,7 +696,7 @@ function PickChip({
       onClick={onClick}
       className={(wide ? "w-full" : "min-w-0 flex-1") + " flex min-h-12 flex-col items-center justify-center rounded-2xl border border-navy/15 bg-white px-1 py-1 text-navy"}
     >
-      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy/60">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-navy/60">{label}</span>
       <span className="text-sm font-semibold leading-tight">{value}</span>
     </button>
   )
