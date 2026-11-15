@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { lodgeTimesheet } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
@@ -139,6 +139,8 @@ export function TimesheetForm({
   const [supervisorConfirmed, setSupervisorConfirmed] = useState(false)
   const [signature, setSignature] = useState<string | null>(null)
   const [padKey, setPadKey] = useState(0)
+  const [picker, setPicker] = useState<"start" | "finish" | "break" | "break-start" | null>(null)
+  const [draft, setDraft] = useState("")
   const [error, setError] = useState("")
   const [queued, setQueued] = useState("")
   const [pending, startTransition] = useTransition()
@@ -319,6 +321,26 @@ export function TimesheetForm({
     setSignatureConfirmed(true)
   }
 
+  const closePicker = useCallback(() => setPicker(null), [])
+
+  function openPicker(next: "start" | "finish" | "break" | "break-start", value: string) {
+    setDraft(value)
+    setPicker(next)
+  }
+
+  function applyPicker() {
+    if (picker === "start") setStart(draft)
+    if (picker === "finish") setFinish(draft)
+    if (picker === "break") {
+      const minutes = Number(draft)
+      setBreakMinutes(minutes)
+      if (minutes === 0) setBreakStart("")
+      else if (!breakStart) setBreakStart("12:00")
+    }
+    if (picker === "break-start") setBreakStart(draft)
+    setPicker(null)
+  }
+
   function editHours() {
     setHoursConfirmed(false)
     setSignatureConfirmed(false)
@@ -448,42 +470,41 @@ export function TimesheetForm({
             />
           </label>
           {!shift ? <p className="text-sm font-semibold text-[#B45309]">No accepted shift on that day.</p> : null}
-          <div className="grid grid-cols-1 gap-3 min-[390px]:grid-cols-3">
-            <Wheel
-              id="start"
-              label="Start"
-              value={start}
-              options={TIMES.map((time) => ({ value: time, label: formatTime(time) }))}
-              onChange={setStart}
-            />
-            <Wheel
-              id="finish"
-              label="Finish"
-              value={finish}
-              options={TIMES.map((time) => ({ value: time, label: formatTime(time) }))}
-              onChange={setFinish}
-            />
-            <Wheel
+          <div className="flex gap-2" data-testid="hours-line">
+            <PickChip id="start" label="Start" value={formatTime(start)} onClick={() => openPicker("start", start)} />
+            <PickChip id="finish" label="Finish" value={formatTime(finish)} onClick={() => openPicker("finish", finish)} />
+            <PickChip
               id="break-minutes"
               label="Break"
-              value={String(breakMinutes)}
-              options={BREAK_MINUTES.map((minutes) => ({ value: String(minutes), label: minutes === 0 ? "No break" : minutes + " min" }))}
-              onChange={(value) => {
-                const minutes = Number(value)
-                setBreakMinutes(minutes)
-                if (minutes === 0) setBreakStart("")
-                else if (!breakStart) setBreakStart("12:00")
-              }}
+              value={breakMinutes === 0 ? "None" : breakMinutes + " min"}
+              onClick={() => openPicker("break", String(breakMinutes))}
             />
           </div>
           {breakMinutes > 0 ? (
-            <Wheel
+            <PickChip
               id="break-start"
               label="Break starts"
-              value={breakStart}
-              options={[{ value: "", label: "Choose a time" }, ...breakSlots.map((time) => ({ value: time, label: formatTime(time) }))]}
-              onChange={setBreakStart}
+              value={breakStart ? formatTime(breakStart) : "Choose"}
+              wide
+              onClick={() => openPicker("break-start", breakStart)}
             />
+          ) : null}
+          {picker ? (
+            <PickerSheet
+              title={picker === "start" ? "Start" : picker === "finish" ? "Finish" : picker === "break" ? "Break" : "Break starts"}
+              onClose={closePicker}
+              onDone={applyPicker}
+            >
+              <Wheel
+                value={draft}
+                options={
+                  picker === "break"
+                    ? BREAK_MINUTES.map((minutes) => ({ value: String(minutes), label: minutes === 0 ? "None" : minutes + " min" }))
+                    : (picker === "break-start" ? breakSlots : TIMES).map((time) => ({ value: time, label: formatTime(time) }))
+                }
+                onChange={setDraft}
+              />
+            </PickerSheet>
           ) : null}
           <p className="rounded-2xl bg-white px-3 py-3" data-testid="paid-hours">
             <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Paid hours today</span>
@@ -540,13 +561,12 @@ export function TimesheetForm({
       )}
       {hoursConfirmed && !locked ? (
         <section className="space-y-3" data-testid="signature-section">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-xl font-semibold leading-tight">Person in charge</h2>
+          <div className="flex justify-end">
             <button type="button" className="min-h-12 px-3 text-sm font-semibold text-teal-600" onClick={editHours}>
               Edit hours
             </button>
           </div>
-          <p className="text-sm">Hand them the phone. Only they sign. No email is sent.</p>
+          <p className="text-sm">Hand the phone to your site supervisor to sign.</p>
           {signatureConfirmed ? (
             <p className="rounded-2xl bg-white px-3 py-3 text-sm font-semibold" data-testid="signature-locked">
               Signature confirmed for {supervisorName || "the supervisor"}.
@@ -656,20 +676,93 @@ function HoursSummary({
   )
 }
 
-function Wheel({
+function PickChip({
   id,
   label,
+  value,
+  onClick,
+  wide = false,
+}: {
+  id: string
+  label: string
+  value: string
+  onClick: () => void
+  wide?: boolean
+}) {
+  return (
+    <button
+      id={id}
+      type="button"
+      onClick={onClick}
+      className={(wide ? "w-full" : "min-w-0 flex-1") + " flex min-h-12 flex-col items-center justify-center rounded-2xl border border-navy/15 bg-white px-1 py-1 text-navy"}
+    >
+      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-navy/60">{label}</span>
+      <span className="text-sm font-semibold leading-tight">{value}</span>
+    </button>
+  )
+}
+
+function PickerSheet({
+  title,
+  onClose,
+  onDone,
+  children,
+}: {
+  title: string
+  onClose: () => void
+  onDone: () => void
+  children: ReactNode
+}) {
+  useEffect(() => {
+    const previous = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", onKey)
+    return () => {
+      document.body.style.overflow = previous
+      window.removeEventListener("keydown", onKey)
+    }
+  }, [onClose])
+  return (
+    <div className="portal-sheet-backdrop" onClick={onClose}>
+      <div
+        className="portal-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        data-testid="time-picker"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="portal-sheet-bar">
+          <h2 className="text-base font-semibold">{title}</h2>
+          <button type="button" className="portal-sheet-close" onClick={onClose}>
+            Cancel
+          </button>
+        </div>
+        <div className="portal-sheet-body">{children}</div>
+        <div className="portal-sheet-foot">
+          <button type="button" className="pill pill-teal w-full" onClick={onDone}>
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Wheel({
   value,
   options,
   onChange,
 }: {
-  id: string
-  label: string
   value: string
   options: { value: string; label: string }[]
   onChange: (value: string) => void
 }) {
   const list = useRef<HTMLDivElement>(null)
+  const ready = useRef(false)
   useEffect(() => {
     const root = list.current
     if (!root) return
@@ -679,33 +772,49 @@ function Wheel({
       root.scrollTop = Math.max(0, selected.offsetTop - root.clientHeight / 2 + selected.clientHeight / 2)
     }
     align()
-    const frame = window.requestAnimationFrame(align)
+    const frame = window.requestAnimationFrame(() => {
+      align()
+      ready.current = true
+    })
     return () => window.cancelAnimationFrame(frame)
-  }, [value])
-  const current = options.find((option) => option.value === value)?.label || value
+  }, [])
   return (
-    <div className="min-w-0">
-      <p id={id + "-label"} className="text-sm font-semibold">
-        {label}
-        <span className="mt-1 block text-base">{current}</span>
-      </p>
+    <div className="relative">
+      <div className="pointer-events-none absolute inset-x-2 top-1/2 h-12 -translate-y-1/2 rounded-xl border border-teal-600 bg-teal-600/20" aria-hidden="true" />
       <div
         role="listbox"
-        aria-labelledby={id + "-label"}
+        aria-label="Choose"
         ref={list}
-        className="mt-1 h-40 overflow-y-auto rounded-2xl border border-navy/10 bg-white"
+        className="h-36 overflow-y-auto"
         style={{ scrollSnapType: "y mandatory", WebkitOverflowScrolling: "touch" }}
+        onScroll={(event) => {
+          if (!ready.current) return
+          const root = event.currentTarget
+          const mid = root.scrollTop + root.clientHeight / 2
+          let nearest = ""
+          let best = Number.POSITIVE_INFINITY
+          for (const node of root.querySelectorAll<HTMLButtonElement>("[data-value]")) {
+            const center = node.offsetTop + node.clientHeight / 2
+            const distance = Math.abs(center - mid)
+            if (distance < best) {
+              best = distance
+              nearest = node.dataset.value || ""
+            }
+          }
+          if (nearest && nearest !== value) onChange(nearest)
+        }}
       >
+        <div aria-hidden="true" className="h-12" />
         {options.map((option) => {
           const on = option.value === value
           return (
             <button
               key={option.value || "empty"}
-              id={on ? id : undefined}
               type="button"
               role="option"
+              data-value={option.value}
               aria-selected={on}
-              className={"flex min-h-12 w-full snap-center items-center justify-center px-2 text-sm font-semibold " + (on ? "bg-teal-600 text-navy" : "text-navy")}
+              className={"relative z-10 flex min-h-12 w-full snap-center items-center justify-center text-base font-semibold " + (on ? "text-navy" : "text-navy/45")}
               style={{ scrollSnapAlign: "center" }}
               onClick={() => onChange(option.value)}
             >
@@ -713,6 +822,7 @@ function Wheel({
             </button>
           )
         })}
+        <div aria-hidden="true" className="h-12" />
       </div>
     </div>
   )
