@@ -42,12 +42,14 @@ export function inductionRows(input: {
     if (!name || seen.has(key) || key === WHS_INDUCTION.toLowerCase()) return
     seen.add(key)
     const saved = stored.get(key)
+    const label = saved?.name || name
     rows.push({
       id: "site:" + key,
-      name: saved?.name || name,
+      name: label,
       status: saved?.doneOn ? "Done " + formatDate(saved.doneOn) : "To do",
       done: Boolean(saved?.doneOn),
       kind: "site",
+      href: "/portal/inductions/" + encodeURIComponent(label),
       link,
     })
   }

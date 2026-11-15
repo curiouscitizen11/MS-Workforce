@@ -19,6 +19,7 @@ describe("inductions", () => {
     expect(rows[0].status.startsWith("Done ")).toBe(true)
     expect(rows[0].href).toBe("/portal/induction")
     expect(rows[1].status).toBe("To do")
+    expect(rows[1].href).toBe("/portal/inductions/" + encodeURIComponent("Brookvale frame stage"))
     expect(rows[1].link).toBe("https://example.com/site")
     expect(rows[2].status.startsWith("Done ")).toBe(true)
     expect(inductionPickerSites([{ status: "Offered", suburb: "Dee Why" }], rows).map((item) => item.label)).toEqual(["Dee Why"])
