@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { DemoBanner, Heading } from "@/components/portal/ui"
+import { DemoBanner } from "@/components/portal/ui"
 import { LoginForm } from "@/components/portal/LoginForm"
 import { isMock } from "@/lib/portal/config"
 import { twilioReady } from "@/lib/portal/notify"
@@ -21,7 +21,6 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
   return (
     <div className="space-y-4">
       <DemoBanner mock={isMock()} />
-      <Heading kicker="Log in" title="Use your email" text="We'll email a 6-digit code. No password." />
       {query.error ? <p className="text-sm font-semibold text-[#B91C1C]">That login link has expired. Request a new one.</p> : null}
       <LoginForm mock={isMock()} sms={sms} demos={demos.filter((demo) => demo.email)} initialEmail={await readEmailCookie()} initialMobile={await readMobileCookie()} />
       <p className="text-sm">

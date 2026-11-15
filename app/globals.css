@@ -373,9 +373,9 @@ body:has(.portal-root) .site-chrome-main {
   font-weight: 600;
 }
 .portal-root .portal-chip-ok { background: var(--p-ok-bg); color: var(--p-ok-text); }
+.portal-root .portal-chip-pending { background: var(--p-button); color: var(--p-button-text); }
 .portal-root .portal-chip-warning,
-.portal-root .portal-chip-restricted,
-.portal-root .portal-chip-pending { background: var(--p-warn-bg); color: var(--p-warn-text); }
+.portal-root .portal-chip-restricted { background: var(--p-bad-bg); color: var(--p-bad-text); }
 .portal-root .portal-chip-do-not-book { background: var(--p-bad-bg); color: var(--p-bad-text); }
 .portal-root .portal-chip-neutral { background: var(--p-card); color: var(--p-text); border: 1px solid var(--p-border); }
 .portal-root .portal-choice {
@@ -498,15 +498,13 @@ body:has(.portal-root) .site-chrome-main {
 .portal-root .portal-badge {
   position: absolute;
   top: 8px;
-  right: 8px;
-  min-width: 1.5rem;
-  border-radius: 999px;
-  background: var(--p-button);
-  color: var(--p-button-text);
-  padding: 0 0.4rem;
-  text-align: center;
+  right: 10px;
+  background: none;
+  color: var(--p-accent, #2ec4b6);
+  padding: 0;
+  text-align: right;
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 @media (prefers-reduced-motion: reduce) {
   .portal-root .portal-tile:active { transform: none; }
