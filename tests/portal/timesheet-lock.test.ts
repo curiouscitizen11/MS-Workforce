@@ -58,8 +58,8 @@ describe("approved timesheets stay locked for the worker", () => {
     )
     expect(approved).toContain("These hours are approved for pay")
     expect(approved).toContain("You can&#x27;t change them")
-    expect(approved).not.toContain("Review hours")
-    expect(approved).not.toContain("Sign and submit")
+    expect(approved).not.toContain("Confirm hours")
+    expect(approved).not.toContain("Submit timesheet")
     expect(approved).not.toContain('id="start"')
     expect(approved).not.toContain('id="finish"')
     expect(approved).not.toContain('id="break-start"')
@@ -72,7 +72,9 @@ describe("approved timesheets stay locked for the worker", () => {
         savedSheets: [saved("Submitted")],
       }),
     )
-    expect(waiting).toContain("Review hours")
+    expect(waiting).toContain("Confirm hours")
+    expect(waiting).toContain("Submit timesheet")
+    expect(waiting).toContain("disabled")
     expect(waiting).toContain('id="start"')
     expect(waiting).toContain('id="finish"')
     expect(waiting).not.toContain("You can&#x27;t change them")

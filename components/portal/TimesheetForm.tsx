@@ -6,8 +6,8 @@ import { lodgeTimesheet } from "@/app/portal/actions"
 import { SignaturePad } from "@/components/portal/SignaturePad"
 import { fieldClass } from "@/components/portal/ui"
 import { emailError, emailProblem } from "@/lib/portal/email"
-import { formatDate } from "@/lib/portal/dates"
-import { STANDARD_BREAK_MINUTES, breakChoiceProblem, formatBreak, formatHours, hoursWarnings, paidHours, parseTime } from "@/lib/portal/hours"
+import { formatDate, formatTime } from "@/lib/portal/dates"
+import { STANDARD_BREAK_MINUTES, breakChoiceProblem, formatBreak, formatHours, hoursSignStamp, hoursWarnings, paidHours, parseTime } from "@/lib/portal/hours"
 import { workerCanEditTimesheet } from "@/lib/portal/timesheet-lock"
 import { SUPERVISOR_ROLES } from "@/lib/portal/types"
 import { WORK_DONE_MAX, workDoneProblem, workDoneText } from "@/lib/portal/work-done"
@@ -63,6 +63,7 @@ type Payload = {
   supervisorRole: string
   supervisorConfirmed: boolean
   signaturePng: string
+  signedHours: string
 }
 
 const QUEUE_KEY = "msw-timesheet-queue"
@@ -75,7 +76,32 @@ function timeOptions() {
   return options
 }
 
+function snapBreak(minutes: number) {
+  const snapped = Math.round(minutes / 5) * 5
+  return Math.min(120, Math.max(0, snapped))
+}
+
 const TIMES = timeOptions()
+const BREAK_MINUTES = Array.from({ length: 25 }, (_, index) => index * 5)
+
+export type TimesheetGate = {
+  hoursConfirmed: boolean
+  signatureConfirmed: boolean
+  signature: string | null
+}
+
+export function applyTimesheetGate(state: TimesheetGate, action: "confirm-hours" | "confirm-signature" | "edit-hours"): TimesheetGate {
+  if (action === "confirm-hours") return { ...state, hoursConfirmed: true }
+  if (action === "confirm-signature") {
+    if (!state.hoursConfirmed || !state.signature) return state
+    return { ...state, signatureConfirmed: true }
+  }
+  return { hoursConfirmed: false, signatureConfirmed: false, signature: null }
+}
+
+export function timesheetReadyToSubmit(state: TimesheetGate) {
+  return state.hoursConfirmed && state.signatureConfirmed && Boolean(state.signature)
+}
 
 export function TimesheetForm({
   shifts,
@@ -91,7 +117,8 @@ export function TimesheetForm({
   const router = useRouter()
   const opening = shifts.find((shift) => shift.workDate === today) || shifts[0]
   const openingSaved = findSaved(savedSheets, opening?.id)
-  const [step, setStep] = useState<"times" | "review">("times")
+  const [hoursConfirmed, setHoursConfirmed] = useState(false)
+  const [signatureConfirmed, setSignatureConfirmed] = useState(false)
   const [workDate, setWorkDate] = useState(opening?.workDate || today)
   const dayShifts = shifts.filter((shift) => shift.workDate === workDate)
   const [offerId, setOfferId] = useState(opening?.id || "")
@@ -99,8 +126,8 @@ export function TimesheetForm({
   const saved = findSaved(savedSheets, shift?.id)
   const [start, setStart] = useState(openingSaved?.start || opening?.start || "07:00")
   const [finish, setFinish] = useState(openingSaved?.finish || opening?.finish || "15:30")
-  const [breakChoice, setBreakChoice] = useState<0 | 30>(openingSaved?.breakMinutes === 0 ? 0 : STANDARD_BREAK_MINUTES)
-  const [breakStart, setBreakStart] = useState(openingSaved?.breakStart || "")
+  const [breakMinutes, setBreakMinutes] = useState(snapBreak(openingSaved?.breakMinutes ?? STANDARD_BREAK_MINUTES))
+  const [breakStart, setBreakStart] = useState(openingSaved?.breakStart || "12:00")
   const [workDone, setWorkDone] = useState(workDoneText(openingSaved?.tasks, openingSaved?.taskNote))
   const [incident, setIncident] = useState<boolean | null>(openingSaved ? openingSaved.incident : null)
   const [incidentNote, setIncidentNote] = useState(openingSaved?.incidentNote || "")
@@ -111,6 +138,7 @@ export function TimesheetForm({
   const [roleNote, setRoleNote] = useState("")
   const [supervisorConfirmed, setSupervisorConfirmed] = useState(false)
   const [signature, setSignature] = useState<string | null>(null)
+  const [padKey, setPadKey] = useState(0)
   const [error, setError] = useState("")
   const [queued, setQueued] = useState("")
   const [pending, startTransition] = useTransition()
@@ -120,14 +148,6 @@ export function TimesheetForm({
       ? [openingSaved.start, openingSaved.finish, String(openingSaved.breakMinutes), openingSaved.breakStart || ""].join("|")
       : null,
   )
-  const span = useMemo(() => {
-    const startMin = parseTime(start)
-    const finishMin = parseTime(finish)
-    if (startMin === null || finishMin === null) return null
-    return finishMin - startMin
-  }, [start, finish])
-  const shortShift = span !== null && span > 0 && span < 4 * 60
-  const breakMinutes = shortShift ? breakChoice : STANDARD_BREAK_MINUTES
   const recordedBreak = breakMinutes === 0 ? "" : breakStart
   const hoursKey = [start, finish, String(breakMinutes), recordedBreak].join("|")
   const hoursDirty =
@@ -170,7 +190,7 @@ export function TimesheetForm({
       if (draft.offerId) setOfferId(draft.offerId)
       if (draft.start) setStart(draft.start)
       if (draft.finish) setFinish(draft.finish)
-      if (draft.breakMinutes === 0) setBreakChoice(0)
+      if (typeof draft.breakMinutes === "number") setBreakMinutes(snapBreak(draft.breakMinutes))
       if (draft.breakStart) setBreakStart(draft.breakStart)
       if (typeof draft.workDone === "string") setWorkDone(draft.workDone)
       else if (draft.tasks) setWorkDone(workDoneText(draft.tasks))
@@ -231,8 +251,10 @@ export function TimesheetForm({
     setWorkDate(next.workDate)
     setStart(prior?.start || next.start)
     setFinish(prior?.finish || next.finish)
-    setBreakChoice(prior?.breakMinutes === 0 ? 0 : STANDARD_BREAK_MINUTES)
-    setBreakStart(prior?.breakStart || "")
+    setBreakMinutes(snapBreak(prior?.breakMinutes ?? STANDARD_BREAK_MINUTES))
+    setBreakStart(prior?.breakStart || "12:00")
+    setHoursConfirmed(false)
+    setSignatureConfirmed(false)
     setWorkDone(workDoneText(prior?.tasks, prior?.taskNote))
     setIncident(prior ? prior.incident : null)
     setIncidentNote(prior?.incidentNote || "")
@@ -244,12 +266,67 @@ export function TimesheetForm({
     signedHours.current = prior?.signaturePng
       ? [prior.start, prior.finish, String(prior.breakMinutes), prior.breakStart || ""].join("|")
       : null
-    setStep("times")
   }
 
   function onSign(value: string | null) {
     setSignature(value)
     signedHours.current = value ? hoursKey : signedHours.current
+  }
+
+  function hoursProblem() {
+    if (!shift) return "No accepted shift on that day."
+    if (workDate > today) return "That date has not happened yet."
+    if (!preview.ok) return preview.error
+    if (breakProblem) return breakProblem
+    if (incident === null) return "Say whether there was an incident today."
+    if (incident && !incidentNote.trim()) return "Tell us what happened."
+    const doneProblem = workDoneProblem(workDone)
+    if (doneProblem) return doneProblem
+    if (needsConfirm && !confirmUnusual) return warnings.find((warning) => warning.level === "confirm")?.message || "Confirm the times."
+    return ""
+  }
+
+  function confirmHours() {
+    const problem = hoursProblem()
+    if (problem) {
+      setError(problem)
+      return
+    }
+    setError("")
+    setHoursConfirmed(true)
+  }
+
+  function confirmSignature() {
+    if (signatureConfirmed) return
+    const emailIssue = emailProblem(supervisorEmail, supervisorEmail, true)
+    if (emailIssue) {
+      setError(emailError(emailIssue))
+      return
+    }
+    if (!supervisorName.trim()) {
+      setError("The supervisor needs to type their name.")
+      return
+    }
+    if (!signature) {
+      setError("The supervisor needs to sign on the screen.")
+      return
+    }
+    if (!supervisorConfirmed) {
+      setError("The supervisor needs to tick the hours as correct.")
+      return
+    }
+    setError("")
+    setSignatureConfirmed(true)
+  }
+
+  function editHours() {
+    setHoursConfirmed(false)
+    setSignatureConfirmed(false)
+    setSupervisorConfirmed(false)
+    setSignature(null)
+    setPadKey((key) => key + 1)
+    signedHours.current = null
+    setError("")
   }
 
   function payload(): Payload | null {
@@ -272,60 +349,24 @@ export function TimesheetForm({
       supervisorRole: role,
       supervisorConfirmed,
       signaturePng,
+      signedHours: hoursSignStamp({ start, finish, breakMinutes, breakStart: breakMinutes === 0 ? "" : breakStart }),
     }
   }
 
+  const ready = timesheetReadyToSubmit({ hoursConfirmed, signatureConfirmed, signature })
+
   return (
     <form
-      className="space-y-3"
-      data-screen={step}
+      className="space-y-4"
+      data-screen={hoursConfirmed ? (signatureConfirmed ? "ready" : "sign") : "hours"}
       onSubmit={(event) => {
         event.preventDefault()
         if (locked) {
           setError("These hours are approved for pay.")
           return
         }
-        if (step === "times") {
-          if (!shift) {
-            setError("No accepted shift on that day.")
-            return
-          }
-          if (workDate > today) {
-            setError("That date has not happened yet.")
-            return
-          }
-          if (!preview.ok) {
-            setError(preview.error)
-            return
-          }
-          if (breakProblem) {
-            setError(breakProblem)
-            return
-          }
-          if (incident === null) {
-            setError("Say whether there was an incident today.")
-            return
-          }
-          if (incident && !incidentNote.trim()) {
-            setError("Tell us what happened.")
-            return
-          }
-          const doneProblem = workDoneProblem(workDone)
-          if (doneProblem) {
-            setError(doneProblem)
-            return
-          }
-          if (needsConfirm && !confirmUnusual) {
-            setError(warnings.find((warning) => warning.level === "confirm")?.message || "Confirm the times.")
-            return
-          }
-          setError("")
-          setStep("review")
-          return
-        }
-        const emailIssue = emailProblem(supervisorEmail, supervisorEmail, true)
-        if (emailIssue) {
-          setError(emailError(emailIssue))
+        if (!ready) {
+          setError("Confirm the hours and the signature before you submit.")
           return
         }
         const body = payload()
@@ -353,30 +394,42 @@ export function TimesheetForm({
         })
       }}
     >
-      {step === "times" ? (
+      <section className="rounded-2xl border border-navy/10 bg-white p-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Site</p>
+        {dayShifts.length > 1 && !hoursConfirmed ? (
+          <label className="mt-2 block text-sm font-semibold" htmlFor="shift">
+            Choose the shift
+            <select id="shift" className={fieldClass} value={offerId} onChange={(event) => chooseShift(event.target.value)}>
+              {dayShifts.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.siteName} · {item.suburb}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <>
+            <p className="mt-1 text-base font-semibold">{shift?.siteName || "No accepted shift"}</p>
+            <p className="text-sm text-navy/70">{shift ? shift.suburb + " · " + shift.builder : "Accept a shift first."}</p>
+          </>
+        )}
+      </section>
+      {locked ? (
+        <p className="text-sm font-semibold" data-testid="timesheet-locked">
+          These hours are approved for pay. You can&apos;t change them.
+        </p>
+      ) : hoursConfirmed ? (
+        <HoursSummary
+          date={shift ? formatDate(shift.workDate) : ""}
+          start={start}
+          finish={finish}
+          breakLabel={formatBreak(breakMinutes, recordedBreak)}
+          paid={preview.ok ? formatHours(preview.hours) + " hours" : "Check the times"}
+          workDone={workDone.trim()}
+          incident={incident}
+        />
+      ) : (
         <>
-          <section className="rounded-2xl border border-navy/10 bg-white p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Site</p>
-            {dayShifts.length > 1 ? (
-              <label className="mt-2 block text-sm font-semibold" htmlFor="shift">
-                Choose the shift
-                <select id="shift" className={fieldClass} value={offerId} onChange={(event) => chooseShift(event.target.value)}>
-                  {dayShifts.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.siteName} · {item.suburb}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ) : (
-              <>
-                <p className="mt-1 text-base font-semibold">{shift?.siteName || "No accepted shift"}</p>
-                <p className="text-sm text-navy/70">
-                  {shift ? shift.suburb + " · " + shift.builder : "Accept a shift first."}
-                </p>
-              </>
-            )}
-          </section>
           <label className="block text-sm font-semibold" htmlFor="work-date">
             Date worked
             <input
@@ -395,60 +448,43 @@ export function TimesheetForm({
             />
           </label>
           {!shift ? <p className="text-sm font-semibold text-[#B45309]">No accepted shift on that day.</p> : null}
-          {locked ? (
-            <p className="text-sm font-semibold" data-testid="timesheet-locked">
-              These hours are approved for pay. You can&apos;t change them.
-            </p>
-          ) : (
-          <>
-          <div className="grid grid-cols-2 gap-2">
-            <label className="block text-sm font-semibold" htmlFor="start">
-              Start time
-              <select id="start" className={fieldClass} value={start} onChange={(event) => setStart(event.target.value)}>
-                {TIMES.map((time) => (
-                  <option key={time}>{time}</option>
-                ))}
-              </select>
-            </label>
-            <label className="block text-sm font-semibold" htmlFor="finish">
-              Finish time
-              <select id="finish" className={fieldClass} value={finish} onChange={(event) => setFinish(event.target.value)}>
-                {TIMES.map((time) => (
-                  <option key={time}>{time}</option>
-                ))}
-              </select>
-            </label>
+          <div className="grid grid-cols-1 gap-3 min-[390px]:grid-cols-3">
+            <Wheel
+              id="start"
+              label="Start"
+              value={start}
+              options={TIMES.map((time) => ({ value: time, label: formatTime(time) }))}
+              onChange={setStart}
+            />
+            <Wheel
+              id="finish"
+              label="Finish"
+              value={finish}
+              options={TIMES.map((time) => ({ value: time, label: formatTime(time) }))}
+              onChange={setFinish}
+            />
+            <Wheel
+              id="break-minutes"
+              label="Break"
+              value={String(breakMinutes)}
+              options={BREAK_MINUTES.map((minutes) => ({ value: String(minutes), label: minutes === 0 ? "No break" : minutes + " min" }))}
+              onChange={(value) => {
+                const minutes = Number(value)
+                setBreakMinutes(minutes)
+                if (minutes === 0) setBreakStart("")
+                else if (!breakStart) setBreakStart("12:00")
+              }}
+            />
           </div>
-          <fieldset>
-            <legend className="text-sm font-semibold">Unpaid break</legend>
-            {shortShift ? (
-              <label className="mt-2 flex min-h-12 items-center gap-3 text-sm font-semibold">
-                <input type="radio" name="break" value="0" checked={breakMinutes === 0} onChange={() => setBreakChoice(0)} />
-                No break
-              </label>
-            ) : null}
-            <label className="mt-2 flex min-h-12 items-center gap-3 text-sm font-semibold">
-              <input
-                type="radio"
-                name="break"
-                value="30"
-                checked={breakMinutes === STANDARD_BREAK_MINUTES}
-                onChange={() => setBreakChoice(STANDARD_BREAK_MINUTES)}
-              />
-              30-minute break
-            </label>
-            {breakMinutes === STANDARD_BREAK_MINUTES ? (
-              <label className="mt-2 block text-sm font-semibold" htmlFor="break-start">
-                Break start time
-                <select id="break-start" className={fieldClass} value={breakStart} onChange={(event) => setBreakStart(event.target.value)}>
-                  <option value="">Choose a time</option>
-                  {breakSlots.map((time) => (
-                    <option key={time}>{time}</option>
-                  ))}
-                </select>
-              </label>
-            ) : null}
-          </fieldset>
+          {breakMinutes > 0 ? (
+            <Wheel
+              id="break-start"
+              label="Break starts"
+              value={breakStart}
+              options={[{ value: "", label: "Choose a time" }, ...breakSlots.map((time) => ({ value: time, label: formatTime(time) }))]}
+              onChange={setBreakStart}
+            />
+          ) : null}
           <p className="rounded-2xl bg-white px-3 py-3" data-testid="paid-hours">
             <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-navy/70">Paid hours today</span>
             <span className="mt-1 block text-4xl font-semibold tracking-tight">{preview.ok ? formatHours(preview.hours) + " hours" : "Check the times"}</span>
@@ -497,108 +533,194 @@ export function TimesheetForm({
               </label>
             ) : null}
           </fieldset>
-          </>
-          )}
-        </>
-      ) : (
-        <>
-          <h2 className="text-2xl font-semibold leading-tight tracking-tight">Check these hours</h2>
-          <p className="text-sm text-navy/70">
-            {workerName} · {shift?.siteName} · {shift?.suburb}
-          </p>
-          <dl className="space-y-2 rounded-2xl bg-white px-3 py-3 text-sm">
-            <div className="flex items-start justify-between gap-3">
-              <dt>Date</dt>
-              <dd className="text-right font-semibold">{shift ? formatDate(shift.workDate) : ""}</dd>
-            </div>
-            <div className="flex items-start justify-between gap-3">
-              <dt>Start</dt>
-              <dd className="font-semibold">{start}</dd>
-            </div>
-            <div className="flex items-start justify-between gap-3">
-              <dt>Finish</dt>
-              <dd className="font-semibold">{finish}</dd>
-            </div>
-            <div className="flex items-start justify-between gap-3">
-              <dt>Break</dt>
-              <dd className="text-right font-semibold">{formatBreak(breakMinutes, breakStart)}</dd>
-            </div>
-            <div className="flex items-start justify-between gap-3">
-              <dt>Total paid hours</dt>
-              <dd className="font-semibold">{preview.ok ? formatHours(preview.hours) : "Check the times"}</dd>
-            </div>
-            <div className="flex items-start justify-between gap-3">
-              <dt>What did you do today?</dt>
-              <dd className="text-right font-semibold">{workDone.trim()}</dd>
-            </div>
-          </dl>
-          <p className="text-sm">Incident reported: {incident ? "Yes" : "No"}</p>
-          {hoursDirty && saved?.signaturePng ? (
-            <p className="text-sm font-semibold">Changing the hours or the break clears the supervisor signature. They need to sign again.</p>
-          ) : null}
-          <h2 className="text-2xl font-semibold leading-tight tracking-tight">Site supervisor</h2>
-          <p className="text-sm">Only the supervisor signs. Hand them the phone. No email is sent.</p>
-          <label className="block text-sm font-semibold" htmlFor="sup-name">
-            Supervisor name
-            <input id="sup-name" className={fieldClass} value={supervisorName} onChange={(event) => setSupervisorName(event.target.value)} />
-          </label>
-          <label className="block text-sm font-semibold" htmlFor="sup-email">
-            Supervisor email
-            <input id="sup-email" type="email" autoComplete="email" inputMode="email" className={fieldClass} value={supervisorEmail} onChange={(event) => setSupervisorEmail(event.target.value)} />
-          </label>
-          <fieldset>
-            <legend className="text-sm font-semibold">Role</legend>
-            <div className="mt-2 flex flex-wrap gap-3">
-              {SUPERVISOR_ROLES.map((item) => (
-                <button key={item} type="button" className={chip(role === item)} onClick={() => setRole(item)}>
-                  {item}
-                </button>
-              ))}
-            </div>
-            {role === "Other, please explain" ? (
-              <input className={fieldClass} aria-label="Other role" value={roleNote} onChange={(event) => setRoleNote(event.target.value)} />
-            ) : null}
-          </fieldset>
-          <label className="flex min-h-12 items-start gap-3 text-sm font-semibold">
-            <input type="checkbox" className="mt-1" checked={supervisorConfirmed} onChange={(event) => setSupervisorConfirmed(event.target.checked)} />
-            I&apos;ve checked these hours and they are correct. MS Workforce can pay and invoice them.
-          </label>
-          <p className="text-sm font-semibold">Sign here</p>
-          <SignaturePad onChange={onSign} />
+          <button type="button" className="pill pill-teal w-full" onClick={confirmHours}>
+            Confirm hours
+          </button>
         </>
       )}
+      {hoursConfirmed && !locked ? (
+        <section className="space-y-3" data-testid="signature-section">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold leading-tight">Person in charge</h2>
+            <button type="button" className="min-h-12 px-3 text-sm font-semibold text-teal-600" onClick={editHours}>
+              Edit hours
+            </button>
+          </div>
+          <p className="text-sm">Hand them the phone. Only they sign. No email is sent.</p>
+          {signatureConfirmed ? (
+            <p className="rounded-2xl bg-white px-3 py-3 text-sm font-semibold" data-testid="signature-locked">
+              Signature confirmed for {supervisorName || "the supervisor"}.
+            </p>
+          ) : (
+            <>
+              <label className="block text-sm font-semibold" htmlFor="sup-name">
+                Supervisor name
+                <input id="sup-name" className={fieldClass} value={supervisorName} onChange={(event) => setSupervisorName(event.target.value)} />
+              </label>
+              <label className="block text-sm font-semibold" htmlFor="sup-email">
+                Supervisor email
+                <input id="sup-email" type="email" autoComplete="email" inputMode="email" className={fieldClass} value={supervisorEmail} onChange={(event) => setSupervisorEmail(event.target.value)} />
+              </label>
+              <fieldset>
+                <legend className="text-sm font-semibold">Role</legend>
+                <div className="mt-2 flex flex-wrap gap-3">
+                  {SUPERVISOR_ROLES.map((item) => (
+                    <button key={item} type="button" className={chip(role === item)} onClick={() => setRole(item)}>
+                      {item}
+                    </button>
+                  ))}
+                </div>
+                {role === "Other, please explain" ? (
+                  <input className={fieldClass} aria-label="Other role" value={roleNote} onChange={(event) => setRoleNote(event.target.value)} />
+                ) : null}
+              </fieldset>
+              <label className="flex min-h-12 items-start gap-3 text-sm font-semibold">
+                <input type="checkbox" className="mt-1" checked={supervisorConfirmed} onChange={(event) => setSupervisorConfirmed(event.target.checked)} />
+                I&apos;ve checked these hours and they are correct. MS Workforce can pay and invoice them.
+              </label>
+              <p className="text-sm font-semibold">Sign here</p>
+              <SignaturePad key={padKey} onChange={onSign} />
+              <button type="button" className="pill pill-line-dark w-full" onClick={confirmSignature}>
+                Confirm signature
+              </button>
+            </>
+          )}
+        </section>
+      ) : null}
       {queued ? <p role="status" className="text-sm font-semibold text-teal-600">{queued}</p> : null}
       {error ? (
         <p role="alert" className="text-sm font-semibold text-[#B91C1C]">
           {error}
         </p>
       ) : null}
+      {hoursDirty && saved?.signaturePng && !signatureConfirmed ? (
+        <p className="text-sm font-semibold">Changing the hours clears the supervisor signature. They need to sign again.</p>
+      ) : null}
       {locked ? null : (
-        <button className="pill pill-teal w-full" disabled={pending}>
-          {step === "times" ? "Review hours" : pending ? "Sending" : "Sign and submit"}
+        <button className="pill pill-teal w-full" data-testid="submit-timesheet" disabled={!ready || pending}>
+          {pending ? "Sending" : "Submit timesheet"}
         </button>
       )}
-      {step === "review" ? (
-        <button
-          type="button"
-          className="min-h-12 w-full text-sm font-semibold text-teal-600"
-          onClick={() => {
-            setStep("times")
-            setSignature(null)
-            setSupervisorConfirmed(false)
-            setError("")
-          }}
-        >
-          Something&apos;s wrong, give the phone back
-        </button>
-      ) : null}
     </form>
+  )
+}
+
+function HoursSummary({
+  date,
+  start,
+  finish,
+  breakLabel,
+  paid,
+  workDone,
+  incident,
+}: {
+  date: string
+  start: string
+  finish: string
+  breakLabel: string
+  paid: string
+  workDone: string
+  incident: boolean | null
+}) {
+  return (
+    <dl className="space-y-2 rounded-2xl border border-navy/10 bg-white px-3 py-3 text-sm" data-testid="hours-summary">
+      <div className="flex items-start justify-between gap-3">
+        <dt>Date</dt>
+        <dd className="text-right font-semibold">{date}</dd>
+      </div>
+      <div className="flex items-start justify-between gap-3">
+        <dt>Start</dt>
+        <dd className="font-semibold">{formatTime(start)}</dd>
+      </div>
+      <div className="flex items-start justify-between gap-3">
+        <dt>Finish</dt>
+        <dd className="font-semibold">{formatTime(finish)}</dd>
+      </div>
+      <div className="flex items-start justify-between gap-3">
+        <dt>Break</dt>
+        <dd className="text-right font-semibold">{breakLabel}</dd>
+      </div>
+      <div className="flex items-start justify-between gap-3">
+        <dt>Paid hours</dt>
+        <dd className="font-semibold">{paid}</dd>
+      </div>
+      <div className="flex items-start justify-between gap-3">
+        <dt>What they did</dt>
+        <dd className="text-right font-semibold">{workDone}</dd>
+      </div>
+      <div className="flex items-start justify-between gap-3">
+        <dt>Incident</dt>
+        <dd className="font-semibold">{incident ? "Yes" : "No"}</dd>
+      </div>
+    </dl>
+  )
+}
+
+function Wheel({
+  id,
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  id: string
+  label: string
+  value: string
+  options: { value: string; label: string }[]
+  onChange: (value: string) => void
+}) {
+  const list = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const root = list.current
+    if (!root) return
+    const align = () => {
+      const selected = root.querySelector("[aria-selected='true']") as HTMLElement | null
+      if (!selected) return
+      root.scrollTop = Math.max(0, selected.offsetTop - root.clientHeight / 2 + selected.clientHeight / 2)
+    }
+    align()
+    const frame = window.requestAnimationFrame(align)
+    return () => window.cancelAnimationFrame(frame)
+  }, [value])
+  const current = options.find((option) => option.value === value)?.label || value
+  return (
+    <div className="min-w-0">
+      <p id={id + "-label"} className="text-sm font-semibold">
+        {label}
+        <span className="mt-1 block text-base">{current}</span>
+      </p>
+      <div
+        role="listbox"
+        aria-labelledby={id + "-label"}
+        ref={list}
+        className="mt-1 h-40 overflow-y-auto rounded-2xl border border-navy/10 bg-white"
+        style={{ scrollSnapType: "y mandatory", WebkitOverflowScrolling: "touch" }}
+      >
+        {options.map((option) => {
+          const on = option.value === value
+          return (
+            <button
+              key={option.value || "empty"}
+              id={on ? id : undefined}
+              type="button"
+              role="option"
+              aria-selected={on}
+              className={"flex min-h-12 w-full snap-center items-center justify-center px-2 text-sm font-semibold " + (on ? "bg-teal-600 text-navy" : "text-navy")}
+              style={{ scrollSnapAlign: "center" }}
+              onClick={() => onChange(option.value)}
+            >
+              {option.label}
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
 function chip(on: boolean) {
   return (
     "min-h-12 rounded-full border px-3 text-sm font-semibold " +
-    (on ? "border-teal-600 bg-teal-600 text-white" : "border-navy/15 bg-white text-navy")
+    (on ? "border-teal-600 bg-teal-600 text-navy" : "border-navy/15 bg-white text-navy")
   )
 }

@@ -70,7 +70,7 @@ export function SignaturePad({ onChange }: { onChange: (value: string | null) =>
           onChange(null)
         }}
       >
-        Clear signature
+        Clear
       </button>
     </div>
   )
