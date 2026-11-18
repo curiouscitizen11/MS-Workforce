@@ -9,7 +9,7 @@ import type { InductionRow } from "@/lib/portal/inductions"
 export function InductionBook({ rows, sites }: { rows: InductionRow[]; sites: { id: string; label: string }[] }) {
   const [picking, setPicking] = useState(false)
   const [error, setError] = useState("")
-  const [pending, start] = useTransition()
+  const [, start] = useTransition()
 
   function add(name: string, done = false) {
     setError("")
@@ -51,32 +51,15 @@ export function InductionBook({ rows, sites }: { rows: InductionRow[]; sites: { 
   return (
     <div>
       <div className="portal-list">
-        {rows.map((row) =>
-          row.href ? (
-            <Link key={row.id} href={row.href} className="portal-list-row">
-              <span className="portal-list-label">{row.name}</span>
-              <span className={"portal-list-status" + (row.done ? "" : " portal-home-attention")}>{row.status}</span>
-              <span className="portal-list-chev" aria-hidden="true">
-                ›
-              </span>
-            </Link>
-          ) : (
-            <div key={row.id} className="portal-list-row">
-              <span className="portal-list-label">{row.name}</span>
-              <span className={"portal-list-status" + (row.done ? "" : " portal-home-attention")}>{row.status}</span>
-              {row.link ? (
-                <a className="portal-row-action" href={row.link} target="_blank" rel="noreferrer">
-                  Open
-                </a>
-              ) : null}
-              {row.done ? null : (
-                <button type="button" className="portal-row-action" disabled={pending} onClick={() => add(row.name, true)}>
-                  Mark done
-                </button>
-              )}
-            </div>
-          ),
-        )}
+        {rows.map((row) => (
+          <Link key={row.id} href={row.href || "/portal/inductions"} className="portal-list-row">
+            <span className="portal-list-label">{row.name}</span>
+            <span className={"portal-list-status" + (row.done ? "" : " portal-home-attention")}>{row.status}</span>
+            <span className="portal-list-chev" aria-hidden="true">
+              ›
+            </span>
+          </Link>
+        ))}
       </div>
       {error ? (
         <p role="alert" className="px-[22px] pt-2 text-sm font-semibold text-[#ff6b6b]">
