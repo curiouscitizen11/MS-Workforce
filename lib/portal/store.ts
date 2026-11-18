@@ -27,11 +27,16 @@ export type Repo<T extends { id: string }> = {
   remove(id: string): Promise<void>
 }
 
+/** A collection whose rows belong to one worker. forWorker filters before the rows leave the store. */
+export type WorkerRepo<T extends { id: string; workerId: string }> = Repo<T> & {
+  forWorker(workerId: string): Promise<T[]>
+}
+
 export type Store = {
   workers: Repo<Worker>
-  offers: Repo<Offer>
-  timesheets: Repo<Timesheet>
-  documents: Repo<PortalDocument>
+  offers: WorkerRepo<Offer>
+  timesheets: WorkerRepo<Timesheet>
+  documents: WorkerRepo<PortalDocument>
   sessions: Repo<Session>
   challenges: Repo<OtpChallenge>
   magics: Repo<MagicToken>
@@ -91,11 +96,24 @@ function repoOf<T extends { id: string }>(rows: T[], persist: () => void): Repo<
   }
 }
 
-function timesheetRepo(rows: Timesheet[], persist: () => void): Repo<Timesheet> {
+function workerRepo<T extends { id: string; workerId: string }>(rows: T[], persist: () => void): WorkerRepo<T> {
   const repo = repoOf(rows, persist)
+  return {
+    ...repo,
+    async forWorker(workerId) {
+      return rows.filter((row) => row.workerId === workerId).map((row) => clone(row))
+    },
+  }
+}
+
+function timesheetRepo(rows: Timesheet[], persist: () => void): WorkerRepo<Timesheet> {
+  const repo = workerRepo(rows, persist)
   return {
     async all() {
       return (await repo.all()).map((row) => normaliseTimesheet(row))
+    },
+    async forWorker(workerId) {
+      return (await repo.forWorker(workerId)).map((row) => normaliseTimesheet(row))
     },
     async get(id) {
       const row = await repo.get(id)
@@ -113,9 +131,9 @@ function timesheetRepo(rows: Timesheet[], persist: () => void): Repo<Timesheet> 
 function bind(db: MemoryDb, persist: () => void): Store {
   return {
     workers: repoOf(db.workers, persist),
-    offers: repoOf(db.offers, persist),
+    offers: workerRepo(db.offers, persist),
     timesheets: timesheetRepo(db.timesheets, persist),
-    documents: repoOf(db.documents, persist),
+    documents: workerRepo(db.documents, persist),
     sessions: repoOf(db.sessions, persist),
     challenges: repoOf(db.challenges, persist),
     magics: repoOf(db.magics, persist),
