@@ -1,9 +1,9 @@
 import { neon } from "@neondatabase/serverless"
-import { and, eq } from "drizzle-orm"
+import { and, eq, sql } from "drizzle-orm"
 import { drizzle } from "drizzle-orm/neon-http"
 import { portalRecords } from "@/lib/portal/db/schema"
 import { normaliseTimesheet } from "@/lib/portal/pay"
-import type { Repo, Store } from "@/lib/portal/store"
+import type { Repo, Store, WorkerRepo } from "@/lib/portal/store"
 import type { Timesheet } from "@/lib/portal/types"
 
 export function createPostgresStore(databaseUrl: string): Store {
@@ -37,10 +37,27 @@ export function createPostgresStore(databaseUrl: string): Store {
     }
   }
 
-  function timesheets(source: Repo<Timesheet>): Repo<Timesheet> {
+  function scoped<T extends { id: string; workerId: string }>(collection: string): WorkerRepo<T> {
+    const source = repo<T>(collection)
+    return {
+      ...source,
+      async forWorker(workerId) {
+        const rows = await db
+          .select()
+          .from(portalRecords)
+          .where(and(eq(portalRecords.collection, collection), sql`${portalRecords.data}->>'workerId' = ${workerId}`))
+        return rows.map((row) => row.data as T)
+      },
+    }
+  }
+
+  function timesheets(source: WorkerRepo<Timesheet>): WorkerRepo<Timesheet> {
     return {
       async all() {
         return (await source.all()).map((row) => normaliseTimesheet(row))
+      },
+      async forWorker(workerId) {
+        return (await source.forWorker(workerId)).map((row) => normaliseTimesheet(row))
       },
       async get(id) {
         const row = await source.get(id)
@@ -57,9 +74,9 @@ export function createPostgresStore(databaseUrl: string): Store {
 
   return {
     workers: repo("workers"),
-    offers: repo("offers"),
-    timesheets: timesheets(repo<Timesheet>("timesheets")),
-    documents: repo("documents"),
+    offers: scoped("offers"),
+    timesheets: timesheets(scoped<Timesheet>("timesheets")),
+    documents: scoped("documents"),
     sessions: repo("sessions"),
     challenges: repo("challenges"),
     magics: repo("magics"),

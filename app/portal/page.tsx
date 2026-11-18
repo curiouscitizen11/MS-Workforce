@@ -18,6 +18,7 @@ import { formatDate, formatTime, sydneyParts, sydneyToday } from "@/lib/portal/d
 import { inductionTodoCount, offersWaiting, shiftsMissingSupervisorSign, ticketActionCount, unsignedWeekDays, weekSummary } from "@/lib/portal/home"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
+import { loadWorkerHome } from "@/lib/portal/worker-home"
 import { TICKET_LABELS } from "@/lib/portal/types"
 import { sidesPresent, slotsFromWorker } from "@/lib/portal/ticket-photos"
 
@@ -40,15 +41,11 @@ export default async function DashboardPage() {
   const today = sydneyToday(now)
   const afternoon = sydneyParts(now).minutes >= 14 * 60
   const check = complianceFor(worker, today)
-  const offers = (await store.offers.all()).filter((offer) => offer.workerId === worker.id)
+  const { offers, sheets, documents: docs } = await loadWorkerHome(store, worker.id)
   const open = offers.find((offer) => offer.status === "Offered")
   const todayShift = offers.find((offer) => offer.status === "Accepted" && offer.shiftDate === today)
-  const sheets = (await store.timesheets.all())
-    .filter((sheet) => sheet.workerId === worker.id)
-    .sort((a, b) => b.workDate.localeCompare(a.workDate))
   const latest = sheets[0]
   const expiring = check.tickets.filter((ticket) => ticket.validity === "expiring" || ticket.validity === "expired" || ticket.validity === "missing")
-  const docs = await store.documents.all()
   const waiting = offersWaiting(offers, worker.id)
   const unsigned = unsignedWeekDays(offers, sheets, worker.id, today)
   const missingSign = shiftsMissingSupervisorSign(offers, sheets, worker.id, today)
