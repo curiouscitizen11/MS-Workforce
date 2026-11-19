@@ -27,17 +27,44 @@ export const TICKET_ANSWERS = ["Yes, I have it", "No", "Booked in for the course
 export const WORKER_STATUSES = ["Applicant", "Onboarding", "Ready", "Inactive"] as const
 export type WorkerStatus = (typeof WORKER_STATUSES)[number]
 
-export const ROLES = [
+export const LABOUR_ROLES = [
   "General labourer",
   "Trade assistant",
-  "Site clean",
-  "Materials handling",
   "Demolition / strip-out",
-  "Concrete labourer",
-  "Asbestos removal labourer (Class B)",
-  "Landscaping labourer",
-  "Other, please explain",
+  "Asbestos removal (Class B)",
 ] as const
+
+export const PLANT_ROLES = [
+  "Excavator",
+  "Skid steer / Bobcat",
+  "Roller",
+  "Loader",
+  "Grader",
+  "Telehandler",
+  "Forklift",
+] as const
+
+export const DRIVER_ROLES = [
+  "Water cart",
+  "Heavy rigid (HR) truck",
+  "Tipper / truck and dog (HC)",
+] as const
+
+export const OTHER_ROLE = "Other, please explain"
+
+export const ROLE_GROUPS = [
+  { heading: "Labour", roles: LABOUR_ROLES },
+  { heading: "Plant operators", roles: PLANT_ROLES },
+  { heading: "Drivers", roles: DRIVER_ROLES },
+] as const
+
+export const ROLES = [...LABOUR_ROLES, ...PLANT_ROLES, ...DRIVER_ROLES, OTHER_ROLE] as const
+
+const LICENCE_ROLES = new Set<string>([...PLANT_ROLES, ...DRIVER_ROLES])
+
+export function needsRoleLicence(roles: readonly string[]) {
+  return roles.some((role) => LICENCE_ROLES.has(role))
+}
 
 export const TRANSPORT_OPTIONS = [
   "Own car",
@@ -261,6 +288,8 @@ export type Worker = {
   suburb?: string
   status: WorkerStatus
   roles: string[]
+  /** Optional note when a plant or driver role is chosen. Not a Notion column. */
+  roleLicence?: string
   experience?: string
   whatsappOk: boolean
   privacyConsent: boolean

@@ -107,7 +107,7 @@ Every other column below is written when it has a value. If the column is missin
 | Column | Type | Choices |
 | --- | --- | --- |
 | Suburb | text | |
-| Roles of interest | multi-select | General labourer, Trade assistant, Site clean, Materials handling, Demolition / strip-out, Concrete labourer, Asbestos removal labourer (Class B), Landscaping labourer, Other – please explain |
+| Roles of interest | multi-select | General labourer, Trade assistant, Demolition / strip-out, Asbestos removal (Class B), Excavator, Skid steer / Bobcat, Roller, Loader, Grader, Telehandler, Forklift, Water cart, Heavy rigid (HR) truck, Tipper / truck and dog (HC), Other – please explain |
 | Experience summary | text | |
 | WhatsApp OK | checkbox | |
 | Privacy consent | checkbox | |

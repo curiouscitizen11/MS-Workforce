@@ -3,10 +3,10 @@
 import { useEffect, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { checkJoinCode, sendJoinCodeAgain, sendJoinDetails } from "@/app/portal/actions"
-import { TickIcon, Field, fieldClass } from "@/components/portal/ui"
+import { RolePicker } from "@/components/portal/RolePicker"
+import { Field, fieldClass } from "@/components/portal/ui"
 import { emailError, emailProblem } from "@/lib/portal/email"
 import { toE164 } from "@/lib/portal/phone"
-import { ROLES } from "@/lib/portal/types"
 
 export function JoinForm({
   initialName = "",
@@ -31,6 +31,7 @@ export function JoinForm({
   const [suburb, setSuburb] = useState("")
   const [postcode, setPostcode] = useState("")
   const [roles, setRoles] = useState<string[]>([])
+  const [roleLicence, setRoleLicence] = useState("")
   const [experience, setExperience] = useState("")
   const [privacy, setPrivacy] = useState(false)
   const [code, setCode] = useState("")
@@ -116,6 +117,7 @@ export function JoinForm({
             suburb,
             postcode: postcode.trim(),
             roles,
+            roleLicence,
             experience,
             privacyConsent: true,
             inviteToken: inviteToken || undefined,
@@ -140,26 +142,7 @@ export function JoinForm({
           <Field label="Confirm email" name="confirmEmail" type="text" inputMode="email" autoComplete="email" value={confirmEmail} onChange={(event) => setConfirmEmail(event.target.value)} required />
           <Field label="Suburb" name="suburb" value={suburb} onChange={(event) => setSuburb(event.target.value)} required />
           <Field label="Postcode" name="postcode" inputMode="numeric" autoComplete="postal-code" value={postcode} onChange={(event) => setPostcode(event.target.value)} required />
-          <fieldset>
-            <legend className="text-sm font-semibold">Roles you want</legend>
-            <div className="mt-2 flex flex-wrap gap-3">
-              {ROLES.map((role) => {
-                const on = roles.includes(role)
-                return (
-                  <button
-                    key={role}
-                    type="button"
-                    aria-pressed={on}
-                    className={"portal-role" + (on ? " portal-role-on" : "")}
-                    onClick={() => setRoles(on ? roles.filter((item) => item !== role) : [...roles, role])}
-                  >
-                    {on ? <TickIcon /> : null}
-                    {role}
-                  </button>
-                )
-              })}
-            </div>
-          </fieldset>
+          <RolePicker roles={roles} onChange={setRoles} roleLicence={roleLicence} onRoleLicence={setRoleLicence} />
           <label className="block text-sm font-semibold" htmlFor="experience">
             Short experience summary
             <textarea id="experience" className={fieldClass} rows={3} value={experience} onChange={(event) => setExperience(event.target.value)} />
