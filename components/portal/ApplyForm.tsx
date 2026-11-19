@@ -4,10 +4,10 @@ import { useState, useTransition } from "react"
 import { applyForWork } from "@/app/portal/actions"
 import { TicketCard } from "@/components/portal/TicketCard"
 import { TicketChoices } from "@/components/portal/TicketChoices"
-import { Field, TickIcon, fieldClass } from "@/components/portal/ui"
+import { RolePicker } from "@/components/portal/RolePicker"
+import { Field, fieldClass } from "@/components/portal/ui"
 import { emailError, emailProblem } from "@/lib/portal/email"
 import { toE164 } from "@/lib/portal/phone"
-import { ROLES } from "@/lib/portal/types"
 
 const ticketFields = [
   ["whiteCard", "White card"],
@@ -29,6 +29,7 @@ export function ApplyForm() {
   const [confirmEmail, setConfirmEmail] = useState("")
   const [suburb, setSuburb] = useState("")
   const [roles, setRoles] = useState<string[]>([])
+  const [roleLicence, setRoleLicence] = useState("")
   const [experience, setExperience] = useState("")
   const [whatsappOk, setWhatsappOk] = useState(false)
   const [privacy, setPrivacy] = useState(false)
@@ -94,6 +95,7 @@ export function ApplyForm() {
             confirmEmail: confirmEmail.trim(),
             suburb,
             roles,
+            roleLicence,
             experience,
             whatsappOk,
             privacyConsent: privacy,
@@ -119,26 +121,7 @@ export function ApplyForm() {
       ) : null}
       {step === 1 ? (
         <>
-          <fieldset>
-            <legend className="text-sm font-semibold">Roles you want</legend>
-            <div className="mt-2 flex flex-wrap gap-3">
-              {ROLES.map((role) => {
-                const on = roles.includes(role)
-                return (
-                  <button
-                    key={role}
-                    type="button"
-                    aria-pressed={on}
-                    className={"portal-role" + (on ? " portal-role-on" : "")}
-                    onClick={() => setRoles(on ? roles.filter((item) => item !== role) : [...roles, role])}
-                  >
-                    {on ? <TickIcon /> : null}
-                    {role}
-                  </button>
-                )
-              })}
-            </div>
-          </fieldset>
+          <RolePicker roles={roles} onChange={setRoles} roleLicence={roleLicence} onRoleLicence={setRoleLicence} />
           <label className="block text-sm font-semibold" htmlFor="experience">
             Short experience summary
             <textarea id="experience" className={fieldClass} rows={3} value={experience} onChange={(event) => setExperience(event.target.value)} />

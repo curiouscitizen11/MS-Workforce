@@ -20,6 +20,7 @@ export type JoinDraft = {
   suburb: string
   postcode: string
   roles: string[]
+  roleLicence?: string
   experience: string
   invitedAs?: string
   exp: number

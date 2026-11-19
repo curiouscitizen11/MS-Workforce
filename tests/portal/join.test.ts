@@ -45,6 +45,49 @@ describe("join codes", () => {
     expect(created?.postcode).toBe("2095")
   })
 
+  it("keeps a plant licence and refuses a role that is no longer offered", async () => {
+    const { ctx } = harness()
+    const retired = await prepareJoin(
+      ctx,
+      { ...details("0499 333 444"), email: "retired.role@example.com", confirmEmail: "retired.role@example.com", roles: ["Site clean"] },
+      "203.0.113.20",
+    )
+    expect(retired.ok).toBe(false)
+    const sent = await prepareJoin(
+      ctx,
+      {
+        ...details("0499 333 444"),
+        email: "plant.person@example.com",
+        confirmEmail: "plant.person@example.com",
+        roles: ["Excavator"],
+        roleLicence: "VOC",
+      },
+      "203.0.113.21",
+    )
+    expect(sent.ok).toBe(true)
+    if (!sent.ok || !sent.devCode) throw new Error("missing code")
+    expect(sent.draft.roleLicence).toBe("VOC")
+    const done = await finishJoin(ctx, sent.draft, sent.devCode)
+    expect(done.ok).toBe(true)
+    const created = (await ctx.store.workers.all()).find((worker) => worker.email === "plant.person@example.com")
+    expect(created?.roles).toEqual(["Excavator"])
+    expect(created?.roleLicence).toBe("VOC")
+    const labour = await prepareJoin(
+      ctx,
+      {
+        ...details("0499 444 555"),
+        email: "labour.only@example.com",
+        confirmEmail: "labour.only@example.com",
+        roles: ["General labourer"],
+        roleLicence: "VOC",
+      },
+      "203.0.113.22",
+    )
+    expect(labour.ok).toBe(true)
+    if (!labour.ok) return
+    expect(labour.draft.roleLicence).toBe("")
+  })
+
   it("sends no code when the mobile is already on file", async () => {
     const { ctx } = harness()
     const before = await ctx.store.challenges.all()

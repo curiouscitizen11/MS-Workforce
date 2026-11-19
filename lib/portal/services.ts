@@ -62,6 +62,7 @@ import type { Notify } from "@/lib/portal/notify"
 import type { Store } from "@/lib/portal/store"
 import {
   ROLES,
+  needsRoleLicence,
   blankTickets,
   SUPERVISOR_ROLES,
   TICKET_ANSWERS,
@@ -384,6 +385,7 @@ const applySchema = z.object({
   confirmEmail: z.string().trim().min(3).max(120),
   suburb: z.string().trim().min(2).max(80),
   roles: z.array(z.enum(ROLES)).min(1),
+  roleLicence: z.string().trim().max(80).optional(),
   experience: z.string().trim().max(1000).optional(),
   whatsappOk: z.boolean(),
   privacyConsent: z.literal(true),
@@ -406,6 +408,7 @@ const joinDetailsSchema = z.object({
   suburb: z.string().trim().min(2).max(80),
   postcode: z.string().trim().regex(/^\d{4}$/),
   roles: z.array(z.enum(ROLES)).min(1),
+  roleLicence: z.string().trim().max(80).optional(),
   experience: z.string().trim().max(1000).optional(),
   privacyConsent: z.literal(true),
   inviteToken: z.string().max(4000).optional(),
@@ -418,6 +421,7 @@ export type JoinDetails = {
   suburb: string
   postcode: string
   roles: string[]
+  roleLicence?: string
   experience: string
   invitedAs?: string
 }
@@ -426,7 +430,7 @@ export async function prepareJoin(ctx: Ctx, input: unknown, ip: string) {
   const parsed = joinDetailsSchema.safeParse(input)
   if (!parsed.success) return fail("Check the form and try again.")
   const data = parsed.data
-  const sensitive = texts([data.name, data.experience, data.suburb, data.email, data.postcode])
+  const sensitive = texts([data.name, data.experience, data.roleLicence, data.suburb, data.email, data.postcode])
   if (sensitive) return fail(sensitive)
   const mobile = toE164(data.mobile)
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
@@ -445,6 +449,7 @@ export async function prepareJoin(ctx: Ctx, input: unknown, ip: string) {
     suburb: data.suburb,
     postcode: data.postcode,
     roles: data.roles,
+    roleLicence: needsRoleLicence(data.roles) ? data.roleLicence || "" : "",
     experience: data.experience || "",
   }
   if (data.inviteToken) {
@@ -496,6 +501,7 @@ export async function finishJoin(ctx: Ctx, draft: JoinDetails, code: string) {
     postcode: draft.postcode,
     status: "Applicant",
     roles: draft.roles,
+    roleLicence: draft.roleLicence || undefined,
     experience: draft.experience,
     whatsappOk: false,
     privacyConsent: true,
@@ -515,7 +521,7 @@ export async function submitApplication(ctx: Ctx, input: unknown) {
   const parsed = applySchema.safeParse(input)
   if (!parsed.success) return fail("Check the form and try again.")
   const data = parsed.data
-  const sensitive = texts([data.name, data.experience, data.suburb, data.email])
+  const sensitive = texts([data.name, data.experience, data.roleLicence, data.suburb, data.email])
   if (sensitive) return fail(sensitive)
   const mobile = toE164(data.mobile)
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
@@ -557,6 +563,7 @@ export async function submitApplication(ctx: Ctx, input: unknown) {
   worker.email = email
   worker.suburb = data.suburb
   worker.roles = data.roles
+  worker.roleLicence = needsRoleLicence(data.roles) ? data.roleLicence || undefined : undefined
   worker.experience = data.experience
   worker.whatsappOk = data.whatsappOk
   worker.privacyConsent = true
