@@ -61,6 +61,7 @@ const FREE_TEXT = new Set([
   "Medical notes",
   "Work history",
   "Site inductions",
+  "Roles requested",
 ])
 
 export class NotionPayloadError extends Error {}

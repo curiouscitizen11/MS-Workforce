@@ -195,7 +195,7 @@ Book labour always adds a new row. It does not update an old one. These columns 
 | Site email | email | |
 | Site address | text | |
 | Site suburb | text | |
-| Roles requested | multi-select | General labourer, Trade assistant, Site clean, Materials handling, Other |
+| Roles requested | text | What the client typed, for example "3 general labourers and 1 trade assistant" |
 | Labour request details | text | |
 | Workers needed | number | |
 | Start | date | |

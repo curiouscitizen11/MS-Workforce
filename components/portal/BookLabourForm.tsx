@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from "react"
 import { sendBookLabour } from "@/app/portal/actions"
-import { BOOK_ROLES, HEARD_OPTIONS } from "@/lib/portal/book-labour"
-import { TickIcon, Field, fieldClass } from "@/components/portal/ui"
+import { HEARD_OPTIONS } from "@/lib/portal/book-labour"
+import { Field, fieldClass } from "@/components/portal/ui"
 import { REPLY_SLA } from "@/components/publicCopy"
 
 const PRIVACY =
@@ -17,8 +17,7 @@ export function BookLabourForm() {
   const [email, setEmail] = useState("")
   const [address, setAddress] = useState("")
   const [suburb, setSuburb] = useState("")
-  const [roles, setRoles] = useState<string[]>([])
-  const [otherRole, setOtherRole] = useState("")
+  const [roles, setRoles] = useState("")
   const [workers, setWorkers] = useState("")
   const [start, setStart] = useState("")
   const [ongoing, setOngoing] = useState(false)
@@ -58,7 +57,6 @@ export function BookLabourForm() {
             address,
             suburb,
             roles,
-            otherRole,
             workers: Number(workers),
             start,
             ongoing,
@@ -83,29 +81,18 @@ export function BookLabourForm() {
       <Field label="Email" name="email" type="text" inputMode="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
       <Field label="Site address" name="address" placeholder="Street address" autoComplete="street-address" value={address} onChange={(event) => setAddress(event.target.value)} required />
       <Field label="Suburb" name="suburb" value={suburb} onChange={(event) => setSuburb(event.target.value)} required />
-      <fieldset>
-        <legend className="text-sm font-semibold">What roles do you need?</legend>
-        <div className="mt-2 flex flex-wrap gap-3">
-          {BOOK_ROLES.map((role) => {
-            const on = roles.includes(role)
-            return (
-              <button
-                key={role}
-                type="button"
-                aria-pressed={on}
-                className={"portal-role" + (on ? " portal-role-on" : "")}
-                onClick={() => setRoles(on ? roles.filter((item) => item !== role) : [...roles, role])}
-              >
-                {on ? <TickIcon /> : null}
-                {role}
-              </button>
-            )
-          })}
-        </div>
-      </fieldset>
-      {roles.includes("Other") ? (
-        <Field label="Other role: tell us a bit more" name="other-role" value={otherRole} onChange={(event) => setOtherRole(event.target.value)} required />
-      ) : null}
+      <label className="block text-sm font-semibold" htmlFor="roles">
+        What roles do you need?
+        <textarea
+          id="roles"
+          className={fieldClass}
+          rows={3}
+          required
+          placeholder="e.g. 3 general labourers and 1 trade assistant for demo work"
+          value={roles}
+          onChange={(event) => setRoles(event.target.value)}
+        />
+      </label>
       <Field label="How many workers?" name="workers" inputMode="numeric" value={workers} onChange={(event) => setWorkers(event.target.value.replace(/\D/g, "").slice(0, 2))} required />
       <label className="block text-sm font-semibold" htmlFor="start-date">
         Start date

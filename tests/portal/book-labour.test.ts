@@ -26,8 +26,7 @@ function request(extra: Record<string, unknown> = {}) {
     email: "alex.stone@example.com",
     address: "12 Harbour Street",
     suburb: "Manly",
-    roles: ["General labourer", "Other"],
-    otherRole: "Traffic control",
+    roles: "3 general labourers and 1 trade assistant for demo work",
     workers: 4,
     start: "2026-11-12",
     ongoing: false,
@@ -46,17 +45,17 @@ describe("book labour", () => {
     expect(hidePortalChrome("/portal/book-labour")).toBe(true)
   })
 
-  it("checks required answers, ongoing, other role and the worker count", async () => {
+  it("checks required answers, the roles note, ongoing and the worker count", async () => {
     const { ctx } = harness()
     const empty = await submitBookLabour(ctx, { startedAt: NOW.getTime() - 10_000 }, "203.0.113.40")
     expect(empty.ok).toBe(false)
     if (empty.ok) return
     expect(empty.error).toBe("Enter the company name.")
 
-    const other = await submitBookLabour(ctx, request({ otherRole: "" }), "203.0.113.40")
-    expect(other.ok).toBe(false)
-    if (other.ok) return
-    expect(other.error).toMatch(/other role/)
+    const missingRoles = await submitBookLabour(ctx, request({ roles: " " }), "203.0.113.40")
+    expect(missingRoles.ok).toBe(false)
+    if (missingRoles.ok) return
+    expect(missingRoles.error).toMatch(/what roles you need/)
 
     const count = await submitBookLabour(ctx, request({ workers: 51 }), "203.0.113.40")
     expect(count.ok).toBe(false)
@@ -109,8 +108,8 @@ describe("book labour", () => {
       "Site email": "alex.stone@example.com",
       "Site address": "12 Harbour Street",
       "Site suburb": "Manly",
-      "Roles requested": ["General labourer", "Other"],
-      "Labour request details": "Other role: Traffic control\nPlease call about the bank of lifts.",
+      "Roles requested": "3 general labourers and 1 trade assistant for demo work",
+      "Labour request details": "Please call about the bank of lifts.",
       "Workers needed": 4,
       Start: "2026-11-12",
       "Open ended": false,
@@ -133,7 +132,7 @@ describe("book labour", () => {
     expect(typed["Workers needed"]).toEqual({ number: 4 })
     expect(typed["Open ended"]).toEqual({ checkbox: false })
     expect(typed["Roles requested"]).toEqual({
-      multi_select: [{ name: "General labourer" }, { name: "Other" }],
+      rich_text: [{ type: "text", text: { content: "3 general labourers and 1 trade assistant for demo work" } }],
     })
 
     const notes = await ctx.store.notifications.all()
@@ -171,8 +170,7 @@ describe("book labour", () => {
       email: "alex.stone@example.com",
       address: "12 Harbour Street",
       suburb: "Manly",
-      roles: ["Site clean"],
-      otherRole: "",
+      roles: "Site clean for two days",
       workers: 2,
       start: "2026-11-12",
       ongoing: true,
@@ -225,8 +223,7 @@ describe("book labour", () => {
         email: "alex.stone@example.com",
         address: "12 Harbour Street",
         suburb: "Manly",
-        roles: ["Site clean"],
-        otherRole: "",
+        roles: "Site clean for two days",
         workers: 2,
         start: "2026-11-12",
         ongoing: true,
