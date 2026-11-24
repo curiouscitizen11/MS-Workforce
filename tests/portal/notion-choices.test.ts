@@ -37,6 +37,14 @@ describe("live Notion choices", () => {
     const props = workerNotionProperties(row)
     expect(props["White card"]).toBe("Yes " + EN + " I have it")
     expect(props["Roles of interest"]).toEqual(["General labourer", "Other " + EN + " please explain"])
+    row.roles = ["Site clean", "Excavator"]
+    row.roleLicence = "HR"
+    row.notes = undefined
+    const kept = workerNotionProperties(row)
+    expect(kept["Roles of interest"]).toEqual(["Excavator"])
+    expect(String(kept.Notes)).toContain("Site clean")
+    expect(String(kept.Notes)).toContain("Licence or ticket held: HR")
+    expect(kept["Licence or ticket held"]).toBeUndefined()
     expect(props["RTW evidence"]).toBe("Other")
     expect(props["Fitness declaration"]).toBe("Yes " + EN + " I can safely do these tasks")
     expect(props["Allergy types"]).toEqual(["Foods (e.g. nuts or shellfish)"])

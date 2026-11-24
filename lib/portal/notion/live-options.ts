@@ -15,12 +15,18 @@ export const LIVE_TICKET_OPTIONS = [
 export const LIVE_ROLES = [
   "General labourer",
   "Trade assistant",
-  "Site clean",
-  "Materials handling",
   "Demolition / strip-out",
-  "Concrete labourer",
-  "Asbestos removal labourer (Class B)",
-  "Landscaping labourer",
+  "Asbestos removal (Class B)",
+  "Excavator",
+  "Skid steer / Bobcat",
+  "Roller",
+  "Loader",
+  "Grader",
+  "Telehandler",
+  "Forklift",
+  "Water cart",
+  "Heavy rigid (HR) truck",
+  "Tipper / truck and dog (HC)",
   "Other " + EN + " please explain",
 ] as const
 

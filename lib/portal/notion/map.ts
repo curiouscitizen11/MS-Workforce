@@ -256,7 +256,8 @@ export function workerNotionProperties(worker: Worker): Record<string, unknown> 
   put(props, "Verified by", worker.verifiedBy)
   put(props, "Verification method", one(worker.verificationMethod, LIVE_VERIFICATION, "Verification method", notes))
   put(props, "Images deleted on", worker.imagesDeletedOn)
-  put(props, "Notes", [worker.notes, ...notes].filter(Boolean).join("\n") || undefined)
+  const licence = worker.roleLicence?.trim()
+  put(props, "Notes", [worker.notes, licence ? "Licence or ticket held: " + licence : "", ...notes].filter(Boolean).join("\n") || undefined)
   assertNotionPayloadSafe(props)
   return props
 }
