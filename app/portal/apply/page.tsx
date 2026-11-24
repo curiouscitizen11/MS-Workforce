@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Join MS Workforce" }
 export default function ApplyPage() {
   return (
     <div className="space-y-4">
-      <Heading kicker="Join" title="Join MS Workforce" text="One short form. No tax, bank or super details." />
+      <Heading kicker="Join" title="Join MS Workforce" text="Takes about 2 minutes." />
       <JoinForm />
     </div>
   )

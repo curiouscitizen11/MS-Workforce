@@ -14,7 +14,7 @@ export default async function JoinPage({ searchParams }: { searchParams: { invit
   const ready = invite?.ok ? invite : null
   return (
     <div className="space-y-4">
-      <Heading kicker="Join" title="Join MS Workforce" text="One short form. No tax, bank or super details." />
+      <Heading kicker="Join" title="Join MS Workforce" text="Takes about 2 minutes." />
       <JoinForm
         initialName={ready?.name || ""}
         initialMobile={ready ? formatAuMobile(ready.mobile) : ""}
