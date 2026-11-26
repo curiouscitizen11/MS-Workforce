@@ -1,8 +1,10 @@
 import { test, expect, type Page } from "@playwright/test"
-import { flowEmail, flowMobile, formAlert, readDemoCode } from "./login"
+import { bookingSlot, flowEmail, flowMobile, formAlert, readDemoCode } from "./login"
 
 async function drawSignature(page: Page, pad: ReturnType<Page["getByLabel"]>) {
-  await pad.evaluate((node) => node.scrollIntoView({ block: "center", inline: "center" }))
+  // The site scrolls smoothly. On iPhone the pad starts under the bottom bar, so wait until it is clear.
+  await pad.evaluate((node) => node.scrollIntoView({ block: "center", inline: "center", behavior: "instant" }))
+  await expect.poll(async () => padIsClear(page, pad)).toBe(true)
   const box = await pad.boundingBox()
   if (!box) throw new Error("signature pad")
   const startX = box.x + 8
@@ -15,9 +17,18 @@ async function drawSignature(page: Page, pad: ReturnType<Page["getByLabel"]>) {
   await page.mouse.up()
 }
 
-test.describe("demo flows", () => {
+async function padIsClear(page: Page, pad: ReturnType<Page["getByLabel"]>) {
+  const box = await pad.boundingBox()
+  if (!box || box.width < 40 || box.height < 40) return false
+  const nav = page.locator(".portal-nav")
+  const navBox = (await nav.count()) ? await nav.boundingBox() : null
+  const bottom = navBox ? navBox.y : box.y + box.height
+  return box.y >= 56 && box.y + 48 <= bottom
+}
+
+test.describe("demo flows", { tag: "@smoke" }, () => {
   test.beforeEach(({}, info) => {
-    test.skip(info.project.name === "desktop", "desktop checks layout; the flows run on iPhone width and Android")
+    test.skip(info.project.name === "desktop", "desktop checks layout; the flows run on phone, Android, Safari and Firefox")
   })
 
   test("join shows a demo code, rejects a wrong code, and accepts the right one", async ({ page }) => {
@@ -58,7 +69,7 @@ test.describe("demo flows", () => {
 
   test("book labour rejects an end date before the start and accepts a typed role", async ({ page }) => {
     await page.goto("/portal/book-labour")
-    const slot = test.info().project.name === "pixel" ? 2 : test.info().project.name === "galaxy" ? 3 : 1
+    const slot = bookingSlot(test.info().project.name)
     await page.getByLabel("Company name").fill("Client " + slot + " Build")
     await page.getByLabel("Your name").fill("Client Contact")
     await page.getByLabel("Phone").fill("0299991111")
@@ -89,7 +100,12 @@ test.describe("demo flows", () => {
 
   test("timesheet confirm, sign, clear and edit hours", async ({ page }) => {
     await page.goto("/portal/timesheet")
-    await page.locator("#work-done").fill("Carried materials")
+    const note = "Carried materials"
+    // iPhone WebKit can finish hydrating after an early fill and put the empty state back.
+    await expect(async () => {
+      await page.locator("#work-done").fill(note)
+      await expect(page.getByText(note.length + "/200")).toBeVisible()
+    }).toPass()
     await page.getByRole("button", { name: "No", exact: true }).click()
     await page.getByRole("button", { name: "Confirm hours" }).click()
     await expect(page.getByTestId("signature-section")).toBeVisible()
