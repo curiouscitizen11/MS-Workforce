@@ -9,6 +9,7 @@ const portalHeaders = [
 
 const nextConfig = {
   experimental: {
+    agentUpgrade: "security",
     serverActions: {
       bodySizeLimit: "12mb",
     },
