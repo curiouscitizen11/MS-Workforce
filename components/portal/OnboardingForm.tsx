@@ -235,7 +235,7 @@ export function OnboardingForm({ worker, photos, today }: { worker: Worker; phot
           <Select label="Casual contract received?" name="contract" defaultValue={worker.contractReceived} options={["Yes", "Not yet"]} />
           <label className="flex min-h-12 items-center gap-3 text-sm font-semibold">
             <input type="checkbox" name="contractAccept" defaultChecked={worker.contractAccepted} />
-            I accept the casual contract if I have received it
+            I have read and accept the casual employment contract
           </label>
           <Text label="Type your full name" name="typedName" value={typedName} onChange={(event) => setTypedName(event.target.value)} />
           <SignaturePad onChange={setSignature} />
