@@ -17,7 +17,8 @@ async function shot(page: import("@playwright/test").Page, folder: string, name:
 
 async function audit(page: import("@playwright/test").Page, label: string, file: string): Promise<Problem[]> {
   const found: Problem[] = []
-  const metrics = await page.evaluate(() => {
+  const measure = () =>
+    page.evaluate(() => {
     const root = document.documentElement
     const small = Array.from(document.querySelectorAll("button, a, input, select, textarea"))
       .filter((node) => {
@@ -49,6 +50,14 @@ async function audit(page: import("@playwright/test").Page, label: string, file:
       small,
     }
   })
+  let metrics
+  try {
+    metrics = await measure()
+  } catch (error) {
+    if (!String(error).includes("context was destroyed")) throw error
+    await page.waitForLoadState("domcontentloaded")
+    metrics = await measure()
+  }
   if (metrics.overflow > 2) {
     found.push({ severity: "medium", page: label, detail: "Page scrolls sideways by " + metrics.overflow + "px.", shot: file })
   }
