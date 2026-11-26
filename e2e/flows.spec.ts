@@ -1,5 +1,19 @@
-import { test, expect } from "@playwright/test"
+import { test, expect, type Page } from "@playwright/test"
 import { flowEmail, flowMobile, formAlert, readDemoCode } from "./login"
+
+async function drawSignature(page: Page, pad: ReturnType<Page["getByLabel"]>) {
+  await pad.evaluate((node) => node.scrollIntoView({ block: "center", inline: "center" }))
+  const box = await pad.boundingBox()
+  if (!box) throw new Error("signature pad")
+  const startX = box.x + 8
+  const startY = box.y + 16
+  const endX = box.x + Math.max(24, Math.min(72, box.width - 8))
+  const endY = box.y + Math.max(28, Math.min(48, box.height - 8))
+  await page.mouse.move(startX, startY)
+  await page.mouse.down()
+  await page.mouse.move(endX, endY, { steps: 12 })
+  await page.mouse.up()
+}
 
 test.describe("demo flows", () => {
   test.beforeEach(({}, info) => {
@@ -81,20 +95,11 @@ test.describe("demo flows", () => {
     await page.locator("#sup-email").fill("msworkforce.ops+client2@mail.grokbot.com")
     await page.getByRole("checkbox", { name: /checked these hours/i }).check()
     const pad = page.getByLabel("Signature")
-    await pad.scrollIntoViewIfNeeded()
-    const box = await pad.boundingBox()
-    if (!box) throw new Error("signature pad")
-    await page.mouse.move(box.x + 30, box.y + 40)
-    await page.mouse.down()
-    await page.mouse.move(box.x + 160, box.y + 90)
-    await page.mouse.up()
+    await drawSignature(page, pad)
     await page.getByRole("button", { name: "Clear" }).click()
     await page.getByRole("button", { name: "Confirm signature" }).click()
     await expect(formAlert(page)).toContainText(/sign/i)
-    await page.mouse.move(box.x + 40, box.y + 50)
-    await page.mouse.down()
-    await page.mouse.move(box.x + 180, box.y + 100)
-    await page.mouse.up()
+    await drawSignature(page, pad)
     await page.getByRole("button", { name: "Confirm signature" }).click()
     await expect(page.getByTestId("signature-locked")).toBeVisible()
     await page.getByRole("button", { name: "Edit hours" }).click()
