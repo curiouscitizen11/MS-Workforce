@@ -1,8 +1,6 @@
 import { parseCalendarDate } from "@/lib/portal/dates"
 import { emailError, emailProblem } from "@/lib/portal/email"
 
-export const BOOK_ROLES = ["General labourer", "Trade assistant", "Site clean", "Materials handling", "Other"] as const
-
 export const HEARD_OPTIONS = [
   "Google",
   "Referral / word of mouth",
@@ -43,8 +41,7 @@ export type BookValue = {
   email: string
   address: string
   suburb: string
-  roles: string[]
-  otherRole: string
+  roles: string
   workers: number
   start: string
   ongoing: boolean
@@ -89,10 +86,8 @@ export function checkBookLabour(
   if (address.length < 5) return { ok: false, error: "Enter the site address." }
   const suburb = text(raw.suburb, 80)
   if (suburb.length < 2) return { ok: false, error: "Enter the suburb." }
-  const roles = Array.isArray(raw.roles) ? raw.roles.filter((role): role is string => typeof role === "string" && (BOOK_ROLES as readonly string[]).includes(role)) : []
-  if (roles.length === 0) return { ok: false, error: "Choose at least one role." }
-  const otherRole = text(raw.otherRole, 200)
-  if (roles.includes("Other") && otherRole.length < 2) return { ok: false, error: "Tell us a bit more about the other role." }
+  const roles = text(raw.roles, 1000)
+  if (roles.length < 2) return { ok: false, error: "Tell us what roles you need." }
   const workers = Number(raw.workers)
   if (!Number.isInteger(workers) || workers < 1 || workers > 50) return { ok: false, error: "Enter how many workers, from 1 to 50." }
   const start = calendarDate(text(raw.start, 32)) || ""
@@ -118,7 +113,6 @@ export function checkBookLabour(
       address,
       suburb,
       roles,
-      otherRole: roles.includes("Other") ? otherRole : "",
       workers,
       start,
       ongoing,
@@ -136,7 +130,7 @@ export function placementRequestTitle(company: string, suburb: string, requestId
 }
 
 export function placementProperties(value: BookValue, requestId?: string): Record<string, unknown> {
-  const details = [value.otherRole ? "Other role: " + value.otherRole : "", value.notes].filter(Boolean).join("\n")
+  const details = value.notes
   const properties: Record<string, unknown> = {
     Placement: requestId ? placementRequestTitle(value.company, value.suburb, requestId) : value.company + " – " + value.suburb,
     Client: value.company,
@@ -166,8 +160,7 @@ export function bookAlertBody(value: BookValue) {
     "Phone: " + value.phone,
     "Email: " + value.email,
     "Site: " + value.address + ", " + value.suburb,
-    "Roles: " + value.roles.join(", "),
-    value.otherRole ? "Other role: " + value.otherRole : "",
+    "Roles: " + value.roles,
     "Workers: " + value.workers,
     "Start: " + value.start,
     "Ongoing: " + (value.ongoing ? "Yes" : "No"),

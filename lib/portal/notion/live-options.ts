@@ -202,14 +202,6 @@ export const LIVE_HEARD = [
   "Other",
 ] as const
 
-export const LIVE_PLACEMENT_ROLES = [
-  "General labourer",
-  "Trade assistant",
-  "Site clean",
-  "Materials handling",
-  "Other",
-] as const
-
 /** Portal wording to the live choice. Field overrides win when the same words map differently. */
 const SHARED: Record<string, string> = {
   "Yes, I have it": "Yes " + EN + " I have it",
