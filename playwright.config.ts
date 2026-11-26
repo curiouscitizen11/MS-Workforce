@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test"
 
 const port = 4173
-const baseURL = "http://127.0.0.1:" + port
+const baseURL = "http://localhost:" + port
 
 export default defineConfig({
   testDir: "e2e",
@@ -51,6 +51,27 @@ export default defineConfig({
       dependencies: ["setup"],
       testIgnore: /auth\.setup\.ts/,
       use: { ...devices["Galaxy S9+"], defaultBrowserType: "chromium", deviceScaleFactor: 1 },
+    },
+    {
+      name: "iphone",
+      dependencies: ["setup"],
+      grep: /@smoke/,
+      testIgnore: /auth\.setup\.ts/,
+      use: { ...devices["iPhone 14"], deviceScaleFactor: 1 },
+    },
+    {
+      name: "safari",
+      dependencies: ["setup"],
+      grep: /@smoke/,
+      testIgnore: /auth\.setup\.ts/,
+      use: { ...devices["Desktop Safari"], viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
+    },
+    {
+      name: "firefox",
+      dependencies: ["setup"],
+      grep: /@smoke/,
+      testIgnore: /auth\.setup\.ts/,
+      use: { ...devices["Desktop Firefox"], viewport: { width: 1440, height: 900 } },
     },
   ],
 })

@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto"
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { PENDING_2FA_MS, isMock, sessionSecret } from "@/lib/portal/config"
 import { getStore } from "@/lib/portal/store"
@@ -26,11 +26,39 @@ export type JoinDraft = {
   exp: number
 }
 
-function cookieOptions(maxAge?: number, expires?: Date) {
+/**
+ * Safari refuses a Secure cookie on plain HTTP, so a local production server
+ * (next start) cannot sign anyone in on WebKit. Vercel sends x-forwarded-proto
+ * https, and any other production host stays Secure.
+ */
+export function cookieIsSecure(input: { forwardedProto?: string | null; host?: string | null; production?: boolean }) {
+  const host = hostname(input.host)
+  if (host === "localhost" || host === "127.0.0.1" || host === "::1") return false
+  const proto = (input.forwardedProto || "").split(",")[0].trim().toLowerCase()
+  if (proto === "https") return true
+  if (proto === "http") return false
+  return input.production ?? process.env.NODE_ENV === "production"
+}
+
+function hostname(host: string | null | undefined) {
+  const raw = (host || "").trim().toLowerCase()
+  if (raw.startsWith("[")) {
+    const end = raw.indexOf("]")
+    return end > 1 ? raw.slice(1, end) : raw
+  }
+  return raw.split(":")[0]
+}
+
+async function cookieOptions(maxAge?: number, expires?: Date) {
+  const incoming = await headers()
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure: cookieIsSecure({
+      forwardedProto: incoming.get("x-forwarded-proto"),
+      host: incoming.get("host"),
+      production: process.env.NODE_ENV === "production",
+    }),
     path: "/",
     ...(maxAge !== undefined ? { maxAge } : {}),
     ...(expires ? { expires } : {}),
@@ -76,12 +104,12 @@ export function sessionCookieValue(session: Session) {
 }
 
 export async function writeSessionCookie(session: Session) {
-  ;(await cookies()).set(COOKIE, sessionCookieValue(session), cookieOptions(undefined, new Date(session.expiresAt)))
+  ;(await cookies()).set(COOKIE, sessionCookieValue(session), await cookieOptions(undefined, new Date(session.expiresAt)))
 }
 
 export async function writeOtpCookie(challenge: OtpChallenge) {
   if (!isMock()) return
-  ;(await cookies()).set(OTP, pack(challenge), cookieOptions(10 * 60))
+  ;(await cookies()).set(OTP, pack(challenge), await cookieOptions(10 * 60))
 }
 
 export async function readOtpCookie() {
@@ -89,7 +117,7 @@ export async function readOtpCookie() {
 }
 
 export async function clearOtpCookie() {
-  ;(await cookies()).set(OTP, "", cookieOptions(0))
+  ;(await cookies()).set(OTP, "", await cookieOptions(0))
 }
 
 export async function clearSessionCookie() {
@@ -97,7 +125,7 @@ export async function clearSessionCookie() {
 }
 
 export async function writeMobileCookie(mobile: string) {
-  ;(await cookies()).set(MOBILE, mobile, cookieOptions(365 * 24 * 60 * 60))
+  ;(await cookies()).set(MOBILE, mobile, await cookieOptions(365 * 24 * 60 * 60))
 }
 
 export async function readMobileCookie() {
@@ -105,7 +133,7 @@ export async function readMobileCookie() {
 }
 
 export async function writeEmailCookie(email: string) {
-  ;(await cookies()).set(EMAIL, email, cookieOptions(365 * 24 * 60 * 60))
+  ;(await cookies()).set(EMAIL, email, await cookieOptions(365 * 24 * 60 * 60))
 }
 
 export async function readEmailCookie() {
@@ -114,7 +142,7 @@ export async function readEmailCookie() {
 
 export async function writeJoinDraft(draft: Omit<JoinDraft, "exp">, nowMs = Date.now()) {
   const value: JoinDraft = { ...draft, exp: nowMs + JOIN_MS }
-  ;(await cookies()).set(JOIN, pack(value), cookieOptions(JOIN_MS / 1000))
+  ;(await cookies()).set(JOIN, pack(value), await cookieOptions(JOIN_MS / 1000))
 }
 
 export async function readJoinDraft(nowMs = Date.now()) {
@@ -124,13 +152,13 @@ export async function readJoinDraft(nowMs = Date.now()) {
 }
 
 export async function clearJoinDraft() {
-  ;(await cookies()).set(JOIN, "", cookieOptions(0))
+  ;(await cookies()).set(JOIN, "", await cookieOptions(0))
 }
 
 export async function writePendingCookie(workerId: string, nowMs: number) {
   const exp = Math.floor(nowMs / 1000) + PENDING_2FA_MS / 1000
   const payload = workerId + "." + exp
-  ;(await cookies()).set(PENDING, payload + "." + sign(payload), cookieOptions(PENDING_2FA_MS / 1000))
+  ;(await cookies()).set(PENDING, payload + "." + sign(payload), await cookieOptions(PENDING_2FA_MS / 1000))
 }
 
 export async function clearPendingCookie() {

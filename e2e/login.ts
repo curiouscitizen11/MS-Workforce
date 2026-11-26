@@ -3,7 +3,16 @@ import { expect, type Page } from "@playwright/test"
 export function flowSlot(project: string) {
   if (project === "pixel") return 2
   if (project === "galaxy") return 3
+  if (project === "iphone") return 4
+  if (project === "safari") return 5
+  if (project === "firefox") return 6
   return 1
+}
+
+/** Five different bookings fit the hourly limit. A sixth repeats the first and still shows the thank-you. */
+export function bookingSlot(project: string) {
+  const slot = flowSlot(project)
+  return slot > 5 ? 1 : slot
 }
 
 export function flowEmail(project: string) {
