@@ -60,7 +60,7 @@ export default async function AdminHomePage() {
       </div>
       <InviteWorker sms={twilioReady()} />
       <p className="text-sm">
-        <Link href="/portal/admin/ready" className="font-semibold text-teal-600 underline">
+        <Link href="/portal/admin/ready" className="inline-flex min-h-11 items-center font-semibold text-teal-600 underline">
           Check the portal is ready
         </Link>
       </p>

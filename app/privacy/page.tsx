@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   ...socialMeta("/privacy", "Privacy Policy | MS Workforce", pageDescription),
 };
 
-const mail = "text-teal-300 underline decoration-teal-300/40 underline-offset-4 break-all";
-const ext = "text-teal-300 underline decoration-teal-300/40 underline-offset-4";
+const mail = "inline-flex min-h-11 items-center text-teal-300 underline decoration-teal-300/40 underline-offset-4 break-all";
+const ext = "inline-flex min-h-11 items-center text-teal-300 underline decoration-teal-300/40 underline-offset-4";
 
 const sections: { title: string; body: React.ReactNode }[] = [
   {

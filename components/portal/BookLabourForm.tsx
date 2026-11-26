@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useRef, useState, useTransition } from "react"
 import { sendBookLabour } from "@/app/portal/actions"
 import { HEARD_OPTIONS } from "@/lib/portal/book-labour"
 import { Field, fieldClass } from "@/components/portal/ui"
@@ -29,6 +29,7 @@ export function BookLabourForm() {
   const [error, setError] = useState("")
   const [sent, setSent] = useState(false)
   const [pending, startSend] = useTransition()
+  const sending = useRef(false)
 
   if (sent) {
     return (
@@ -47,31 +48,37 @@ export function BookLabourForm() {
       noValidate
       onSubmit={(event) => {
         event.preventDefault()
+        if (sending.current) return
+        sending.current = true
         setError("")
         startSend(async () => {
-          const result = await sendBookLabour({
-            company,
-            name,
-            phone,
-            email,
-            address,
-            suburb,
-            roles,
-            workers: Number(workers),
-            start,
-            ongoing,
-            end: ongoing ? "" : end,
-            shift,
-            notes,
-            heard,
-            companyWebsite: website,
-            startedAt,
-          })
-          if (!result.ok) {
-            setError(result.error)
-            return
+          try {
+            const result = await sendBookLabour({
+              company,
+              name,
+              phone,
+              email,
+              address,
+              suburb,
+              roles,
+              workers: Number(workers),
+              start,
+              ongoing,
+              end: ongoing ? "" : end,
+              shift,
+              notes,
+              heard,
+              companyWebsite: website,
+              startedAt,
+            })
+            if (!result.ok) {
+              setError(result.error)
+              return
+            }
+            setSent(true)
+          } finally {
+            sending.current = false
           }
-          setSent(true)
         })
       }}
     >

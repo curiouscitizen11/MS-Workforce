@@ -25,7 +25,7 @@ export default async function LoginPage({ searchParams }: { searchParams: { erro
       <LoginForm mock={isMock()} sms={sms} demos={demos.filter((demo) => demo.email)} initialEmail={await readEmailCookie()} initialMobile={await readMobileCookie()} />
       <p className="text-sm">
         New here?{" "}
-        <a className="font-semibold text-teal-600 underline" href="/portal/apply">
+        <a className="inline-flex min-h-11 items-center font-semibold text-teal-600 underline" href="/portal/apply">
           Apply for work
         </a>
       </p>

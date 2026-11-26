@@ -44,7 +44,7 @@ export default async function ShiftPage({ params }: { params: { id: string } }) 
           {offer.sitePhone ? (
             <>
               {" · "}
-              <a className="font-semibold text-teal-600 underline" href={"tel:" + offer.sitePhone}>
+              <a className="inline-flex min-h-11 items-center font-semibold text-teal-600 underline" href={"tel:" + offer.sitePhone}>
                 {offer.sitePhone}
               </a>
             </>
@@ -75,7 +75,7 @@ function Row({ label, value, href }: { label: string; value: string; href?: stri
       <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-navy/50">{label}</dt>
       <dd>
         {href ? (
-          <a className="font-semibold text-teal-600 underline" href={href}>
+          <a className="inline-flex min-h-11 items-center font-semibold text-teal-600 underline" href={href}>
             {value}
           </a>
         ) : (

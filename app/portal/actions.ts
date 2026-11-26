@@ -91,8 +91,8 @@ async function rememberDemoOtp(target: string) {
   if (!isMock()) return
   if (!target) return
   const latest = (await (await getStore()).challenges.all())
-    .filter((item) => item.target === target)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+    .filter((item) => item.target === target && !item.consumedAt)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))[0]
   if (latest) await writeOtpCookie(latest)
 }
 

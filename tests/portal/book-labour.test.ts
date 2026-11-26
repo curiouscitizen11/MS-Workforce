@@ -83,10 +83,12 @@ describe("book labour", () => {
     expect(fast.error).toMatch(/wait a moment/)
 
     for (let n = 0; n < 5; n += 1) {
-      const sent = await submitBookLabour(ctx, request(), "203.0.113.51")
+      const sent = await submitBookLabour(ctx, request({ notes: "Job " + n }), "203.0.113.51")
       expect(sent.ok).toBe(true)
     }
-    const limited = await submitBookLabour(ctx, request(), "203.0.113.51")
+    const repeat = await submitBookLabour(ctx, request({ notes: "Job 0" }), "203.0.113.51")
+    expect(repeat).toEqual({ ok: true, ignored: true })
+    const limited = await submitBookLabour(ctx, request({ notes: "Job extra" }), "203.0.113.51")
     expect(limited.ok).toBe(false)
     if (limited.ok) return
     expect(limited.error).toMatch(/Too many requests/)

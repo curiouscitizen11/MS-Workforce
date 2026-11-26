@@ -40,5 +40,17 @@ export default defineConfig({
       testIgnore: /auth\.setup\.ts/,
       use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
     },
+    {
+      name: "pixel",
+      dependencies: ["setup"],
+      testIgnore: /auth\.setup\.ts/,
+      use: { ...devices["Pixel 7"], defaultBrowserType: "chromium", deviceScaleFactor: 1 },
+    },
+    {
+      name: "galaxy",
+      dependencies: ["setup"],
+      testIgnore: /auth\.setup\.ts/,
+      use: { ...devices["Galaxy S9+"], defaultBrowserType: "chromium", deviceScaleFactor: 1 },
+    },
   ],
 })

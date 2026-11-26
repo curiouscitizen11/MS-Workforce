@@ -1,4 +1,4 @@
-import { parseCalendarDate } from "@/lib/portal/dates"
+import { parseCalendarDate, sydneyToday } from "@/lib/portal/dates"
 import { emailError, emailProblem } from "@/lib/portal/email"
 
 export const HEARD_OPTIONS = [
@@ -13,6 +13,9 @@ export const HEARD_OPTIONS = [
 export const MIN_FILL_MS = 3000
 export const BOOK_IP_MAX = 5
 export const BOOK_IP_WINDOW_MS = 60 * 60 * 1000
+export const BOOK_REPEAT_MS = 2 * 60 * 1000
+export const COMPANY_MAX = 120
+export const ROLES_MAX = 1000
 
 export const PLACEMENT_PROPERTIES = [
   "Placement",
@@ -73,7 +76,10 @@ export function checkBookLabour(
   const raw = input && typeof input === "object" ? (input as Record<string, unknown>) : {}
   const honeypot = typeof raw.companyWebsite === "string" ? raw.companyWebsite.trim() : ""
   if (honeypot) return { ok: true, ignored: true }
-  const company = text(raw.company, 120)
+  if (trimmed(raw.company).length > COMPANY_MAX) {
+    return { ok: false, error: "The company name is too long. Keep it under 120 characters." }
+  }
+  const company = text(raw.company, COMPANY_MAX)
   if (company.length < 2) return { ok: false, error: "Enter the company name." }
   const name = text(raw.name, 80)
   if (name.length < 2) return { ok: false, error: "Enter your name." }
@@ -86,12 +92,16 @@ export function checkBookLabour(
   if (address.length < 5) return { ok: false, error: "Enter the site address." }
   const suburb = text(raw.suburb, 80)
   if (suburb.length < 2) return { ok: false, error: "Enter the suburb." }
-  const roles = text(raw.roles, 1000)
+  if (trimmed(raw.roles).length > ROLES_MAX) {
+    return { ok: false, error: "That roles note is too long. Keep it under 1,000 characters." }
+  }
+  const roles = text(raw.roles, ROLES_MAX)
   if (roles.length < 2) return { ok: false, error: "Tell us what roles you need." }
   const workers = Number(raw.workers)
   if (!Number.isInteger(workers) || workers < 1 || workers > 50) return { ok: false, error: "Enter how many workers, from 1 to 50." }
   const start = calendarDate(text(raw.start, 32)) || ""
   if (!start) return { ok: false, error: "Choose a start date." }
+  if (start < sydneyToday(new Date(nowMs))) return { ok: false, error: "Choose a start date that is today or later." }
   const ongoing = raw.ongoing === true
   const end = ongoing ? "" : calendarDate(text(raw.end, 32)) || ""
   if (!ongoing && !end) return { ok: false, error: "Choose an end date, or tick ongoing." }
@@ -173,6 +183,25 @@ export function bookAlertBody(value: BookValue) {
     .join("\n")
 }
 
+export function sameBookedRequest(properties: Record<string, unknown>, value: BookValue) {
+  return (
+    properties.Client === value.company &&
+    properties["Site email"] === value.email &&
+    properties["Site suburb"] === value.suburb &&
+    properties["Roles requested"] === value.roles &&
+    properties["Workers needed"] === value.workers &&
+    properties.Start === value.start &&
+    properties["Open ended"] === value.ongoing &&
+    (properties.End || "") === (value.end || "") &&
+    properties.Shift === value.shift &&
+    (properties["Labour request details"] || "") === (value.notes || "")
+  )
+}
+
+function trimmed(value: unknown) {
+  return typeof value === "string" ? value.trim() : ""
+}
+
 function text(value: unknown, max: number) {
-  return typeof value === "string" ? value.trim().slice(0, max) : ""
+  return trimmed(value).slice(0, max)
 }

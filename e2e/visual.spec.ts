@@ -15,40 +15,52 @@ async function shot(page: import("@playwright/test").Page, folder: string, name:
   return file
 }
 
+async function readMetrics(page: import("@playwright/test").Page) {
+  try {
+    return await page.evaluate(collectMetrics)
+  } catch (error) {
+    if (!String(error).includes("context was destroyed")) throw error
+    await page.waitForLoadState("domcontentloaded")
+    return page.evaluate(collectMetrics)
+  }
+}
+
+function collectMetrics() {
+  const root = document.documentElement
+  const small = Array.from(document.querySelectorAll("button, a, input, select, textarea"))
+    .filter((node) => {
+      const box = node.getBoundingClientRect()
+      if (box.width < 2 || box.height < 2) return false
+      if (box.right < 0 || box.bottom < 0 || box.left > window.innerWidth + 4) return false
+      const style = getComputedStyle(node)
+      if (style.visibility === "hidden" || style.display === "none") return false
+      const type = (node.getAttribute("type") || "").toLowerCase()
+      if (type === "checkbox" || type === "radio" || type === "hidden" || node.classList.contains("sr-only")) {
+        const label = node.closest("label")
+        const hit = label ? label.getBoundingClientRect() : box
+        return hit.width < 44 || hit.height < 44
+      }
+      return box.width < 44 || box.height < 44
+    })
+    .slice(0, 8)
+    .map((node) => {
+      const box = node.getBoundingClientRect()
+      const name = node.id ? "#" + node.id : node.getAttribute("aria-label") || node.textContent || node.tagName
+      return name.trim().replace(/\s+/g, " ").slice(0, 40) + " " + Math.round(box.width) + "x" + Math.round(box.height)
+    })
+  const header = document.querySelector("header")
+  const headerStyle = header ? getComputedStyle(header).position : ""
+  return {
+    overflow: root.scrollWidth - root.clientWidth,
+    font: getComputedStyle(document.body).fontFamily,
+    header: headerStyle,
+    small,
+  }
+}
+
 async function audit(page: import("@playwright/test").Page, label: string, file: string): Promise<Problem[]> {
   const found: Problem[] = []
-  const metrics = await page.evaluate(() => {
-    const root = document.documentElement
-    const small = Array.from(document.querySelectorAll("button, a, input, select, textarea"))
-      .filter((node) => {
-        const box = node.getBoundingClientRect()
-        if (box.width < 2 || box.height < 2) return false
-        if (box.right < 0 || box.bottom < 0 || box.left > window.innerWidth + 4) return false
-        const style = getComputedStyle(node)
-        if (style.visibility === "hidden" || style.display === "none") return false
-        const type = (node.getAttribute("type") || "").toLowerCase()
-        if (type === "checkbox" || type === "radio" || type === "hidden" || node.classList.contains("sr-only")) {
-          const label = node.closest("label")
-          const hit = label ? label.getBoundingClientRect() : box
-          return hit.width < 44 || hit.height < 44
-        }
-        return box.width < 44 || box.height < 44
-      })
-      .slice(0, 8)
-      .map((node) => {
-        const box = node.getBoundingClientRect()
-        const name = node.id ? "#" + node.id : node.getAttribute("aria-label") || node.textContent || node.tagName
-        return name.trim().replace(/\s+/g, " ").slice(0, 40) + " " + Math.round(box.width) + "x" + Math.round(box.height)
-      })
-    const header = document.querySelector("header")
-    const headerStyle = header ? getComputedStyle(header).position : ""
-    return {
-      overflow: root.scrollWidth - root.clientWidth,
-      font: getComputedStyle(document.body).fontFamily,
-      header: headerStyle,
-      small,
-    }
-  })
+  const metrics = await readMetrics(page)
   if (metrics.overflow > 2) {
     found.push({ severity: "medium", page: label, detail: "Page scrolls sideways by " + metrics.overflow + "px.", shot: file })
   }

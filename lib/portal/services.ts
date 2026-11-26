@@ -50,7 +50,7 @@ import { MS_PHONE, olderThanDays, payWeek, timesheetIsSigned, timesheetReminder,
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
 import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
-import { BOOK_IP_MAX, BOOK_IP_WINDOW_MS, bookAlertBody, checkBookLabour, placementProperties } from "@/lib/portal/book-labour"
+import { BOOK_IP_MAX, BOOK_IP_WINDOW_MS, BOOK_REPEAT_MS, bookAlertBody, checkBookLabour, placementProperties, sameBookedRequest } from "@/lib/portal/book-labour"
 import { assertNotionPayloadSafe, offerNotionProperties, preferPayWeekProperty, timesheetNotionProperties, toNotionProperties, workerNotionProperties, writeNotionProperties } from "@/lib/portal/notion/map"
 import { toE164 } from "@/lib/portal/phone"
 import { SENSITIVE_MESSAGE, sensitiveMessage } from "@/lib/portal/privacy"
@@ -184,6 +184,10 @@ async function issueOtp(
   if (recent.length >= OTP_MAX_SENDS) return fail("Wait a few minutes before asking for another code.", "rate")
   const ipCount = challenges.filter((item) => item.ip === ip && within(item.createdAt, ctx.now, OTP_IP_WINDOW_MS)).length
   if (ipCount >= OTP_IP_MAX) return fail("Too many codes from this connection. Try again later.", "rate")
+  for (const older of challenges.filter((item) => item.target === target && !item.consumedAt)) {
+    older.consumedAt = ctx.now.toISOString()
+    await ctx.store.challenges.save(older)
+  }
   const code = String(randomInt(0, 1000000)).padStart(6, "0")
   await ctx.store.challenges.save({
     id: newId("otp"),
@@ -211,7 +215,7 @@ async function findWorkersByEmail(ctx: Ctx, email: string) {
 async function consumeOtp(ctx: Ctx, mobile: string, code: string) {
   const challenges = (await ctx.store.challenges.all())
     .filter((item) => item.target === mobile && !item.consumedAt)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
   const latest = challenges[0]
   if (!latest) return fail("Request a code first.")
   if (latest.lockedUntil && Date.parse(latest.lockedUntil) > ctx.now.getTime()) {
@@ -2034,6 +2038,11 @@ export async function submitBookLabour(ctx: Ctx, input: unknown, ip: string) {
   const recent = (await ctx.store.outbox.all()).filter(
     (item) => item.kind === "placements" && item.payload.ip === ip && within(item.createdAt, ctx.now, BOOK_IP_WINDOW_MS),
   )
+  const repeat = recent.find((item) => {
+    const payload = item.payload as { properties?: Record<string, unknown> }
+    return within(item.createdAt, ctx.now, BOOK_REPEAT_MS) && payload.properties && sameBookedRequest(payload.properties, checked.value)
+  })
+  if (repeat) return { ok: true as const, ignored: true as const }
   if (recent.length >= BOOK_IP_MAX) return fail("Too many requests from this connection. Try again later.", "rate")
   const properties = placementProperties(checked.value, newId("lr"))
   try {

@@ -1,5 +1,19 @@
 import { expect, type Page } from "@playwright/test"
 
+export function flowSlot(project: string) {
+  if (project === "pixel") return 2
+  if (project === "galaxy") return 3
+  return 1
+}
+
+export function flowEmail(project: string) {
+  return "msworkforce.ops+worker" + flowSlot(project) + "@mail.grokbot.com"
+}
+
+export function flowMobile(project: string) {
+  return "0499 200 00" + flowSlot(project)
+}
+
 export function formAlert(page: Page) {
   return page.locator("p[role='alert']")
 }

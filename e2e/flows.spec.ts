@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test"
-import { formAlert, loginWithDemo, readDemoCode } from "./login"
+import { flowEmail, flowMobile, formAlert, readDemoCode } from "./login"
 
 test.describe("demo flows", () => {
   test.beforeEach(({}, info) => {
-    test.skip(info.project.name !== "phone", "one width is enough for the flow")
+    test.skip(info.project.name === "desktop", "desktop checks layout; the flows run on iPhone width and Android")
   })
 
   test("join shows a demo code, rejects a wrong code, and accepts the right one", async ({ page }) => {
@@ -11,9 +11,10 @@ test.describe("demo flows", () => {
     await expect(page.getByRole("heading", { name: "Join MS Workforce" })).toBeVisible()
     await expect(page.getByText("Takes about 2 minutes.")).toBeVisible()
     await page.getByLabel("Full name").fill("Ava Nguyen")
-    await page.getByLabel("Mobile").fill("0499 200 001")
-    await page.getByLabel("Email", { exact: true }).fill("msworkforce.ops+worker1@mail.grokbot.com")
-    await page.getByLabel("Confirm email").fill("msworkforce.ops+worker1@mail.grokbot.com")
+    const email = flowEmail(test.info().project.name)
+    await page.getByLabel("Mobile").fill(flowMobile(test.info().project.name))
+    await page.getByLabel("Email", { exact: true }).fill(email)
+    await page.getByLabel("Confirm email").fill(email)
     await page.getByLabel("Suburb").fill("Manly")
     await page.getByLabel("Postcode").fill("2095")
     await page.getByRole("button", { name: "General labourer" }).click()
@@ -31,9 +32,10 @@ test.describe("demo flows", () => {
 
   test("login rejects a wrong code and accepts the demo code", async ({ page }) => {
     await page.goto("/portal/login")
-    await page.getByRole("button", { name: /Sam Lee/ }).click()
+    await page.getByLabel("Email").fill(flowEmail(test.info().project.name))
     await page.getByRole("button", { name: "Send code" }).click()
     const code = await readDemoCode(page)
+    await expect(page.getByRole("button", { name: /Send again/ })).toBeVisible()
     await page.locator("#code").fill("000000")
     await expect(formAlert(page)).toContainText(/not right/i)
     await page.locator("#code").fill(code)
@@ -42,18 +44,23 @@ test.describe("demo flows", () => {
 
   test("book labour rejects an end date before the start and accepts a typed role", async ({ page }) => {
     await page.goto("/portal/book-labour")
-    await page.getByLabel("Company name").fill("Client One Build")
+    const slot = test.info().project.name === "pixel" ? 2 : test.info().project.name === "galaxy" ? 3 : 1
+    await page.getByLabel("Company name").fill("Client " + slot + " Build")
     await page.getByLabel("Your name").fill("Client Contact")
     await page.getByLabel("Phone").fill("0299991111")
-    await page.getByLabel("Email").fill("msworkforce.ops+client1@mail.grokbot.com")
+    await page.getByLabel("Email").fill("msworkforce.ops+client" + slot + "@mail.grokbot.com")
     await page.getByLabel("Site address").fill("12 Harbour Street")
     await page.getByLabel("Suburb").fill("Manly")
     await page.locator("#roles").fill("2 general labourers for a strip-out")
     await page.getByLabel("How many workers?").fill("2")
-    await page.locator("#start-date").fill("2026-12-10")
-    await page.locator("#end-date").fill("2026-12-01")
+    await page.locator("#start-date").fill("2020-01-01")
+    await page.locator("#end-date").fill("2020-01-02")
     await page.getByLabel("Shift and start time").fill("Day shift, 7:00 am")
     await page.waitForTimeout(3200)
+    await page.getByRole("button", { name: "Send request" }).click()
+    await expect(formAlert(page)).toContainText(/today or later/i)
+    await page.locator("#start-date").fill("2026-12-10")
+    await page.locator("#end-date").fill("2026-12-01")
     await page.getByRole("button", { name: "Send request" }).click()
     await expect(formAlert(page)).toContainText(/end date/i)
     await page.locator("#end-date").fill("2026-12-12")
@@ -126,9 +133,11 @@ test.describe("demo flows", () => {
   })
   })
 
+  test.describe("admin code", () => {
+    test.use({ storageState: "e2e/.auth/admin-pending.json" })
+
   test("admin login rejects a bad authenticator code", async ({ page }) => {
-    await loginWithDemo(page, /Marek/)
-    await page.waitForURL("**/portal/login/admin")
+    await page.goto("/portal/login/admin")
     await page.locator("#admin-code").fill("000000")
     await page.getByRole("button", { name: "Continue" }).click()
     await expect(formAlert(page)).toContainText(/not right/i)
@@ -136,12 +145,13 @@ test.describe("demo flows", () => {
     await page.getByRole("button", { name: "Continue" }).click()
     await page.waitForURL("**/portal/admin")
   })
+  })
 
   test("blank required fields stay on the form", async ({ page }) => {
     await page.goto("/portal/join")
     const name = page.getByLabel("Full name")
     await page.getByRole("button", { name: "Send code" }).click()
     await expect(name).toBeVisible()
-    expect(await name.evaluate((el: HTMLInputElement) => el.validity.valueMissing)).toBe(true)
+    await expect(formAlert(page)).toContainText(/Check the form and try again/)
   })
 })
