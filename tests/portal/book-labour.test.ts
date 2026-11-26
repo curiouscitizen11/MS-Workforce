@@ -159,7 +159,7 @@ describe("book labour", () => {
       expect(text).not.toContain(word)
     }
     expect(text).toContain("hello@msworkforce.au")
-    expect(text).toContain("reply_sla")
+    expect(text).toContain("replies within one business hour, mon–fri, 6am–5pm.")
     expect(text).not.toContain("same business day")
   })
 
