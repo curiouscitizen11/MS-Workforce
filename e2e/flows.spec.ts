@@ -79,8 +79,9 @@ test.describe("demo flows", () => {
     await expect(formAlert(page)).toContainText(/end date/i)
     await page.locator("#end-date").fill("2026-12-12")
     await page.getByRole("button", { name: "Send request" }).click()
-    await expect(page.getByText(/we've got your request/i)).toBeVisible()
-    await expect(page.getByText("Replies within one business hour, Mon–Fri, 6am–5pm.")).toBeVisible()
+    const thanks = page.getByText(/we've got your request/i)
+    await expect(thanks).toBeVisible()
+    await expect(thanks).toContainText("Replies within one business hour, Mon–Fri, 6am–5pm.")
   })
 
   test.describe("signed in as Sam", () => {
