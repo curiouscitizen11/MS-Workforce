@@ -133,7 +133,7 @@ export default async function OffersPage({ searchParams }: { searchParams: { mon
               const shiftHref = (entry.offer.status === "Accepted" ? "/portal/shifts/" : "/portal/offers/") + entry.offer.id
               return (
                 <li key={entry.offer.id} className="text-sm">
-                  <Link href={shiftHref} className="font-semibold">
+                  <Link href={shiftHref} className="inline-flex min-h-11 items-center font-semibold">
                     {entry.offer.roleName}
                   </Link>
                   <p className="mt-1">{formatTime(entry.offer.startTime)}</p>
@@ -142,13 +142,13 @@ export default async function OffersPage({ searchParams }: { searchParams: { mon
                   {entry.sheet ? (
                     <p className="mt-1">
                       {entry.sheet.status} · {formatHours(entry.sheet.totalHours)} h ·{" "}
-                      <Link href={"/portal/timesheet/" + entry.sheet.id} className="font-semibold text-teal-600 underline">
+                      <Link href={"/portal/timesheet/" + entry.sheet.id} className="inline-flex min-h-11 items-center font-semibold text-teal-600 underline">
                         Open timesheet
                       </Link>
                     </p>
                   ) : entry.offer.status === "Accepted" ? (
                     <p className="mt-1">
-                      <Link href="/portal/timesheet" className="font-semibold text-teal-600 underline">
+                      <Link href="/portal/timesheet" className="inline-flex min-h-11 items-center font-semibold text-teal-600 underline">
                         Log hours
                       </Link>
                     </p>

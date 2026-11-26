@@ -28,7 +28,7 @@ export default async function TicketsPage() {
         otherDetails={worker.licenceChecks || {}}
         photos={photos}
       />
-      <Link href="/candidates" className="text-sm font-semibold text-teal-600 underline">
+      <Link href="/candidates" className="inline-flex min-h-11 items-center text-sm font-semibold text-teal-600 underline">
         Training providers
       </Link>
     </div>

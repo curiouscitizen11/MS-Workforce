@@ -60,7 +60,7 @@ export function SignaturePad({ onChange }: { onChange: (value: string | null) =>
       />
       <button
         type="button"
-        className="mt-2 min-h-12 text-sm font-semibold text-teal-600"
+        className="mt-2 inline-flex min-h-12 min-w-11 items-center justify-center px-3 text-sm font-semibold text-teal-600"
         onClick={() => {
           const canvas = ref.current
           const context = canvas?.getContext("2d")

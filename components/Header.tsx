@@ -124,7 +124,7 @@ export default function Header({ applyHref, bookHref }: { applyHref: string; boo
                 href={item.href}
                 current={current}
                 className={
-                  "border-b-2 pb-0.5 text-[13px] font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
+                  "inline-flex min-h-11 min-w-11 items-center justify-center border-b-2 text-[13px] font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal " +
                   (current
                     ? "border-teal text-white"
                     : "border-transparent text-white/70 hover:text-white")
@@ -136,7 +136,7 @@ export default function Header({ applyHref, bookHref }: { applyHref: string; boo
           })}
           <NavItem
             href={applyHref}
-            className="border-b-2 border-transparent pb-0.5 text-[13px] font-medium text-white/70 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center border-b-2 border-transparent text-[13px] font-medium text-white/70 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal"
           >
             Apply for work
           </NavItem>

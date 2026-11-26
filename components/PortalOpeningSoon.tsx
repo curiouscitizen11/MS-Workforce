@@ -19,7 +19,7 @@ export default function PortalOpeningSoon() {
         </p>
         <p className="copy mt-4">
           Looking for work? Email{" "}
-          <a href={JOBS_EMAIL_HREF} className="text-teal-300 underline decoration-teal-300/40 underline-offset-4">
+          <a href={JOBS_EMAIL_HREF} className="inline-flex min-h-11 items-center text-teal-300 underline decoration-teal-300/40 underline-offset-4">
             {JOBS_EMAIL}
           </a>
           .

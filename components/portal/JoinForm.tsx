@@ -67,6 +67,7 @@ export function JoinForm({
   return (
     <form
       className="space-y-4"
+      noValidate
       onSubmit={(event) => {
         event.preventDefault()
         setError("")

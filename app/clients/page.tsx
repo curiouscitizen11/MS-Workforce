@@ -69,14 +69,14 @@ export default function ClientsPage() {
           </div>
           <p className="mt-6 text-small text-body">
             See our full range of roles and booking options on the{" "}
-            <Link href="/services" className="text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white">
+            <Link href="/services" className="inline-flex min-h-11 items-center text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white">
               Services page
             </Link>
             .
           </p>
           <p className="mt-2 text-small text-body">
             Prefer email? Write to{" "}
-            <a href={EMAIL_HREF} className="text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white">
+            <a href={EMAIL_HREF} className="inline-flex min-h-11 items-center text-teal-300 underline decoration-teal-300/40 underline-offset-4 hover:text-white">
               {EMAIL}
             </a>
             .

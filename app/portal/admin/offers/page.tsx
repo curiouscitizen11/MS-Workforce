@@ -27,7 +27,7 @@ export default async function AdminOffersPage() {
       <ul className="space-y-2">
         {offers.map((offer) => (
           <li key={offer.id} className="flex items-center justify-between gap-2 rounded-2xl bg-white px-3 py-2 text-sm">
-            <Link href={"/portal/offers/" + offer.id}>
+            <Link href={"/portal/offers/" + offer.id} className="flex min-h-12 flex-1 flex-col justify-center">
               <span className="font-semibold">{names.get(offer.workerId)}</span>
               <span className="block text-navy/70">
                 {offer.suburb} · {formatDate(offer.shiftDate)}

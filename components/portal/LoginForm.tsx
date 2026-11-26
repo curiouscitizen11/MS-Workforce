@@ -35,6 +35,13 @@ export function LoginForm({
   const [pending, start] = useTransition()
   const tried = useRef("")
   const busy = useRef(false)
+  const [wait, setWait] = useState(0)
+
+  useEffect(() => {
+    if (wait <= 0) return
+    const timer = window.setTimeout(() => setWait((value) => value - 1), 1000)
+    return () => window.clearTimeout(timer)
+  }, [wait])
 
   function submitCode(nextCode: string) {
     if (busy.current || !/^\d{6}$/.test(nextCode)) return
@@ -97,6 +104,7 @@ export function LoginForm({
             setDevCode(result.devCode || "")
             setCode("")
             tried.current = ""
+            setWait(30)
             setStep("code")
             return
           }
@@ -114,6 +122,7 @@ export function LoginForm({
           setDevCode(result.devCode || "")
           setCode("")
           tried.current = ""
+          setWait(30)
           setStep("code")
         })
       }}
@@ -201,6 +210,29 @@ export function LoginForm({
       <button className="pill pill-teal w-full" type="submit" disabled={pending}>
         {pending ? "Please wait" : step === "code" ? "Log in" : step === "link" ? "Email me a link" : "Send code"}
       </button>
+      {step === "code" ? (
+        <button
+          type="button"
+          className="pill pill-line w-full"
+          disabled={pending || wait > 0}
+          onClick={() => {
+            setError("")
+            start(async () => {
+              const result = channel === "sms" ? await sendLoginCode(mobile) : await sendEmailLoginCode(email.trim())
+              if (!result.ok) {
+                setError(result.error)
+                return
+              }
+              setDevCode(result.devCode || "")
+              setCode("")
+              tried.current = ""
+              setWait(30)
+            })
+          }}
+        >
+          {wait > 0 ? "Send again in " + wait + "s" : "Send again"}
+        </button>
+      ) : null}
       {step === "email" ? (
         <button type="button" className="min-h-12 w-full text-sm font-semibold text-teal-600" onClick={() => setStep("link")}>
           Email me a link instead

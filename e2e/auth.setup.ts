@@ -16,6 +16,7 @@ test("sign in as the demo admin once", async ({ page }) => {
   mkdirSync(dir, { recursive: true })
   await loginWithDemo(page, /Marek/)
   await page.waitForURL("**/portal/login/admin")
+  await page.context().storageState({ path: path.join(dir, "admin-pending.json") })
   const shots = process.env.E2E_ARTIFACTS
   if (shots) {
     const folder = path.join(shots, "admin-code")

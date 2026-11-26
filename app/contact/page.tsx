@@ -47,11 +47,11 @@ export default function ContactPage() {
           <p className="lede mt-5 text-body">
             Builders, site managers and trades: email the brief and you will get
             a personal reply. Looking for work? Email{" "}
-            <a href={JOBS_EMAIL_HREF} className="text-white underline decoration-white/30 underline-offset-4">
+            <a href={JOBS_EMAIL_HREF} className="inline-flex min-h-11 max-w-full items-center break-all text-white underline decoration-white/30 underline-offset-4">
               {JOBS_EMAIL}
             </a>{" "}
             or head to the{" "}
-            <Link href="/candidates" className="text-white underline decoration-white/30 underline-offset-4">
+            <Link href="/candidates" className="inline-flex min-h-11 items-center text-white underline decoration-white/30 underline-offset-4">
               workers page
             </Link>
             .
@@ -106,7 +106,7 @@ export default function ContactPage() {
                 <dt className="kicker text-teal">{item.label}</dt>
                 <dd className="card-title mt-1 break-words">
                   {item.href ? (
-                    <a href={item.href} className="inline-flex min-h-11 items-center text-teal-300">
+                    <a href={item.href} className="inline-flex min-h-11 min-w-0 max-w-full items-center break-all text-teal-300">
                       {item.value}
                     </a>
                   ) : (
