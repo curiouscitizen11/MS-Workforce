@@ -25,6 +25,12 @@ pnpm-debug.log*
 # portal mock store
 .data/
 
+# end-to-end output
+/e2e/output/
+/e2e/.auth/
+/playwright-report/
+/test-results/
+
 # vercel / tooling
 .vercel
 *.tsbuildinfo
