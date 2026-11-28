@@ -1,11 +1,9 @@
 /**
- * WHS induction v1.0.
- * Topics and the pass rule match the live quiz: all 3 critical questions
+ * WHS induction v1.1.
+ * Topics and the pass rule are unchanged: all 3 critical questions
  * (1, 2 and 4) correct, and at least 7 of 8 overall.
- * The live answer wording was not in the website repo, so confirm the
- * option text against the current induction form before go-live.
  */
-export const INDUCTION_VERSION = "v1.0"
+export const INDUCTION_VERSION = "v1.1"
 
 export type QuizQuestion = {
   id: string
@@ -68,12 +66,12 @@ export const QUESTIONS: QuizQuestion[] = [
     id: "q5",
     critical: false,
     correctIndex: 2,
-    prompt: "What do you bring to every site unless you are told otherwise?",
+    prompt: "What is the PPE rule for boots, hi-vis and anything else the site needs?",
     options: [
       "Just a hi-vis shirt",
-      "Whatever is in the ute",
-      "Hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses",
-      "Boots only. The builder supplies the rest",
+      "The site charges me for any PPE I am missing",
+      "I bring my own boots and hi-vis. They are checked at induction. MS Workforce supplies any missing or site-specific PPE free.",
+      "I buy any extra PPE myself",
     ],
   },
   {
@@ -95,7 +93,7 @@ export const QUESTIONS: QuizQuestion[] = [
     prompt: "You are running late or cannot make it to site. What do you do?",
     options: [
       "Turn up when I can. No need to call",
-      "Call the site contact and MS Workforce as soon as I know",
+      "Contact MS Workforce and the site supervisor before start time",
       "Message a workmate only",
       "Wait until the morning of the shift",
     ],

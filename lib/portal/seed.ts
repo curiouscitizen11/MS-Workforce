@@ -6,7 +6,7 @@ import { blankTickets, type Offer, type PortalDocument, type StoredBlob, type Ti
 export const SEED_VERSION = 5
 
 export const WHAT_TO_BRING =
-  "You must bring a hard hat, steel cap boots, long pants, hi-vis clothing and safety glasses."
+  "Bring your own boots and hi-vis. They are checked at induction. MS Workforce supplies any missing or site-specific PPE free."
 
 export const DEMO_SIGNATURE =
   "data:image/svg+xml," +
