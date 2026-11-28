@@ -32,9 +32,10 @@ test.describe("cross-browser signed-in pages", { tag: "@smoke" }, () => {
 
   test("signature pad and timesheet stay on the screen", async ({ page }, info) => {
     await page.goto("/portal/onboarding", { waitUntil: "domcontentloaded" })
-    const clear = page.getByRole("button", { name: "Clear" })
+    const pad = page.getByRole("main").getByLabel("Signature")
+    const clear = page.getByRole("main").getByRole("button", { name: "Clear" })
     await clear.scrollIntoViewIfNeeded()
-    await expect(page.getByLabel("Signature")).toBeVisible()
+    await expect(pad).toBeVisible()
     await expectPageFits(page)
     await saveShot(page, info.project.name, "signature")
 
