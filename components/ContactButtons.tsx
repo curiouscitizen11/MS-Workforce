@@ -1,14 +1,14 @@
-import { PHONE, WHATSAPP } from "@/data/contact";
+import { WHATSAPP } from "@/data/contact";
+import { businessPhone, CONTACT_LINE, JOBS_MAILTO, telHref } from "@/lib/portal/business-phone";
 
 function digits(value: string) {
   return value.replace(/[^\d+]/g, "");
 }
 
-// Renders nothing until a number is set in data/contact.ts.
+// Call stays hidden until BUSINESS_PHONE is set. The jobs email is shown instead.
 export default function ContactButtons({ className = "" }: { className?: string }) {
-  const phone = PHONE.trim();
+  const phone = businessPhone();
   const whatsapp = WHATSAPP.trim();
-  if (!phone && !whatsapp) return null;
 
   // WhatsApp links want digits only, with the country code and no leading + or 0.
   const waNumber = digits(whatsapp).replace(/^\+/, "").replace(/^0/, "61");
@@ -16,10 +16,14 @@ export default function ContactButtons({ className = "" }: { className?: string 
   return (
     <div className={"flex flex-col gap-3 sm:flex-row " + className}>
       {phone ? (
-        <a href={"tel:" + digits(phone)} className="pill pill-line w-full sm:w-auto">
+        <a href={telHref(phone)} className="pill pill-line w-full sm:w-auto">
           Call {phone}
         </a>
-      ) : null}
+      ) : (
+        <a href={JOBS_MAILTO} className="inline-flex min-h-12 max-w-full items-center text-base font-semibold text-teal-300 underline underline-offset-4 [overflow-wrap:anywhere]">
+          {CONTACT_LINE}
+        </a>
+      )}
       {whatsapp ? (
         <a
           href={"https://wa.me/" + waNumber}

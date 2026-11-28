@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { WaitingForApproval } from "@/components/portal/Waiting"
 import { Heading, StatusChip } from "@/components/portal/ui"
 import { formatDate, formatTime } from "@/lib/portal/dates"
-import { adminMobile } from "@/lib/portal/config"
+import { RunningLate } from "@/components/portal/ContactLine"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import { notFound } from "next/navigation"
@@ -59,9 +59,7 @@ export default async function ShiftPage({ params }: { params: { id: string } }) 
         {offer.parking ? <Row label="Parking" value={offer.parking} /> : null}
         {offer.bring ? <Row label="Bring" value={offer.bring} /> : null}
       </dl>
-      <a className="pill pill-line-dark w-full" href={"tel:" + adminMobile()}>
-        Running late — call MS Workforce
-      </a>
+      <RunningLate />
       <Link href="/portal/timesheet" className="pill pill-teal w-full">
         Log hours
       </Link>

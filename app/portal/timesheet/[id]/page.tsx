@@ -7,7 +7,8 @@ import { formatDate, formatLongDate } from "@/lib/portal/dates"
 import { formatBreak, formatHours } from "@/lib/portal/hours"
 import { workerCanEditTimesheet } from "@/lib/portal/timesheet-lock"
 import { workDoneText } from "@/lib/portal/work-done"
-import { MS_PHONE, cutoffMessage } from "@/lib/portal/pay"
+import { cutoffMessage } from "@/lib/portal/pay"
+import { ContactLine } from "@/components/portal/ContactLine"
 import { requireUser } from "@/lib/portal/session"
 import { getStore } from "@/lib/portal/store"
 import Link from "next/link"
@@ -100,7 +101,7 @@ export default async function SignedTimesheetPage({ params }: { params: { id: st
       {worker.role !== "admin" && !workerCanEditTimesheet(sheet.status) ? (
         <p className="text-sm font-semibold">Approved for pay. These hours are locked.</p>
       ) : null}
-      <p className="text-sm leading-relaxed">Something wrong? Call MS Workforce on {MS_PHONE}.</p>
+      <ContactLine lead="Something wrong?" />
       <Link href="/portal" className="pill pill-teal w-full">
         Back to home
       </Link>
