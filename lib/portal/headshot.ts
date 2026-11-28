@@ -3,7 +3,7 @@ import { contentTypeFor, sniffFile, stripJpegExif, stripPngMetadata } from "@/li
 import { newId } from "@/lib/portal/id"
 import type { Ctx } from "@/lib/portal/services"
 import type { PortalDocument } from "@/lib/portal/types"
-import { MS_PHONE } from "@/lib/portal/pay"
+import { contactAsk } from "@/lib/portal/business-phone"
 
 export const HEADSHOT_GUIDANCE =
   "A clear photo of your face, looking at the camera. No sunglasses, hat or hard hat. Plain background if you can."
@@ -102,7 +102,7 @@ export async function saveHeadshot(ctx: Ctx, workerId: string, input: { bytes: B
   try {
     url = await storePrivateBlob(id, bytes, contentType, "portal/headshots")
   } catch {
-    return fail("The private file store did not accept this photo. Try again, or call MS Workforce on " + MS_PHONE + ".")
+    return fail("The private file store did not accept this photo. Try again, or " + contactAsk() + ".")
   }
   await ctx.store.blobs.save({
     id,

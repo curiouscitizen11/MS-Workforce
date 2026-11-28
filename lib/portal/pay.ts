@@ -1,6 +1,5 @@
 import { addDays, daysBetween, formatLongDate, instantInSydney, isThursday, parseCalendarDate, sydneyParts } from "@/lib/portal/dates"
 
-export const MS_PHONE = "0435 842 164"
 /** A Thursday. Each pay week runs from this weekday to the next Wednesday. */
 export const DEFAULT_PAY_ANCHOR = "2026-11-05"
 

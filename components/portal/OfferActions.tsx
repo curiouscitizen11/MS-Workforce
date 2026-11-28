@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { answerOffer } from "@/app/portal/actions"
+import { CONTACT_LINE, JOBS_MAILTO } from "@/lib/portal/business-phone"
 
 export function OfferActions({ offerId, blocked }: { offerId: string; blocked?: string }) {
   const router = useRouter()
@@ -25,9 +26,19 @@ export function OfferActions({ offerId, blocked }: { offerId: string; blocked?: 
   }
 
   if (blocked) {
+    const linked = blocked.startsWith(CONTACT_LINE)
     return (
       <p role="alert" className="rounded-2xl bg-[#FEE2E2] px-4 py-3 text-sm font-semibold text-[#B91C1C]">
-        {blocked}
+        {linked ? (
+          <>
+            <a className="underline" href={JOBS_MAILTO}>
+              {CONTACT_LINE}
+            </a>
+            {blocked.slice(CONTACT_LINE.length)}
+          </>
+        ) : (
+          blocked
+        )}
       </p>
     )
   }

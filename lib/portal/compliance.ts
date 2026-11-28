@@ -1,3 +1,4 @@
+import { contactSentence } from "@/lib/portal/business-phone"
 import { daysBetween } from "@/lib/portal/dates"
 import { TICKET_LABELS, TICKET_TYPES, type TicketType } from "@/lib/portal/types"
 
@@ -142,7 +143,7 @@ export function canAcceptShift(input: {
     return {
       ok: false,
       code: "do-not-book",
-      message: "Call MS Workforce on 0435 842 164. DO NOT BOOK. " + assessment.reasons.join(". ") + ".",
+      message: contactSentence() + ". DO NOT BOOK. " + assessment.reasons.join(". ") + ".",
     }
   }
   const required = Array.from(new Set<TicketType>(["whiteCard", ...input.required]))
@@ -152,7 +153,7 @@ export function canAcceptShift(input: {
       return {
         ok: false,
         code: "ticket",
-        message: "Call MS Workforce on 0435 842 164. " + TICKET_LABELS[type] + " is not valid on the job date.",
+        message: contactSentence() + ". " + TICKET_LABELS[type] + " is not valid on the job date.",
       }
     }
   }

@@ -8,6 +8,7 @@ import { signedFilePath, stripJpegExif, verifyFileToken } from "@/lib/portal/fil
 import { breakChoiceProblem, formatHours, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
 import { payRunWeek, payWeek, sydneyInstant, weekContaining, xeroCsv } from "@/lib/portal/pay"
 import { QUESTIONS, scoreAnswers } from "@/lib/portal/induction"
+import { WHAT_TO_BRING } from "@/lib/portal/seed"
 import { toNotionProperties } from "@/lib/portal/notion/map"
 import { sensitiveFindings } from "@/lib/portal/privacy"
 import { retryAfterMs, createRateGate } from "@/lib/portal/rate-limit"
@@ -176,6 +177,25 @@ describe("hours, privacy, induction and file links", () => {
     expect(sensitiveFindings("BSB 062-000")).toContain("bsb")
     expect(sensitiveFindings("bank account later")).toContain("bank-or-super")
     expect(sensitiveFindings("Call me on 0400111222")).toEqual([])
+  })
+
+  it("states the current PPE and lateness answers, with no nickname or phone number", () => {
+    const ppe = QUESTIONS.find((question) => question.id === "q5")
+    const late = QUESTIONS.find((question) => question.id === "q7")
+    if (!ppe || !late) throw new Error("quiz")
+    expect(ppe.options[ppe.correctIndex]).toBe(
+      "I bring my own boots and hi-vis. They are checked at induction. MS Workforce supplies any missing or site-specific PPE free.",
+    )
+    expect(late.options[late.correctIndex]).toBe("Contact MS Workforce and the site supervisor before start time")
+    const text = JSON.stringify(QUESTIONS)
+    expect(text).not.toMatch(/\bMav\b/)
+    expect(text).not.toMatch(/\b04\d{2}\b/)
+    expect(text).not.toMatch(/\+61/)
+    expect(WHAT_TO_BRING).toBe(
+      "Bring your own boots and hi-vis. They are checked at induction. MS Workforce supplies any missing or site-specific PPE free.",
+    )
+    expect(WHAT_TO_BRING).not.toMatch(/\bMav\b/)
+    expect(WHAT_TO_BRING).not.toMatch(/\b04\d{2}\b/)
   })
 
   it("scores the induction the same way as the live quiz", () => {

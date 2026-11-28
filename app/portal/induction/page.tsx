@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { InductionForm } from "@/components/portal/InductionForm"
 import { Heading } from "@/components/portal/ui"
 import { INDUCTION_FITNESS_LINE } from "@/lib/portal/fitness"
-import { publicQuiz } from "@/lib/portal/induction"
+import { INDUCTION_VERSION, publicQuiz } from "@/lib/portal/induction"
 import { requireUser } from "@/lib/portal/session"
 import Link from "next/link"
 
@@ -33,7 +33,7 @@ export default async function InductionPage() {
   }
   return (
     <div className="space-y-4">
-      <Heading kicker="Induction" title="Safety basics v1.0" text="Read each question and tap the answer. You can try again." />
+      <Heading kicker="Induction" title={"Safety basics " + INDUCTION_VERSION} text="Read each question and tap the answer. You can try again." />
       <InductionForm questions={publicQuiz()} name={worker.name} />
     </div>
   )

@@ -46,7 +46,8 @@ import {
   slotsFromWorker,
 } from "@/lib/portal/ticket-photos"
 import { breakChoiceProblem, formatHours, hoursSignStamp, hoursWarnings, onQuarterHour, paidHours } from "@/lib/portal/hours"
-import { MS_PHONE, olderThanDays, payWeek, timesheetIsSigned, timesheetReminder, weekContaining } from "@/lib/portal/pay"
+import { contactAsk, contactSentence } from "@/lib/portal/business-phone"
+import { olderThanDays, payWeek, timesheetIsSigned, timesheetReminder, weekContaining } from "@/lib/portal/pay"
 import { randomInt } from "crypto"
 import { newId, sha256 } from "@/lib/portal/id"
 import { INDUCTION_VERSION, scoreAnswers } from "@/lib/portal/induction"
@@ -243,7 +244,7 @@ export async function requestOtp(ctx: Ctx, input: { mobile: string; ip: string }
   if (!mobile) return fail("Enter an Australian mobile, like 0400 000 000.")
   const worker = await findWorkerByMobile(ctx, mobile)
   if (!worker) return fail("That mobile is not on file. Apply for work first.", "unknown")
-  if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  if (worker.status === "Inactive") return fail("This account is inactive. " + contactSentence() + ".")
   if (ctx.mode === "live" && !twilioReady()) return fail("Log in with the code we email you.")
   return issueOtp(ctx, mobile, "sms", input.ip, (code) => ctx.notify.sms(mobile, loginSms(code), "Login code sent"))
 }
@@ -262,10 +263,10 @@ export async function requestEmailOtp(ctx: Ctx, input: { email: string; ip: stri
   if (problem) return fail(emailError(problem))
   const email = normaliseEmail(input.email)
   const matches = await findWorkersByEmail(ctx, email)
-  if (matches.length > 1) return fail("Call MS Workforce on " + MS_PHONE + ".")
+  if (matches.length > 1) return fail(contactSentence() + ".")
   const worker = matches[0]
   if (!worker) return fail("That email is not on file. Apply for work first.", "unknown")
-  if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  if (worker.status === "Inactive") return fail("This account is inactive. " + contactSentence() + ".")
   return issueOtp(ctx, email, "email", input.ip, (code) => deliverEmailCode(ctx, email, code))
 }
 
@@ -293,7 +294,7 @@ export async function verifyOtp(ctx: Ctx, input: { mobile: string; code: string 
   const consumed = await consumeOtp(ctx, mobile, input.code)
   if (!consumed.ok) return consumed
   const worker = await findWorkerByMobile(ctx, mobile)
-  if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  if (!worker || worker.status === "Inactive") return fail("This account is inactive. " + contactSentence() + ".")
   if (worker.role === "admin") return { ok: true as const, needsTotp: true as const, workerId: worker.id }
   const session = await openSession(ctx, worker)
   return { ok: true as const, needsTotp: false as const, session }
@@ -307,7 +308,7 @@ export async function verifyEmailOtp(ctx: Ctx, input: { email: string; code: str
   if (!consumed.ok) return consumed
   const matches = await findWorkersByEmail(ctx, email)
   const worker = matches.length === 1 ? matches[0] : null
-  if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  if (!worker || worker.status === "Inactive") return fail("This account is inactive. " + contactSentence() + ".")
   if (worker.role === "admin") return { ok: true as const, needsTotp: true as const, workerId: worker.id }
   const session = await openSession(ctx, worker)
   return { ok: true as const, needsTotp: false as const, session }
@@ -352,7 +353,7 @@ export async function requestMagicLink(ctx: Ctx, input: { email: string; confirm
   if (!worker) {
     return fail(twilioReady() ? "That email is not on file. Try your mobile instead." : "That email is not on file. Apply for work first.", "unknown")
   }
-  if (worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  if (worker.status === "Inactive") return fail("This account is inactive. " + contactSentence() + ".")
   const token = newId("magic") + newId()
   await ctx.store.magics.save({
     id: sha256(token),
@@ -376,7 +377,7 @@ export async function consumeMagicLink(ctx: Ctx, token: string) {
   row.usedAt = ctx.now.toISOString()
   await ctx.store.magics.save(row)
   const worker = await ctx.store.workers.get(row.workerId)
-  if (!worker || worker.status === "Inactive") return fail("This account is inactive. Call MS Workforce on " + MS_PHONE + ".")
+  if (!worker || worker.status === "Inactive") return fail("This account is inactive. " + contactSentence() + ".")
   if (worker.role === "admin") return { ok: true as const, needsTotp: true as const, workerId: worker.id }
   const session = await openSession(ctx, worker)
   return { ok: true as const, needsTotp: false as const, session }
@@ -991,7 +992,7 @@ export async function saveTicketPhoto(
   try {
     url = await storePrivateBlob(id, bytes, contentType)
   } catch {
-    return fail("The private file store did not accept this photo. Try again, or call MS Workforce on " + MS_PHONE + ".")
+    return fail("The private file store did not accept this photo. Try again, or " + contactAsk() + ".")
   }
   await deleteLicencePhotos(ctx, workerId, input.licenceKey, workerId, "Replaced by a new " + input.side + " photo.", input.side)
   await ctx.store.blobs.save({
@@ -1176,7 +1177,7 @@ export async function respondToOffer(
   if (Date.parse(offer.expiresAt) < ctx.now.getTime()) {
     offer.status = "Expired"
     await ctx.store.offers.save(offer)
-    return fail("This offer has expired. Call MS Workforce on " + MS_PHONE + " if you still want the shift.")
+    return fail("This offer has expired. " + contactSentence() + " if you still want the shift.")
   }
   const worker = await ctx.store.workers.get(input.workerId)
   if (!worker) return fail("Log in again.")
@@ -1245,7 +1246,7 @@ export async function submitTimesheet(
   if (offer.shiftDate !== input.workDate) return fail("Choose the shift for that day.")
   const today = sydneyToday(ctx.now)
   if (input.workDate > today) return fail("That date has not happened yet.")
-  if (olderThanDays(input.workDate, today, 7)) return fail("Please call MS Workforce on " + MS_PHONE)
+  if (olderThanDays(input.workDate, today, 7)) return fail("Please " + contactAsk())
   const worker = await ctx.store.workers.get(input.workerId)
   if (!worker) return fail("Log in again.")
   if (worker.status !== "Ready") return fail("Waiting for approval. MS Workforce will call within 2 business days.")
@@ -1295,7 +1296,7 @@ export async function submitTimesheet(
     (sheet) => sheet.workerId === input.workerId && sheet.placementRef === offer.placementRef && sheet.workDate === input.workDate,
   )
   if (existing?.status === "Approved") {
-    return fail("These hours are approved for pay. Call MS Workforce on " + MS_PHONE + ".")
+    return fail("These hours are approved for pay. " + contactSentence() + ".")
   }
   const nextBreakStart = breakMinutes === 0 ? "" : input.breakStart?.trim() || ""
   const stamp = hoursSignStamp({ start: input.start, finish: input.finish, breakMinutes, breakStart: nextBreakStart })

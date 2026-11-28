@@ -3,6 +3,7 @@ import { OfferActions } from "@/components/portal/OfferActions"
 import { WaitingForApproval } from "@/components/portal/Waiting"
 import { DemoBanner, Heading, StatusChip, badgeLevel } from "@/components/portal/ui"
 import { isMock } from "@/lib/portal/config"
+import { contactSentence } from "@/lib/portal/business-phone"
 import { asTicketInputs, canAcceptShift } from "@/lib/portal/compliance"
 import { formatDate, formatTime } from "@/lib/portal/dates"
 import { TICKET_LABELS } from "@/lib/portal/types"
@@ -28,7 +29,7 @@ export default async function OfferPage({ params }: { params: { id: string } }) 
   const owner = worker.role === "admin" ? await store.workers.get(offer.workerId) : worker
   const check = owner
     ? canAcceptShift({ tickets: asTicketInputs(owner.tickets), jobDate: offer.shiftDate, required: offer.requiredTickets })
-    : { ok: false as const, message: "Call MS Workforce." }
+    : { ok: false as const, message: contactSentence() + "." }
   const showAddress = offer.status === "Accepted"
   return (
     <div className="space-y-4">
